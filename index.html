@@ -659,6 +659,12 @@ html.dark .major-hero{background:linear-gradient(135deg,#22304d,#1a2540)}
 .cal-d{aspect-ratio:1; display:flex; align-items:center; justify-content:center; border-radius:8px; font-size:13px; background:var(--bg); border:1px solid transparent}
 .cal-d.ck{background:var(--slight); color:var(--success); border-color:var(--success); font-weight:700}
 .cal-d.today{border-color:var(--primary); color:var(--primary); font-weight:700}
+/* 补打卡：可补打日期（虚线可点）与已补打日期（虚线勾） */
+.cal-d.can-mk{border:1px dashed var(--border); color:var(--text3); cursor:pointer; transition:background .15s,border-color .15s,color .15s}
+.cal-d.can-mk:hover{background:var(--slight); border-color:var(--success); color:var(--success)}
+.cal-d.mk{background:var(--slight); color:var(--success); border:1px dashed var(--success); font-weight:700}
+.ck-tip{margin-top:10px; font-size:12px; color:var(--text3); line-height:1.6}
+.ck-tip b{color:var(--success); font-weight:700}
 /* 番茄钟:圆形主体 + 圈内小按钮 + 绕环文字(细线) */
 .pomo{position:fixed; right:18px; bottom:18px; z-index:200; width:96px; height:96px; cursor:grab; user-select:none; touch-action:none; background:transparent; border:none; box-shadow:none; transition:width .25s ease, height .25s ease}
 .pomo.dragging{cursor:grabbing}
@@ -699,6 +705,100 @@ html.dark .major-hero{background:linear-gradient(135deg,#22304d,#1a2540)}
   .course-item{white-space:nowrap} .hero .cd-num{font-size:34px}
 }
 @media(max-width:560px){ .g2,.g3{grid-template-columns:1fr} .cards-grid{grid-template-columns:1fr} .nav-cd{display:none} }
+
+/* ================= 响应式：一套 CSS 适配电脑 / 平板 / 手机 ================= */
+html{-webkit-text-size-adjust:100%; text-size-adjust:100%}
+body{overflow-x:clip; overflow-wrap:break-word}
+img,svg,video,iframe{max-width:100%; height:auto}
+/* 宽表格一律可横向滑动（无溢出时不显示滚动条，不影响桌面观感） */
+.note-table-wrap{overflow-x:auto; -webkit-overflow-scrolling:touch}
+
+@media (max-width:1024px){
+  .container{padding:18px 14px 60px}
+  .nav-inner{padding:0 12px}
+  .major-tbl,table.tb,.books-tbl,.topup-tbl,.courses-tbl,.sched-period-tbl{
+    display:block; width:100%; max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch;
+  }
+}
+
+@media (max-width:768px){
+  /* 顶部导航：横向滑动，高度保持 56px 以配合 sticky 偏移 */
+  .nav-inner{overflow-x:auto; overflow-y:visible; flex-wrap:nowrap; -webkit-overflow-scrolling:touch; scrollbar-width:none}
+  .nav-inner::-webkit-scrollbar{display:none}
+  .logo{font-size:16px; margin-right:8px}
+  .nav-btn{padding:8px 10px; font-size:13px}
+  /* 下拉菜单改为浮层，避免被导航横向滚动容器裁切 */
+  .nav-dropdown-menu{position:fixed; top:58px; left:8px; right:8px; width:auto; min-width:0; max-height:70vh; overflow-y:auto; box-shadow:0 12px 32px rgba(15,23,42,.18)}
+  .nav-dropdown-item{white-space:normal}
+
+  /* 首页 hero */
+  .hero{padding:14px 16px; gap:12px}
+  .hero .cd-block{margin-left:0}
+  .hero .cd-num{font-size:44px}
+  .hero-info{flex:1 1 100%; min-width:0; margin-left:0}
+  .hero-info #cdDetail,.hero-info #regTip{white-space:normal}
+  /* 手机端隐藏右侧黄历日历：占面积过大，仅保留倒计时 */
+  .hero-cal{display:none}
+
+  /* 复习备考：侧栏与章节导航 */
+  .study-layout{gap:12px}
+  .study-side{max-height:none; overflow:visible; position:static}
+  #chList{max-height:196px; overflow-y:auto; -webkit-overflow-scrolling:touch}
+  .sub-tabs{flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none}
+  .sub-tabs::-webkit-scrollbar{display:none}
+  .sub-tab{flex:0 0 auto}
+
+  /* 考点速记：标题与四个板块按钮改为上下排布 */
+  .od-cover.memo-cover{flex-direction:column; align-items:stretch}
+  .od-cover.memo-cover .memo-tabs{max-width:100%; justify-content:flex-start}
+  .memo-tab{padding:6px 12px; font-size:12.5px}
+  .od-cover{padding:14px 16px 12px}
+  .od-cover h2{font-size:16px}
+
+  /* 表格：可横向滑动，不再被裁切/撑破页面 */
+  .note-table-wrap{overflow-x:auto; -webkit-overflow-scrolling:touch}
+  .note-table{font-size:12px}
+  .note-table th,.note-table td{padding:7px 8px}
+  .major-tbl,table.tb,.books-tbl,.topup-tbl,.courses-tbl,.sched-period-tbl{
+    display:block; width:100%; max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch;
+  }
+  .courses-tbl th:nth-child(2),.courses-tbl td:nth-child(2){min-width:200px; max-width:200px; width:200px}
+
+  /* 表单：16px 防止 iOS 聚焦时自动放大 */
+  input,select,textarea{font-size:16px}
+  .dialog{padding:18px 16px; max-height:86vh; border-radius:12px}
+  .exam-timer{top:58px; padding:8px 12px; font-size:15px}
+  .pomo{right:10px; bottom:10px}
+  /* 触控目标 */
+  .nav-btn,.stab,.sub-tab,.memo-tab,.icon-btn{min-height:36px}
+  .q-opt{padding:10px 13px}
+}
+
+@media (max-width:480px){
+  .container{padding:14px 12px 56px}
+  .nav-inner{padding:0 10px; gap:2px}
+  .nav-btn{padding:7px 8px; font-size:12.5px}
+  .hero{padding:12px 14px}
+  .hero .cd-num{font-size:34px}
+  .hero .cd-unit{font-size:15px}
+  .g2,.g3,.g4{grid-template-columns:1fr}
+  .cards-grid{grid-template-columns:1fr}
+  .major-info-grid{grid-template-columns:repeat(2,1fr)}
+  .note-table{font-size:11.5px}
+  .note-table th,.note-table td{padding:6px}
+  .cal{gap:4px}
+  .cal-d{font-size:12px}
+  .q-opt{padding:9px 12px; font-size:13px}
+  .pomo{right:8px; bottom:8px}
+}
+
+/* 横屏矮屏（手机横放）：压缩纵向留白 */
+@media (max-height:520px) and (orientation:landscape){
+  .hero{padding:10px 14px}
+  .hero .cd-num{font-size:32px}
+  .study-side{max-height:none}
+  #chList{max-height:150px}
+}
 </style>
 </head>
 <body>
@@ -1038,6 +1138,7 @@ html.dark .major-hero{background:linear-gradient(135deg,#22304d,#1a2540)}
     <div class="card">
       <h3>📅 学习打卡 <span class="muted" style="font-weight:400" id="ckStreak"></span></h3>
       <div class="cal" id="calendar"></div>
+      <div class="ck-tip" id="ckMakeupTip"></div>
       <button class="btn btn-p" style="margin-top:12px" id="ckBtn" onclick="doCheckin()">今日打卡</button>
     </div>
     <div class="card">
@@ -2251,22 +2352,35 @@ function addTask(){
 }
 function toggleTask(id){ const tasks=store.get('tasks',[]); const t=tasks.find(x=>x.id===id); if(t){t.done=!t.done; store.set('tasks',tasks); renderTasks()} }
 function delTask(id){ store.set('tasks',store.get('tasks',[]).filter(t=>t.id!==id)); renderTasks(); renderHome() }
-/* --- 学习打卡 --- */
+/* --- 学习打卡（含每月 3 次补打卡） --- */
+const MAKEUP_LIMIT=3;                       // 每月补打卡上限
+function monthKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0') }
+function fmtDate(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0') }
+function makeupUsed(mk){ const m=store.get('checkins_makeup',{}); return m[mk]||0 }
 function renderCalendar(){
   const cks=store.get('checkins',[]);
+  const mkDays=store.get('checkins_makeup_days',[]);   // 被补打的日期列表
   const now=new Date(), y=now.getFullYear(), m=now.getMonth();
+  const mk=monthKey(now), used=makeupUsed(mk), left=Math.max(0,MAKEUP_LIMIT-used);
   const first=new Date(y,m,1), days=new Date(y,m+1,0).getDate();
   let html=['一','二','三','四','五','六','日'].map(d=>`<div class="cal-h">${d}</div>`).join('');
   for(let i=0;i<(first.getDay()+6)%7;i++) html+='<div></div>';
   for(let d=1;d<=days;d++){
     const k=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-    html+=`<div class="cal-d${cks.includes(k)?' ck':''}${k===today()?' today':''}">${cks.includes(k)?'✓':d}</div>`;
+    const done=cks.includes(k), isMk=mkDays.includes(k);
+    const canMk=!done && left>0 && k<today();          // 过去的、未打卡的、还有次数
+    const cls='cal-d'+(done?(isMk?' ck mk':' ck'):'')+(k===today()?' today':'')+(canMk?' can-mk':'');
+    html+=`<div class="${cls}"${canMk?` title="补打卡 ${d} 日" onclick="doMakeup('${k}')"`:''}>${done?'✓':d}</div>`;
   }
   $('#calendar').innerHTML=html;
   let streak=0, dd=new Date();
   if(!cks.includes(today())) dd.setDate(dd.getDate()-1);
   while(cks.includes(dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0'))){ streak++; dd.setDate(dd.getDate()-1) }
   $('#ckStreak').textContent=`已连续 ${streak} 天`;
+  const tip=$('#ckMakeupTip');
+  if(tip) tip.innerHTML=left>0
+    ? `本月补打卡剩余 <b>${left}</b> / ${MAKEUP_LIMIT} 次 · 点击当月空格子可补打（已用 ${used} 次）`
+    : `本月补打卡已用完（${MAKEUP_LIMIT}/${MAKEUP_LIMIT} 次），下月自动重置`;
   $('#ckBtn').textContent=cks.includes(today())?'今日已打卡 ✓':'今日打卡';
   $('#ckBtn').disabled=cks.includes(today());
 }
@@ -2274,6 +2388,22 @@ function doCheckin(){
   const cks=store.get('checkins',[]);
   if(!cks.includes(today())){ cks.push(today()); store.set('checkins',cks); toast('打卡成功，继续保持！') }
   renderCalendar(); renderHome();
+}
+/* 补打卡：仅限当月过去的日期，每月 3 次 */
+function doMakeup(k){
+  const now=new Date(), mk=monthKey(now);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(k)) return;
+  if(k.slice(0,7)!==mk) return toast('只能补打本月的日期');
+  if(k>=today()) return toast('未来的日期不能补打卡');
+  const cks=store.get('checkins',[]);
+  if(cks.includes(k)) return toast('这一天已经打过卡了');
+  const used=store.get('checkins_makeup',{});
+  if((used[mk]||0)>=MAKEUP_LIMIT) return toast(`本月 ${MAKEUP_LIMIT} 次补打卡已用完`);
+  cks.push(k); store.set('checkins',cks);
+  used[mk]=(used[mk]||0)+1; store.set('checkins_makeup',used);
+  const mkDays=store.get('checkins_makeup_days',[]); mkDays.push(k); store.set('checkins_makeup_days',mkDays);
+  renderCalendar(); renderHome();
+  toast(`已补打卡 ${k}（本月还剩 ${MAKEUP_LIMIT-used[mk]} 次）`);
 }
 /* --- 报考计划 --- */
 function renderPlan(){
@@ -2399,7 +2529,7 @@ function renderStudyAnalysis(){
   `;
 }
 /* --- 数据备份 --- */
-const DATA_KEYS=['scores','tasks','checkins','plan','study_log','wrong_chapter','wrong_exam','quiz_stats','favs','pomo_total','pomo_log'];
+const DATA_KEYS=['scores','tasks','checkins','checkins_makeup','checkins_makeup_days','plan','study_log','wrong_chapter','wrong_exam','quiz_stats','favs','pomo_total','pomo_log'];
 function exportData(){
   const data={}; DATA_KEYS.forEach(k=>data[k]=store.get(k,null));
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
