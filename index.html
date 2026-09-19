@@ -775,10 +775,12 @@ img,svg,video,iframe{max-width:100%; height:auto}
   .nav-dropdown-menu{position:fixed; top:58px; left:8px; right:8px; width:auto; min-width:0; max-height:70vh; overflow-y:auto; box-shadow:0 12px 32px rgba(15,23,42,.18)}
   .nav-dropdown-item{white-space:normal}
 
-  /* 首页 hero */
+  /* 首页 hero - 手机端倒计时居中放大（PC 端不动） */
   .hero{padding:14px 16px; gap:12px}
-  .hero .cd-block{margin-left:0}
-  .hero .cd-num{font-size:44px}
+  .hero .cd-block{margin-left:0; align-items:center; text-align:center; width:100%}
+  .hero .cd-wrap{justify-content:center}
+  .hero .cd-num{font-size:132px; line-height:1}
+  .hero .cd-label{text-align:center}
   .hero-info{flex:1 1 100%; min-width:0; margin-left:0}
   .hero-info #cdDetail,.hero-info #regTip{white-space:normal}
   /* 手机端隐藏右侧黄历日历：占面积过大，仅保留倒计时 */
@@ -833,7 +835,7 @@ img,svg,video,iframe{max-width:100%; height:auto}
   .nav-inner{padding:0 10px; gap:2px}
   .nav-btn{padding:7px 8px; font-size:12.5px}
   .hero{padding:12px 14px}
-  .hero .cd-num{font-size:34px}
+  .hero .cd-num{font-size:102px; line-height:1}
   .hero .cd-unit{font-size:15px}
   .g2,.g3,.g4{grid-template-columns:1fr}
   .cards-grid{grid-template-columns:1fr}
@@ -849,7 +851,7 @@ img,svg,video,iframe{max-width:100%; height:auto}
 /* 横屏矮屏（手机横放）：压缩纵向留白 */
 @media (max-height:520px) and (orientation:landscape){
   .hero{padding:10px 14px}
-  .hero .cd-num{font-size:32px}
+  .hero .cd-num{font-size:96px; line-height:1}
   .study-side{max-height:none}
   #chList{max-height:150px}
 }
@@ -976,7 +978,7 @@ html.custom body{background:var(--custom-bg,#eef2f8) center/cover no-repeat fixe
   </div>
   <div class="grid g2">
     <div class="card">
-      <h3>📊 学习热力图（近 6 个月）</h3>
+      <h3 id="heatmapTitle">📊 学习热力图（近 6 个月）</h3>
       <div class="heatmap" id="heatmap"></div>
       <div class="hm-legend"><span>少</span><span class="hm-cell"></span><span class="hm-cell hm-1"></span><span class="hm-cell hm-2"></span><span class="hm-cell hm-3"></span><span class="hm-cell hm-4"></span><span>多</span><span style="margin-left:10px">做题/番茄钟自动记录时长</span></div>
     </div>
@@ -2258,12 +2260,14 @@ function renderHome(){
   let week=0;
   for(let i=0;i<=dow;i++){ const dd=new Date(now); dd.setDate(now.getDate()-i); const k=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0'); week+=log[k]||0 }
   $('#stWeek').textContent=week;
-  // 热力图（近6个自然月，每月一块：星期在上、按当月起始星期偏移排格）
+  // 热力图：PC 展示近 6 个月；手机端仅展示最近 3 个月（不影响 PC 端）
+  const hmMonths = (window.matchMedia && window.matchMedia('(max-width:768px)').matches) ? 3 : 6;
+  const hmTitle = $('#heatmapTitle'); if (hmTitle) hmTitle.textContent = '📊 学习热力图（近 '+hmMonths+' 个月）';
   const hm=$('#heatmap'); hm.innerHTML='';
   const todayD=new Date();
   const dayNames=['一','二','三','四','五','六','日'];
   let blocks='';
-  for(let m=5;m>=0;m--){
+  for(let m=hmMonths-1;m>=0;m--){
     const d0=new Date(todayD.getFullYear(), todayD.getMonth()-m, 1);
     const y=d0.getFullYear(), mo=d0.getMonth();
     const startCol=(d0.getDay()+6)%7;
