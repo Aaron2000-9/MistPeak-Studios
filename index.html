@@ -34,6 +34,8 @@ a{color:var(--primary); text-decoration:none}
 .nav-right{margin-left:auto; display:flex; align-items:center; gap:10px}
 .nav-cd{font-size:13px; color:var(--warning); background:var(--wlight); padding:4px 10px; border-radius:20px; white-space:nowrap}
 .icon-btn{border:1px solid var(--border); background:var(--card); color:var(--text2); width:34px; height:34px; border-radius:8px; font-size:15px}
+/* 手机端底部 Tab 栏（桌面端隐藏，仅在 ≤768px 媒体查询中显示） */
+.bottom-tabbar{display:none}
 /* 官网平台·下拉菜单 */
 .nav-dropdown{position:relative}
 .nav-dropdown-trigger::after{content:"▾"; margin-left:5px; font-size:10px; opacity:.6; display:inline-block; transform:translateY(-1px)}
@@ -214,6 +216,12 @@ html.dark .hm-1{background:#1d3a6e} html.dark .hm-2{background:#2a5298} html.dar
 .ct-政治课{background:var(--wlight); color:var(--warning)}
 .ct-文化基础课{background:var(--slight); color:var(--success)}
 .ct-专业课{background:var(--plight); color:var(--primary)}
+/* 复习备考 · 左侧课程搜索 */
+.course-search{position:relative; margin:2px 0 8px}
+.course-search input{width:100%; box-sizing:border-box; padding:7px 26px 7px 10px; border:1px solid var(--border); border-radius:8px; font-size:12.5px; background:var(--bg); color:var(--text); outline:none; transition:border-color .15s}
+.course-search input:focus{border-color:var(--primary); box-shadow:0 0 0 2px var(--plight)}
+.course-search .cs-clear{display:none; position:absolute; right:5px; top:50%; transform:translateY(-50%); border:none; background:none; color:var(--text3); cursor:pointer; font-size:13px; line-height:1; padding:3px 5px}
+.course-search .cs-clear:hover{color:var(--text)}
 .course-banner{background:linear-gradient(135deg,#1a56db,#0f3fa8); color:#fff; border-radius:var(--radius); padding:20px 26px; margin-bottom:14px}
 html.dark .course-banner{background:linear-gradient(135deg,#22304d,#1a2540)}
 .course-banner h3{font-size:20px; margin-bottom:4px}
@@ -356,6 +364,34 @@ html.dark .study-intro .si-hero{background:linear-gradient(135deg,#22304d,#1a254
 .study-intro .si-cta .si-cta-b{background:#fff; color:var(--primary); padding:9px 18px; border-radius:9px; font-size:13.5px; font-weight:700; text-decoration:none; white-space:nowrap; cursor:pointer; border:none}
 .study-intro .si-cta .si-cta-b:hover{background:#f0f4ff}
 .study-intro .si-note{background:var(--wlight); border-left:3px solid var(--warning); padding:10px 14px; border-radius:0 8px 8px 0; margin:10px 0; font-size:12.5px; color:var(--text2); line-height:1.7}
+
+/* 手机端：复习备考引导文章自适应 —— 只上下滑动，不出现左右滚动（PC 端不受影响） */
+@media (max-width:768px){
+  .study-main{overflow-x:hidden}
+  .study-intro{padding:14px 14px 24px}
+  .study-intro .si-hero{padding:16px 14px; border-radius:12px}
+  .study-intro .si-hero h2{font-size:17.5px; line-height:1.45}
+  .study-intro .si-hero p{font-size:12.5px; line-height:1.7}
+  .study-intro .si-cnt{gap:6px; margin-top:12px}
+  .study-intro .si-cnt b{padding:4px 10px; font-size:11.5px}
+  .study-intro .si-grid{grid-template-columns:repeat(2,1fr); gap:9px; margin-bottom:16px}
+  .study-intro .si-box{padding:11px 8px}
+  .study-intro .si-box .si-ico{font-size:22px}
+  .study-intro .si-h{font-size:14.5px; margin:18px 0 8px}
+  .study-intro .si-p{font-size:13px}
+  .study-intro .si-list{font-size:13px; padding-left:18px}
+  /* 人群对照表变卡片：每行一张卡、字段名前置，彻底消灭横向滚动 */
+  .study-intro table.si-table{display:block; background:transparent; box-shadow:none; margin:4px 0 10px}
+  .study-intro table.si-table thead{display:none}
+  .study-intro table.si-table tbody{display:block; width:100%}
+  .study-intro table.si-table tr{display:block; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:2px 12px; margin:10px 0}
+  .study-intro table.si-table td{display:flex; align-items:flex-start; gap:10px; padding:7px 0; border-bottom:1px dashed var(--border); font-size:12.5px; line-height:1.6}
+  .study-intro table.si-table td:last-child{border-bottom:none}
+  .study-intro table.si-table td::before{content:attr(data-l); flex:none; width:6em; font-weight:600; color:var(--text3); font-size:12px; padding-top:1px}
+  .study-intro .si-cta{padding:14px 16px}
+  .study-intro .si-cta .si-cta-t{min-width:0; flex:1 1 100%}
+  .study-intro .si-cta .si-cta-b{width:100%}
+}
 
 /* 停止注册专业 · 侧栏红色徽标 + 红色细线 */
 .major-cat-stopped .major-cat-title{color:#b91c1c}
@@ -912,10 +948,20 @@ img,svg,video,iframe{max-width:100%; height:auto}
   /* 触控目标 */
   .nav-btn,.stab,.sub-tab,.memo-tab,.icon-btn{min-height:36px}
   .q-opt{padding:10px 13px}
+  /* 手机端底部 Tab 栏：首页/专业信息/复习备考/我的学习 移到底部；顶部保留新手指南/专业查询/官网平台/🌙/⚙️ */
+  .nav-main{display:none}
+  .bottom-tabbar{display:flex; position:fixed; left:0; right:0; bottom:0; z-index:200; height:54px; padding-bottom:env(safe-area-inset-bottom); background:var(--card); border-top:1px solid var(--border); box-shadow:0 -2px 12px rgba(15,23,42,.08)}
+  .bottom-tabbar .btab{flex:1; border:none; background:none; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; cursor:pointer; color:var(--text3); padding:4px 0}
+  .bottom-tabbar .btab .bi{font-size:20px; line-height:1}
+  .bottom-tabbar .btab .bl{font-size:11px; line-height:1.2}
+  .bottom-tabbar .btab.active{color:var(--primary); font-weight:600}
+  .bottom-tabbar .btab.active .bi{transform:translateY(-1px)}
+  .container{padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+  .pomo{right:10px; bottom:64px}
 }
 
 @media (max-width:480px){
-  .container{padding:14px 12px 56px}
+  .container{padding:14px 12px calc(72px + env(safe-area-inset-bottom))}
   .nav-inner{padding:0 10px; gap:2px}
   .nav-btn{padding:7px 8px; font-size:12.5px}
   .hero{padding:12px 14px}
@@ -929,7 +975,7 @@ img,svg,video,iframe{max-width:100%; height:auto}
   .cal{gap:4px}
   .cal-d{font-size:12px}
   .q-opt{padding:9px 12px; font-size:13px}
-  .pomo{right:8px; bottom:8px}
+  .pomo{right:8px; bottom:62px}
 }
 
 /* 横屏矮屏（手机横放）：压缩纵向留白 */
@@ -1015,11 +1061,11 @@ html.custom{--card:rgba(255,255,255,.8)}
 <nav class="topnav">
   <div class="nav-inner">
     <span class="logo" onclick="go('home')">工商管理</span>
-    <button class="nav-btn active" data-page="home">首页</button>
+    <button class="nav-btn nav-main active" data-page="home">首页</button>
     <button class="nav-btn" data-page="guide">新手指南</button>
-    <button class="nav-btn" data-page="major">专业信息</button>
-    <button class="nav-btn" data-page="study">复习备考</button>
-    <button class="nav-btn" data-page="my">我的学习</button>
+    <button class="nav-btn nav-main" data-page="major">专业信息</button>
+    <button class="nav-btn nav-main" data-page="study">复习备考</button>
+    <button class="nav-btn nav-main" data-page="my">我的学习</button>
     <div class="nav-dropdown" id="navPlatform">
       <button class="nav-btn nav-dropdown-trigger" type="button" aria-haspopup="true" aria-expanded="false" title="查看官方网站 / 平台">官网平台</button>
       <div class="nav-dropdown-menu" role="menu">
@@ -1036,6 +1082,14 @@ html.custom{--card:rgba(255,255,255,.8)}
       <button class="icon-btn" id="settingBtn" title="设置">⚙️</button>
     </div>
   </div>
+</nav>
+
+<!-- 手机端底部导航（仅 ≤768px 显示，PC 端隐藏） -->
+<nav class="bottom-tabbar" id="bottomTabbar">
+  <button class="btab" data-page="home"><span class="bi">🏠</span><span class="bl">首页</span></button>
+  <button class="btab" data-page="major"><span class="bi">📋</span><span class="bl">专业信息</span></button>
+  <button class="btab" data-page="study"><span class="bi">📚</span><span class="bl">复习备考</span></button>
+  <button class="btab" data-page="my"><span class="bi">👤</span><span class="bl">我的学习</span></button>
 </nav>
 
 <main class="container">
@@ -1240,6 +1294,10 @@ html.custom{--card:rgba(255,255,255,.8)}
   <div class="study-layout">
     <aside class="study-side">
       <div class="card" style="padding:10px 12px;margin-bottom:10px">
+        <div class="course-search">
+          <input id="courseSearch" type="text" placeholder="搜索课程名称或代码" autocomplete="off" oninput="filterCourseList()">
+          <button class="cs-clear" id="csClear" type="button" title="清空" onclick="clearCourseSearch()">✕</button>
+        </div>
         <div class="side-group">政治课（必修）</div>
         <div class="course-list" id="clPol"></div>
         <div class="side-group">文化基础课（必修）</div>
@@ -1248,6 +1306,7 @@ html.custom{--card:rgba(255,255,255,.8)}
         <div class="course-list" id="clPro"></div>
         <div class="side-group">专业课（选修 · 6选4）</div>
         <div class="course-list" id="clOpt"></div>
+        <p class="small" id="clEmpty" style="display:none;padding:6px 8px 2px;color:var(--text3)">没有匹配的课程，换个关键词试试</p>
       </div>
       <div class="card" style="padding:10px 12px">
         <div class="side-group">章节导航</div>
@@ -1577,6 +1636,7 @@ function go(page,sub){
   $$('.page').forEach(p=>p.classList.remove('active'));
   $('#page-'+page).classList.add('active');
   $$('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
+  $$('.btab').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
   window.scrollTo(0,0);
   if(page==='my') renderMy();
   if(page==='settings') renderSettings();
@@ -1585,6 +1645,9 @@ function go(page,sub){
   if(page==='settings') renderSettings();
 }
 $$('.nav-btn').forEach(b=>{ if(b.dataset.page) b.onclick=()=>go(b.dataset.page) });
+$$('.btab').forEach(b=>{ if(b.dataset.page) b.onclick=()=>go(b.dataset.page) });
+/* 底部 Tab 栏：首屏初始高亮同步 */
+(function(){ const cur=document.querySelector('.page.active'); const p=cur?cur.id.replace('page-',''):'home'; $$('.btab').forEach(b=>b.classList.toggle('active',b.dataset.page===p)) })();
 
 /* 官网平台·下拉菜单:点击触发器开/关,点击外部/点击菜单项后关闭 */
 (function(){
@@ -11297,6 +11360,31 @@ function renderCourseList(){
   markCourseActive();
   renderCourseBanner();
 }
+/* 左侧课程搜索：按课程名称 / 代码过滤，空分组连同标题一起隐藏 */
+function filterCourseList(){
+  const inp=$('#courseSearch'); if(!inp) return;
+  const q=(inp.value||'').trim().toLowerCase();
+  const clearBtn=$('#csClear'); if(clearBtn) clearBtn.style.display=q?'block':'none';
+  let any=false;
+  ['clPol','clCul','clPro','clOpt'].forEach(id=>{
+    const list=document.getElementById(id); if(!list) return;
+    const head=list.previousElementSibling;
+    let n=0;
+    list.querySelectorAll('.course-item').forEach(el=>{
+      const hit=!q||el.textContent.toLowerCase().indexOf(q)>=0;
+      el.style.display=hit?'':'none'; if(hit)n++;
+    });
+    const show=n>0;
+    list.style.display=show?'':'none';
+    if(head&&head.classList.contains('side-group')) head.style.display=show?'':'none';
+    if(show)any=true;
+  });
+  const tip=$('#clEmpty'); if(tip) tip.style.display=any?'none':'block';
+}
+function clearCourseSearch(){
+  const inp=$('#courseSearch'); if(inp) inp.value='';
+  filterCourseList();
+}
 function renderCourseBanner(){
   const c=courseOf(curCourse);
   if(!c){ $('#courseBanner').innerHTML=''; return }
@@ -11489,14 +11577,14 @@ function showStudyIntro(){
     </ul>
 
     <div class="si-h"><span class="si-num">3</span>一年该报几门？不同人群对号入座</div>
-    <p class="si-p">没有「标准答案」，关键看你每天能拿出多少整块时间、基础如何、目标多急。下面 four 类人群可直接套用：</p>
+    <p class="si-p">没有「标准答案」，关键看你每天能拿出多少整块时间、基础如何、目标多急。下面四类人群可直接套用：</p>
     <table class="si-table">
       <thead><tr><th>人群</th><th>特征</th><th>一年建议通过</th><th>每次报考</th><th>学习节奏</th><th>核心策略</th></tr></thead>
       <tbody>
-        <tr><td><span class="si-tag fast">🚀 冲刺拿证</span></td><td>时间充裕、自律强、急于拿证 / 评职称</td><td><b>8–10 门</b><br>（约 1–1.5 年）</td><td>每次 3–4 门</td><td>2 门并行、滚动复习</td><td>公共课 + 低难度专业课打底，真题猛刷</td></tr>
-        <tr><td><span class="si-tag steady">💼 在职稳妥</span></td><td>工作忙、基础中等、求稳为主</td><td><b>4–6 门</b><br>（约 2 年）</td><td>每次 2–3 门</td><td>工作日晚 1h + 周末半天</td><td>先易后难，公共课先行</td></tr>
-        <tr><td><span class="si-tag weak">🐢 零基础起步</span></td><td>离校久、记忆吃力、基础薄弱</td><td><b>2–4 门</b><br>（2.5–3 年）</td><td>每次 1–2 门</td><td>慢工出细活，重理解</td><td>死磕大纲 + 笔记，不贪多</td></tr>
-        <tr><td><span class="si-tag busy">👶 碎片时间党</span></td><td>宝妈 / 加班多，整块时间少</td><td><b>3–5 门</b><br>（约 2 年）</td><td>每次 1–2 门</td><td>通勤等碎片时间利用</td><td>考点速记卡片 + 错题循环</td></tr>
+        <tr><td data-l="人群"><span class="si-tag fast">🚀 冲刺拿证</span></td><td data-l="特征">时间充裕、自律强、急于拿证 / 评职称</td><td data-l="一年建议通过"><b>8–10 门</b><br>（约 1–1.5 年）</td><td data-l="每次报考">每次 3–4 门</td><td data-l="学习节奏">2 门并行、滚动复习</td><td data-l="核心策略">公共课 + 低难度专业课打底，真题猛刷</td></tr>
+        <tr><td data-l="人群"><span class="si-tag steady">💼 在职稳妥</span></td><td data-l="特征">工作忙、基础中等、求稳为主</td><td data-l="一年建议通过"><b>4–6 门</b><br>（约 2 年）</td><td data-l="每次报考">每次 2–3 门</td><td data-l="学习节奏">工作日晚 1h + 周末半天</td><td data-l="核心策略">先易后难，公共课先行</td></tr>
+        <tr><td data-l="人群"><span class="si-tag weak">🐢 零基础起步</span></td><td data-l="特征">离校久、记忆吃力、基础薄弱</td><td data-l="一年建议通过"><b>2–4 门</b><br>（2.5–3 年）</td><td data-l="每次报考">每次 1–2 门</td><td data-l="学习节奏">慢工出细活，重理解</td><td data-l="核心策略">死磕大纲 + 笔记，不贪多</td></tr>
+        <tr><td data-l="人群"><span class="si-tag busy">👶 碎片时间党</span></td><td data-l="特征">宝妈 / 加班多，整块时间少</td><td data-l="一年建议通过"><b>3–5 门</b><br>（约 2 年）</td><td data-l="每次报考">每次 1–2 门</td><td data-l="学习节奏">通勤等碎片时间利用</td><td data-l="核心策略">考点速记卡片 + 错题循环</td></tr>
       </tbody>
     </table>
 
