@@ -549,6 +549,9 @@ html.dark .mod-hd{background:linear-gradient(135deg,#22304d,#1a2540)}
 .mod-anno{margin-top:12px; display:flex; align-items:center; justify-content:center; gap:6px; padding:12px; border:1px dashed var(--border); border-radius:12px; font-size:13px; color:var(--text2); cursor:pointer; background:var(--card)}
 /* 手机端内容层顶部的「返回卡片」条（PC 端不出现） */
 #modBackBar{display:none; align-items:center; gap:6px; font-size:13px; font-weight:700; color:var(--primary); background:var(--plight); border-radius:9px; padding:9px 12px; margin-bottom:10px; cursor:pointer; -webkit-tap-highlight-color:transparent}
+#modBackBar .mbb-ar{flex:none; font-weight:700}
+#modBackBar .mbb-nm{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+#modBackBar .mbb-t{flex:none; font-size:11.5px; font-weight:600; color:var(--text3)}
 
 /* ===== 专业查询模块 ===== */
 .major-layout{display:flex; gap:16px; align-items:flex-start}
@@ -1280,23 +1283,36 @@ img,svg,video,iframe{max-width:100%; height:auto}
   .hero-cal{display:none}
 
   /* 复习备考：侧栏与章节导航 */
-  .study-layout{gap:12px}
-  .study-side{max-height:none; overflow:visible; position:static}
-  #chList{max-height:196px; overflow-y:auto; -webkit-overflow-scrolling:touch}
-  /* 科目缩写：手机端侧栏只显示 short，隐藏全称与分类标签，横滑距离大幅缩短 */
+  /* 科目缩写：手机端侧栏只显示 short，隐藏全称与分类标签 */
   .cn-full{display:none}
   .cn-short{display:inline}
   .course-item .ct{display:none}
-  /* 侧栏紧凑化：搜索框 / 分组标题 / 章节导航（与章节胶囊重复）全部收起，
-     4 组课程用 display:contents 合并成一条横滑带，17 门课一屏滑完 */
-  .side-courses{display:flex !important; overflow-x:auto; gap:5px; align-items:center; padding:8px 10px !important; margin-bottom:8px !important; -webkit-overflow-scrolling:touch; scrollbar-width:none}
-  .side-courses::-webkit-scrollbar{display:none}
+
+  /* 复习备考：手机端左右分栏 —— 左侧竖排科目缩写（全程保留，随时换科），右侧卡片/内容。
+     原实现是「顶部横滑带 + 下方全宽内容」，改成左侧竖列后右侧宽度约 284px。 */
+  .study-layout{flex-direction:row !important; align-items:flex-start !important; gap:8px}
+  .study-side{
+    width:82px !important; flex:0 0 82px !important;
+    position:sticky; top:62px;
+    max-height:calc(100vh - 126px); overflow-y:auto; overflow-x:hidden;
+    -webkit-overflow-scrolling:touch; scrollbar-width:none;
+  }
+  .study-side::-webkit-scrollbar{display:none}
+  #chList{max-height:196px; overflow-y:auto; -webkit-overflow-scrolling:touch}
+  /* 科目带竖排：搜索框 / 分组标题 / 章节导航（与章节胶囊重复）全部收起，
+     4 组课程用 display:contents 合并成一列，17 门课一列排下、独立滚动 */
+  .side-courses{display:flex !important; flex-direction:column; gap:3px; align-items:stretch; padding:5px !important; margin-bottom:0 !important; overflow:visible}
   .side-courses .course-search,
   .side-courses .side-group,
-  .side-courses #clEmpty{display:none !important}
+  .side-courses #clEmpty,
+  .side-courses .course-item .tag{display:none !important}
   .side-courses .course-list{display:contents}
-  .side-courses .course-item{flex:0 0 auto; padding:6px 10px; background:var(--bg); border:1px solid var(--border)}
-  .side-courses .course-item.active{border-color:var(--primary)}
+  .side-courses .course-item{flex:0 0 auto; width:100%; box-sizing:border-box; padding:8px 2px !important; gap:0;
+    justify-content:center; text-align:center; border-radius:9px; font-size:12px; line-height:1.2;
+    background:var(--bg); border:1px solid var(--border)}
+  .side-courses .course-item .cn-short{display:block; white-space:nowrap; overflow:visible}
+  .side-courses .course-item .cc{display:none}
+  .side-courses .course-item.active{border-color:var(--primary); background:var(--plight); font-weight:700}
   .side-chaps{display:none !important}
   /* 科目卡片层：手机上固定 2 列 */
   .mod-grid{grid-template-columns:repeat(2,1fr); gap:9px}
@@ -16832,15 +16848,24 @@ async function switchTab(tab){
 $$('.stab').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
 function syncStudyChrome(){
   const tabs=document.getElementById('studyTabs');
+  const nar=isNarrowScreen();
   /* 手机端卡片层不显示子标签栏（否则一层导航变两层）；PC 端逻辑不变 */
-  const cardView = !!curCourse && studyView==='cards' && isNarrowScreen();
+  const cardView = !!curCourse && studyView==='cards' && nar;
   if(tabs) tabs.style.display = (curCourse && !cardView) ? '' : 'none';
-  /* 手机端内容层顶部给一个回卡片的入口 */
+  /* 手机端内容层顶部给一个回卡片的入口，条上带科目全称（替代原来的蓝色横幅） */
   const bb=document.getElementById('modBackBar');
-  if(bb) bb.style.display = (curCourse && !cardView && isNarrowScreen()) ? 'flex' : 'none';
-  /* 卡片层自带头部（科目全称+代码+学分+返回），课程横幅不再重复；未选课时也不留空蓝条 */
+  if(bb){
+    const on = !!curCourse && !cardView && nar;
+    bb.style.display = on ? 'flex' : 'none';
+    if(on){
+      const c=COURSES.find(x=>x.code===curCourse);
+      bb.innerHTML='<span class="mbb-ar">←</span><span class="mbb-nm">'+esc(c?c.name:curCourse)+'</span><span class="mbb-t">全部模块</span>';
+    }
+  }
+  /* 手机端科目列已高亮当前科目 + 返回条带全称，蓝色横幅全程不再重复显示；
+     卡片层自带头部；未选课时也不留空蓝条。PC 端逻辑不变。 */
   const bn=document.getElementById('courseBanner');
-  if(bn) bn.style.display = (!curCourse||cardView) ? 'none' : '';
+  if(bn) bn.style.display = (!curCourse||cardView||nar) ? 'none' : '';
 }
 function isNarrowScreen(){ try{ return window.matchMedia('(max-width:768px)').matches }catch(e){ return false } }
 function renderStudyContent(){
@@ -16973,7 +16998,7 @@ function showStudyIntro(){
   box.innerHTML=`<div class="study-intro">
     <div class="si-hero">
       <h2>📚 复习备考 · 怎么学才能又快又好拿下证书</h2>
-      <p>这个模块汇总了本专业的全部课程与备考资料：每门课都配套 <b>考试大纲 / 题型分析 / 学习笔记 / 考点速记 / 思维导图 / 题库 / 错题本 / 学习分析</b>。手机端顶部（电脑端为左侧）把全部课程按<b>简称</b>排成一条，先<b>选一门课</b>，再从模块卡片里<b>选一个模块</b>，才进入具体内容。下面先讲清楚两件事：① 这个模块怎么用；② 不同基础的人，一年该报几门、怎么排计划。</p>
+      <p>这个模块汇总了本专业的全部课程与备考资料：每门课都配套 <b>考试大纲 / 题型分析 / 学习笔记 / 考点速记 / 思维导图 / 题库 / 错题本 / 学习分析</b>。<b>左侧</b>把全部课程按<b>简称</b>排成一列，先<b>点一门课</b>，再从模块卡片里<b>选一个模块</b>，才进入具体内容；学到一半想换课，左侧科目列随时都在。下面先讲清楚两件事：① 这个模块怎么用；② 不同基础的人，一年该报几门、怎么排计划。</p>
       <div class="si-cnt">
         <b>📋 共 ${total} 门课程</b>
         <b>✅ 必修 ${req} 门</b>
@@ -18627,6 +18652,7 @@ function rdBuild(){
   if(m&&m.classList.contains('on')) rdListHtml();
   return rdItems.length>0;
 }
+function rdLabel(t){ t=String(t||'').replace(/\s+/g,' ').trim(); return t.length>16? t.slice(0,16)+'…' : t }
 function rdSync(force){
   if(rdTick&&!force) return;
   rdItems=rdItems||[];
@@ -18658,7 +18684,7 @@ function rdSync(force){
     for(let i=0;i<rdItems.length;i++){ if(rdItems[i].el.getBoundingClientRect().top<=120) k=i }
     if(k!==rdCur||!pill.classList.contains('on')){
       rdCur=k;
-      if(txt) txt.textContent=rdItems[k].txt;
+      if(txt) txt.textContent=rdLabel(rdItems[k].txt);
       if(pill) pill.classList.add('on');
     }
   });
@@ -18688,7 +18714,7 @@ function rdJump(i){
   const y=it.el.getBoundingClientRect().top+window.scrollY-104;
   try{ window.scrollTo({top:y, behavior:'smooth'}) }catch(e){ window.scrollTo(0,y) }
   rdCur=i;
-  const t=$('#rdPillTxt'); if(t) t.textContent=it.txt;
+  const t=$('#rdPillTxt'); if(t) t.textContent=rdLabel(it.txt);
 }
 window.addEventListener('scroll',()=>rdSync(),{passive:true});
 window.addEventListener('resize',()=>{
