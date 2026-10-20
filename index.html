@@ -525,6 +525,31 @@ html.dark .course-banner{background:linear-gradient(135deg,#22304d,#1a2540)}
 .study-main{flex:1; min-width:0}
 .study-tabs{display:flex; gap:2px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:5px; margin-bottom:16px; flex-wrap:wrap; position:sticky; top:66px; z-index:50}
 
+/* ===== 科目缩写（手机端侧栏只显示 short，PC 显示全称） ===== */
+.cn-short{display:none}
+
+/* ===== 手机端三级导航：科目卡片层 ===== */
+.mod-wrap{animation:modIn .18s ease both}
+@keyframes modIn{from{opacity:0; transform:translateY(6px)}to{opacity:1; transform:none}}
+.mod-hd{background:linear-gradient(135deg,#1a56db,#0f3fa8); color:#fff; border-radius:var(--radius); padding:16px 18px; margin-bottom:14px}
+html.dark .mod-hd{background:linear-gradient(135deg,#22304d,#1a2540)}
+.mod-hd h3{font-size:17px; margin-bottom:5px; line-height:1.35}
+.mod-hd .mod-hd-sub{font-size:12px; opacity:.88; line-height:1.6}
+.mod-hd .mod-hd-back{display:inline-flex; align-items:center; gap:4px; font-size:12px; opacity:.9; margin-bottom:9px; cursor:pointer; background:rgba(255,255,255,.16); border:none; color:#fff; padding:4px 10px; border-radius:20px}
+.mod-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px}
+.mod-card{background:var(--card); border:1px solid var(--border); border-radius:12px; padding:13px 12px; cursor:pointer; position:relative; transition:border-color .15s, transform .1s; min-height:92px; display:flex; flex-direction:column; -webkit-tap-highlight-color:transparent}
+.mod-card:active{transform:scale(.975); border-color:var(--primary)}
+.mod-card.dis{opacity:.45; cursor:not-allowed}
+.mod-card.dis:active{transform:none; border-color:var(--border)}
+.mod-ic{font-size:19px; line-height:1; margin-bottom:9px}
+.mod-nm{font-size:13.5px; font-weight:700; color:var(--text); margin-bottom:5px}
+.mod-ds{font-size:11.5px; color:var(--text3); line-height:1.5; margin-top:auto}
+.mod-ds b{color:var(--primary); font-weight:700}
+.mod-flag{position:absolute; top:9px; right:10px; font-size:10px; padding:1px 6px; border-radius:8px; background:var(--plight); color:var(--primary); font-weight:700}
+.mod-anno{margin-top:12px; display:flex; align-items:center; justify-content:center; gap:6px; padding:12px; border:1px dashed var(--border); border-radius:12px; font-size:13px; color:var(--text2); cursor:pointer; background:var(--card)}
+/* 手机端内容层顶部的「返回卡片」条（PC 端不出现） */
+#modBackBar{display:none; align-items:center; gap:6px; font-size:13px; font-weight:700; color:var(--primary); background:var(--plight); border-radius:9px; padding:9px 12px; margin-bottom:10px; cursor:pointer; -webkit-tap-highlight-color:transparent}
+
 /* ===== 专业查询模块 ===== */
 .major-layout{display:flex; gap:16px; align-items:flex-start}
 .major-side{width:300px; flex-shrink:0; position:sticky; top:76px; max-height:calc(100vh - 96px); overflow-y:auto; background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:10px 12px}
@@ -1258,6 +1283,33 @@ img,svg,video,iframe{max-width:100%; height:auto}
   .study-layout{gap:12px}
   .study-side{max-height:none; overflow:visible; position:static}
   #chList{max-height:196px; overflow-y:auto; -webkit-overflow-scrolling:touch}
+  /* 科目缩写：手机端侧栏只显示 short，隐藏全称与分类标签，横滑距离大幅缩短 */
+  .cn-full{display:none}
+  .cn-short{display:inline}
+  .course-item .ct{display:none}
+  /* 侧栏紧凑化：搜索框 / 分组标题 / 章节导航（与章节胶囊重复）全部收起，
+     4 组课程用 display:contents 合并成一条横滑带，17 门课一屏滑完 */
+  .side-courses{display:flex !important; overflow-x:auto; gap:5px; align-items:center; padding:8px 10px !important; margin-bottom:8px !important; -webkit-overflow-scrolling:touch; scrollbar-width:none}
+  .side-courses::-webkit-scrollbar{display:none}
+  .side-courses .course-search,
+  .side-courses .side-group,
+  .side-courses #clEmpty{display:none !important}
+  .side-courses .course-list{display:contents}
+  .side-courses .course-item{flex:0 0 auto; padding:6px 10px; background:var(--bg); border:1px solid var(--border)}
+  .side-courses .course-item.active{border-color:var(--primary)}
+  .side-chaps{display:none !important}
+  /* 科目卡片层：手机上固定 2 列 */
+  .mod-grid{grid-template-columns:repeat(2,1fr); gap:9px}
+  .mod-card{min-height:88px; padding:12px 11px}
+  .mod-hd{padding:14px 15px}
+  .mod-hd h3{font-size:16px}
+  /* 子标签栏：单行横滑 + 真正吸顶。
+     原 .study-main{overflow-x:hidden} 会让 study-main 变成滚动容器，使内部 sticky 失效；
+     改用 clip（不创建滚动容器）后 sticky 才会相对视口吸附。top 与顶导航 56px 对齐。 */
+  .study-main{overflow-x:clip}
+  .study-tabs{flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; top:56px; padding:4px}
+  .study-tabs::-webkit-scrollbar{display:none}
+  .stab{flex:0 0 auto; white-space:nowrap}
   .sub-tabs{flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex:0 0 auto}
@@ -1580,6 +1632,42 @@ html.dark .t3-oo span.ok{color:#5ddc8b}
   .t3-d>summary{font-size:12.5px; padding:8px 10px}
   .t3-dbody{padding:9px 10px 11px}
 }
+
+/* ================= 长文档阅读定位：顶部进度条 + 章节悬浮胶囊 ================= */
+#rdBar{position:fixed; left:0; top:0; height:3px; width:0; background:var(--primary); z-index:180;
+  pointer-events:none; opacity:0; transition:width .12s linear, opacity .2s}
+#rdBar.on{opacity:.85}
+#rdPill{position:fixed; left:12px; bottom:calc(66px + env(safe-area-inset-bottom)); z-index:180;
+  display:none; align-items:center; gap:7px; max-width:calc(100vw - 92px);
+  padding:8px 13px; border-radius:20px; border:1px solid var(--border); background:var(--card);
+  box-shadow:0 4px 16px rgba(15,23,42,.18); cursor:pointer; -webkit-tap-highlight-color:transparent}
+#rdPill .rd-ico{font-size:12px; flex:none; color:var(--primary); line-height:1}
+#rdPill .rd-t{font-size:12.5px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+#rdPill .rd-ar{font-size:10px; color:var(--text3); flex:none}
+#rdMask{position:fixed; inset:0; z-index:1700; background:rgba(15,23,42,.45); display:none}
+#rdMask.on{display:block}
+#rdSheet{position:absolute; left:0; right:0; bottom:0; max-height:74vh; background:var(--card);
+  border-radius:16px 16px 0 0; display:flex; flex-direction:column; padding-bottom:env(safe-area-inset-bottom)}
+.rd-sheet-hd{display:flex; align-items:center; gap:8px; padding:14px 16px 11px; flex:none;
+  border-bottom:1px solid var(--border); font-size:14px; font-weight:700; color:var(--text)}
+.rd-sheet-hd .rd-cnt{font-size:11.5px; font-weight:400; color:var(--text3)}
+.rd-sheet-hd .rd-x{margin-left:auto; border:none; background:none; font-size:15px; color:var(--text3); padding:2px 6px; cursor:pointer}
+#rdList{overflow-y:auto; -webkit-overflow-scrolling:touch; padding:6px 8px 16px}
+.rd-item{display:flex; align-items:center; gap:9px; padding:12px; border-radius:9px;
+  font-size:13.5px; color:var(--text2); cursor:pointer; line-height:1.45}
+.rd-item:active{background:var(--bg)}
+.rd-item.cur{background:var(--plight); color:var(--primary); font-weight:700}
+.rd-item .rd-n{flex:none; min-width:22px; font-size:11px; color:var(--text3); font-variant-numeric:tabular-nums}
+.rd-item.cur .rd-n{color:var(--primary)}
+.rd-item.lv0{font-weight:700; color:var(--text); padding-left:8px; margin-top:2px}
+.rd-item.lv0 .rd-n{min-width:0; width:0}
+.rd-empty{padding:24px 16px; text-align:center; color:var(--text3); font-size:13px; line-height:1.7}
+html.dark #rdPill{box-shadow:0 4px 16px rgba(0,0,0,.42)}
+@media (max-width:768px){
+  #rdPill.on{display:inline-flex}
+  /* 手机端去掉思维导图：窄屏下缩略图整张只能缩到 20%，节点文字不可辨认 */
+  .stab[data-tab="mindmap"]{display:none}
+}
 </style>
 </head>
 <body>
@@ -1807,7 +1895,7 @@ html.dark .t3-oo span.ok{color:#5ddc8b}
 <section class="page" id="page-study">
   <div class="study-layout">
     <aside class="study-side">
-      <div class="card" style="padding:10px 12px;margin-bottom:10px">
+      <div class="card side-courses" style="padding:10px 12px;margin-bottom:10px">
         <div class="course-search">
           <input id="courseSearch" type="text" placeholder="搜索课程名称或代码" autocomplete="off" oninput="filterCourseList()">
           <button class="cs-clear" id="csClear" type="button" title="清空" onclick="clearCourseSearch()">✕</button>
@@ -1822,13 +1910,14 @@ html.dark .t3-oo span.ok{color:#5ddc8b}
         <div class="course-list" id="clOpt"></div>
         <p class="small" id="clEmpty" style="display:none;padding:6px 8px 2px;color:var(--text3)">没有匹配的课程，换个关键词试试</p>
       </div>
-      <div class="card" style="padding:10px 12px">
+      <div class="card side-chaps" style="padding:10px 12px">
         <div class="side-group">章节导航</div>
         <div id="chList"><p class="small" style="padding:4px 8px">先选择课程</p></div>
       </div>
     </aside>
     <div class="study-main">
       <div class="course-banner" id="courseBanner"></div>
+      <div id="modBackBar" onclick="modBackToCards()">← 全部模块</div>
       <div class="study-tabs" id="studyTabs">
         <button class="stab active" data-tab="outline">考试大纲</button>
         <button class="stab" data-tab="analysis">题型分析</button>
@@ -1843,6 +1932,20 @@ html.dark .t3-oo span.ok{color:#5ddc8b}
     </div>
   </div>
 </section>
+
+<!-- 长文档定位：顶部阅读进度条 + 手机端章节悬浮胶囊 + 目录抽屉 -->
+<div id="rdBar"></div>
+<div id="rdPill" onclick="rdOpen()" role="button" tabindex="0" aria-label="打开章节目录">
+  <i class="rd-ico">📖</i><span class="rd-t" id="rdPillTxt">目录</span><i class="rd-ar">▴</i>
+</div>
+<div id="rdMask" onclick="rdClose()">
+  <div id="rdSheet" onclick="event.stopPropagation()">
+    <div class="rd-sheet-hd">目录<span class="rd-cnt" id="rdCnt"></span>
+      <button class="rd-x" type="button" onclick="rdClose()" aria-label="关闭">✕</button>
+    </div>
+    <div id="rdList"></div>
+  </div>
+</div>
 
 <!-- ============ 专业查询 ============ -->
 <section class="page" id="page-majors">
@@ -16550,6 +16653,8 @@ const MAJOR_BOOKS = {
 };
 /* ================= 复习备考模块 ================= */
 let curCourse=null, curTab='outline', qzSub='chapter', qz=null, wrongBook='wrong_chapter';
+/* 手机端三级导航当前所在层：'cards' = 模块卡片层，'content' = 具体内容层（PC 端恒为 content） */
+var studyView='content';
 function isPractice(code){ const s=STUDY[code]; return s&&s.note }
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]] } return a }
 
@@ -16558,7 +16663,7 @@ function catTag(c){
   return `<span class="ct ${m[c.cat]||'ct-专业课'}">${c.cat}</span>`;
 }
 function renderCourseList(){
-  const item=c=>`<div class="course-item" data-code="${c.code}" onclick="selectCourse('${c.code}')"><span class="cc">${c.code}</span><span class="cn">${c.name}${isPractice(c.code)?' <span class="tag tag-o" style="font-size:10px">实践</span>':''}</span>${catTag(c)}</div>`;
+  const item=c=>`<div class="course-item" data-code="${c.code}" onclick="selectCourse('${c.code}')"><span class="cc">${c.code}</span><span class="cn"><span class="cn-full">${c.name}</span><span class="cn-short">${c.short||c.code}</span>${isPractice(c.code)?' <span class="tag tag-o" style="font-size:10px">实践</span>':''}</span>${catTag(c)}</div>`;
   $('#clPol').innerHTML=COURSES.filter(c=>c.cat==='政治课'&&c.req).map(item).join('');
   $('#clCul').innerHTML=COURSES.filter(c=>c.cat==='文化基础课'&&c.req).map(item).join('');
   $('#clPro').innerHTML=COURSES.filter(c=>c.cat==='专业课'&&c.req).map(item).join('');
@@ -16613,7 +16718,11 @@ function renderCourseBanner(){
 function markCourseActive(){ $$('.course-item').forEach(el=>el.classList.toggle('active',el.dataset.code===curCourse)) }
 async function selectCourse(code){
   if(qz&&qz.mode!=='chapter'&&!qz.submitted){ if(!await uiConfirm({title:'考试正在进行',detail:'切换课程将自动交卷，已作答的内容会立即判分。',ok:'交卷并切换'})) return; submitExam(true) }
-  qz=null; curCourse=code; markCourseActive(); renderCourseBanner(); renderChapters(); renderStudyContent();
+  qz=null; curCourse=code;
+  /* 手机端三级导航：选完科目先落到「模块卡片」层，PC 端保持直接进内容 */
+  if(isNarrowScreen()) studyView='cards';
+  markCourseActive(); renderCourseBanner(); renderChapters(); renderStudyContent();
+  rdKey=''; setTimeout(()=>rdSync(true),80);
 }
 // 章节名显示规范：「第X章」与后接标题之间补一个空格（已有空格或后接标点的不动）；仅显示层，不改数据
 function chSp(t){ return typeof t==='string' ? t.replace(/^(第\s*[0-9一二三四五六七八九十百]+\s*章)(?=[^\s章）)。，、；：！？])/, '$1 ') : t }
@@ -16714,17 +16823,36 @@ async function switchTab(tab){
   }
   if(tab!=='quiz'&&qz&&(qz.mode==='chapter'||qz.mode==='review')) endChapter(true);
   curTab=tab;
+  /* 手机端从卡片层进入内容层（PC 端不受影响） */
+  if(isNarrowScreen()) studyView='content';
   $$('.stab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
   renderStudyContent();
+  rdKey=''; rdSync(true);
 }
 $$('.stab').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
 function syncStudyChrome(){
   const tabs=document.getElementById('studyTabs');
-  if(tabs) tabs.style.display = curCourse ? '' : 'none';
+  /* 手机端卡片层不显示子标签栏（否则一层导航变两层）；PC 端逻辑不变 */
+  const cardView = !!curCourse && studyView==='cards' && isNarrowScreen();
+  if(tabs) tabs.style.display = (curCourse && !cardView) ? '' : 'none';
+  /* 手机端内容层顶部给一个回卡片的入口 */
+  const bb=document.getElementById('modBackBar');
+  if(bb) bb.style.display = (curCourse && !cardView && isNarrowScreen()) ? 'flex' : 'none';
+  /* 卡片层自带头部（科目全称+代码+学分+返回），课程横幅不再重复；未选课时也不留空蓝条 */
+  const bn=document.getElementById('courseBanner');
+  if(bn) bn.style.display = (!curCourse||cardView) ? 'none' : '';
 }
+function isNarrowScreen(){ try{ return window.matchMedia('(max-width:768px)').matches }catch(e){ return false } }
 function renderStudyContent(){
   syncStudyChrome();
   if(!curCourse){ showStudyIntro(); return; }
+  /* 手机端卡片层：选完科目先看模块卡片，点卡片才进具体内容 */
+  if(studyView==='cards'&&isNarrowScreen()) return renderModuleCards();
+  /* 手机端不提供思维导图（tab 已隐藏），若从其它入口进来则回落到学习笔记 */
+  if(curTab==='mindmap'&&isNarrowScreen()){
+    curTab='notes';
+    $$('.stab').forEach(b=>b.classList.toggle('active',b.dataset.tab==='notes'));
+  }
   const c=courseOf(curCourse), s=STUDY[curCourse], box=$('#studyContent');
   if(curTab==='wrong') return renderWrong();
   if(curTab==='report') return renderReport();
@@ -16743,8 +16871,96 @@ function renderStudyContent(){
   if(curTab==='quiz') return renderQuizHome();
 }
 
+/* ---- 手机端三级导航第 2 层：科目 → 模块卡片 ----
+   替代原来那一排子标签栏：一次只呈现「这门课有哪些模块、各有多少内容」，
+   点卡片才进第 3 层内容。PC 端不走这条路径。 */
+function modTrunc(t,n){ t=String(t||'').replace(/[▸▾]/g,'').trim(); return t.length>n?t.slice(0,n)+'…':t }
+/* 书签文字压成「第X章/第X节」这种最短形态，卡片副标题一行放得下 */
+function modMark(t){
+  t=String(t||'').replace(/[▸▾]/g,'').trim();
+  const m=t.match(/^第\s*[0-9一二三四五六七八九十百]+\s*[章节]/);
+  return m?m[0].replace(/\s+/g,''):modTrunc(t,6);
+}
+function modLen(v){
+  try{
+    if(!v) return 0;
+    const t=(typeof v==='string')?v:JSON.stringify(v);
+    return t.replace(/<[^>]+>/g,'').length;
+  }catch(e){ return 0 }
+}
+function renderModuleCards(){
+  const box=$('#studyContent'); if(!box||!curCourse) return;
+  const c=courseOf(curCourse)||{name:curCourse,code:curCourse,cat:'',req:true,credit:'',type:''};
+  const s=STUDY[curCourse]||{};
+  const bank=BANK[curCourse]||[], past=(PAST[curCourse]||[]).length;
+  const marks=(store.get('read_marks',{})||{})[curCourse]||{};
+  const qst=(store.get('quiz_stats',{})||{})[curCourse]||{total:0,right:0};
+  const acc=qst.total?Math.round(qst.right/qst.total*100):0;
+  const wrongN=(store.get('wrong_chapter',[])||[]).concat(store.get('wrong_exam',[])||[]).filter(w=>w&&w.course===curCourse).length;
+  const chs=chapsOf(curCourse)||[];
+  const isPrac=isPractice(curCourse)||!!s.note;
+
+  const mk=(tab,ic,nm,dsv,dis,flag)=>{
+    const attr=dis?'':' onclick="modOpen(\''+tab+'\')"';
+    return '<div class="mod-card'+(dis?' dis':'')+'"'+attr+'>'
+      +(flag?'<span class="mod-flag">'+flag+'</span>':'')
+      +'<div class="mod-ic">'+ic+'</div><div class="mod-nm">'+nm+'</div>'
+      +'<div class="mod-ds">'+dsv+'</div></div>';
+  };
+
+  const outDs = s.docs ? (chs.length+' 章 · 掌握程度分级') : (chs.length+' 章 · 要点分级');
+  const outFlag = marks.outline ? '读到' : '';
+  const noteLen = modLen(s.notes);
+  const noteDs = (noteLen?('约 '+(noteLen/10000).toFixed(1)+' 万字'):'完整背诵版')+(marks.notes?(' · <b>'+esc(modMark(marks.notes.t))+'</b>'):'');
+  const memoN = Array.isArray(s.memo)?s.memo.length:0;
+  const memoTxt = memoN?(memoN+' 个板块'):'暂无速记';
+
+  let h='<div class="mod-wrap">';
+  h+='<div class="mod-hd">'
+    +'<button class="mod-hd-back" onclick="modBack()">← 返回文章</button>'
+    +'<h3>'+esc(c.name)+'</h3>'
+    +'<div class="mod-hd-sub">课程代码 '+esc(c.code)+' · '+esc(c.cat)+(c.req?'（必修）':'（选修 · 6选4）')+' · '+esc(String(c.credit))+' 学分 · '+esc(c.type)+'考核</div>'
+    +'</div>';
+  h+='<div class="mod-grid">';
+  h+=mk('outline','📋','考试大纲',outDs,false,outFlag);
+  h+=mk('analysis','📊','题型分析',past?('历年分值 · '+past+' 套真题'):'历年分值分布',isPrac);
+  h+=mk('notes','📖','学习笔记',noteDs,false);
+  h+=mk('cards','🧠','考点速记',memoTxt,!memoN);
+  if(!isNarrowScreen()) h+=mk('mindmap','🗺️','思维导图',(s.map?'全书结构导图':'暂无导图'),!s.map);
+  h+=mk('quiz','✍️','题库',bank.length?(bank.length+' 题'+(qst.total?(' · 正确率 '+acc+'%'):'')):'暂无题库',!bank.length);
+  h+=mk('wrong','❌','错题本',wrongN?(wrongN+' 道待复习'):'暂无错题',false,wrongN?'待复习':'');
+  h+=mk('report','📈','学习分析','掌握度 · 复习建议');
+  h+='</div>';
+  h+='<div class="mod-anno" onclick="openAnnoCenter()">📝 批注中心 · 查看本页全部批注</div>';
+  h+='</div>';
+  box.innerHTML=h;
+}
+/* 点卡片 → 进第 3 层内容层 */
+function modOpen(tab){
+  if(tab==='mindmap'&&isNarrowScreen()){ toast('思维导图请在电脑端查看'); return }
+  studyView='content';
+  switchTab(tab);
+  setTimeout(function(){
+    const el=$('#studyContent'); if(!el) return;
+    window.scrollTo(0, el.getBoundingClientRect().top+window.scrollY-58);
+  },50);
+}
+/* 卡片层顶部「返回文章」→ 回第 1 层 */
+function modBack(){
+  studyView='content';
+  showStudyIntro();
+  window.scrollTo(0,0);
+}
+/* 内容层顶部「← 全部模块」→ 回卡片层 */
+function modBackToCards(){
+  studyView='cards';
+  renderStudyContent();
+  window.scrollTo(0,0);
+}
+
 /* ---- 复习备考默认引导文章（点进页面先看这篇，再选课） ---- */
 function showStudyIntro(){
+  studyView='content';
   curCourse=null; markCourseActive(); renderCourseBanner(); renderChapters(); syncStudyChrome();
   const box=$('#studyContent'); if(!box) return;
   const total=COURSES.length;
@@ -16757,7 +16973,7 @@ function showStudyIntro(){
   box.innerHTML=`<div class="study-intro">
     <div class="si-hero">
       <h2>📚 复习备考 · 怎么学才能又快又好拿下证书</h2>
-      <p>这个模块汇总了本专业的全部课程与备考资料：每门课都配套 <b>考试大纲 / 题型分析 / 学习笔记 / 考点速记 / 思维导图 / 题库 / 错题本 / 学习分析</b>。左侧按「政治课 / 文化基础课 / 专业课 / 选修」分组列出所有课程，<b>点一门即开始学</b>。下面先讲清楚两件事：① 这个模块怎么用；② 不同基础的人，一年该报几门、怎么排计划。</p>
+      <p>这个模块汇总了本专业的全部课程与备考资料：每门课都配套 <b>考试大纲 / 题型分析 / 学习笔记 / 考点速记 / 思维导图 / 题库 / 错题本 / 学习分析</b>。手机端顶部（电脑端为左侧）把全部课程按<b>简称</b>排成一条，先<b>选一门课</b>，再从模块卡片里<b>选一个模块</b>，才进入具体内容。下面先讲清楚两件事：① 这个模块怎么用；② 不同基础的人，一年该报几门、怎么排计划。</p>
       <div class="si-cnt">
         <b>📋 共 ${total} 门课程</b>
         <b>✅ 必修 ${req} 门</b>
@@ -16769,7 +16985,7 @@ function showStudyIntro(){
     </div>
 
     <div class="si-grid">
-      <div class="si-box"><div class="si-ico">🗺️</div><div class="si-t">选课</div><div class="si-d">左侧按类别选一门课程进入</div></div>
+      <div class="si-box"><div class="si-ico">🗺️</div><div class="si-t">选课</div><div class="si-d">先选科目，再看模块卡片</div></div>
       <div class="si-box"><div class="si-ico">📖</div><div class="si-t">大纲与笔记</div><div class="si-d">先看范围，再建知识框架</div></div>
       <div class="si-box"><div class="si-ico">🧠</div><div class="si-t">考点速记</div><div class="si-d">卡片式记忆，碎片时间巩固</div></div>
       <div class="si-box"><div class="si-ico">📝</div><div class="si-t">题库刷题</div><div class="si-d">章节练习 + 模拟考试</div></div>
@@ -16777,8 +16993,8 @@ function showStudyIntro(){
     </div>
 
     <div class="si-h"><span class="si-num">1</span>这个模块怎么用（3 步上手）</div>
-    <p class="si-p"><b>第一步 · 选课程：</b>看左侧导航，课程已按「政治课 / 文化基础课 / 专业课 / 专业课（选修）」分组，点击任意一门即可进入该课的备考界面。</p>
-    <p class="si-p"><b>第二步 · 按标签页学习：</b>进入课程后，顶部有 8 个标签页，按学习顺序用就好——</p>
+    <p class="si-p"><b>第一步 · 选课程：</b>看顶部（电脑端为左侧）导航，全部 ${total} 门课以简称排列——习概、近纲、马原、英语、线代……点任意一门，右侧会展开该课的模块面板。</p>
+    <p class="si-p"><b>第二步 · 按模块卡片学习：</b>选完课程后先看到一组模块卡片（手机端），每张卡片上标着这门课该模块的实际内容量，点进去才开始看——</p>
     <ul class="si-list">
       <li><b>考试大纲</b>：官方考核范围与要求，先搞清楚「考什么」。</li>
       <li><b>题型分析</b>：各题型分值与出题规律，知道「怎么考」。</li>
@@ -18305,7 +18521,7 @@ function renderCards(s){
   if(s.memo && s.memo.length){
     const c=courseOf(curCourse);
     const meta=`<span>课程代码：${c.code}</span><span>教材：${c.book||'官方指定教材'}</span><span>版本：${((c.pub||'').match(/\d{4}\s*年版/)||[])[0]||'官方版'}</span><span class="od-author">编者：${c.author||'官方教材'}</span>`;
-    const tabs=s.memo.map((m,i)=>`<button class="memo-tab${i===0?' active':''}" onclick="switchMemoTab(${i})">${esc(m.h)}</button>`).join('');
+    const tabs=s.memo.map((m,i)=>`<button class="memo-tab${i===0?' active':''}" onclick="switchMemoTab(${i},1)">${esc(m.h)}</button>`).join('');
     const panels=s.memo.map((m,i)=>`<div class="memo-panel${i===0?' active':''}">${m.html}</div>`).join('');
     $('#studyContent').innerHTML=`<div class="outline-doc">${srsStudyBar(curCourse)}<div class="od-cover memo-cover"><div class="od-cover-main"><h2>${c.name}</h2><div class="od-meta">${meta}</div></div><div class="memo-tabs">${tabs}</div></div><div class="memo-panels">${panels}</div></div>`;
     normalizeMemoTables();
@@ -18317,9 +18533,16 @@ function renderCards(s){
   $('#studyContent').innerHTML=`${srsStudyBar(curCourse)}<div class="card"><h3>考点速记 · ${courseOf(curCourse).name}</h3><p class="muted">点击卡片翻面查看答案，适合碎片时间背诵。共 ${s.cards.length} 张。</p></div>
   <div class="cards-grid">${s.cards.map(c=>`<div class="fc" onclick="this.classList.toggle('flip')"><div class="fc-inner"><div class="fc-face fc-front">${c.f}</div><div class="fc-face fc-back">${c.b}</div></div></div>`).join('')}</div>`;
 }
-function switchMemoTab(idx){
+function switchMemoTab(idx, fromUser){
   $$('.memo-tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
   $$('.memo-panel').forEach((p,i)=>p.classList.toggle('active',i===idx));
+  /* 用户点板块时回到该板块开头：各板块长度差很大，不重置会停在新板块的文末，
+     浮动胶囊就会显示成最后一章（恢复书签时不传 fromUser，保持原定位行为） */
+  if(fromUser){
+    const pn=document.querySelector('.memo-panels');
+    if(pn){ const y=pn.getBoundingClientRect().top+window.scrollY-100; try{ window.scrollTo({top:y, behavior:'smooth'}) }catch(e){ window.scrollTo(0,y) } }
+  }
+  rdKey=''; setTimeout(()=>rdSync(true),fromUser?380:60);
   // 速记考点书签：切换板块即记录（配合滚动捕获，下次进入自动回到该板块）
   if(curCourse&&curTab==='cards'){
     const marks=store.get('read_marks',{});
@@ -18357,6 +18580,124 @@ function rmCapture(){
   store.set('read_marks',marks);
 }
 window.addEventListener('scroll',rmCapture,{passive:true});
+/* ================= 长文档阅读定位：进度条 + 章节悬浮胶囊 =================
+   只作用于「学习笔记 / 考点速记」这两个超长文档（实测 6.4 万 / 4.1 万 px）
+   进度条全端显示；胶囊只在手机端显示（PC 端左侧已有章节导航） */
+/* 用 var 而非 let：switchTab / selectCourse 在文件更早处就会调用 rdSync，必须避开 TDZ */
+var RD_TABS=['notes','cards'];
+var rdItems=[], rdCur=-1, rdKey='', rdTick=false;
+function rdScope(){
+  if(!curCourse||RD_TABS.indexOf(curTab)<0) return null;
+  if(studyView==='cards'&&isNarrowScreen()) return null;   /* 手机端卡片层不是长文档，不出进度条与章节胶囊 */
+  const pg=$('#page-study'); if(!pg||!pg.classList.contains('active')) return null;
+  const box=$('#studyContent'); if(!box) return null;
+  if(curTab==='cards'){
+    const ps=[...box.querySelectorAll('.memo-panel')];
+    if(!ps.length) return null;                 /* 翻转卡片式速记没有长文档结构 */
+    return ps.find(p=>p.classList.contains('active'))||null;
+  }
+  return box;
+}
+function rdListHtml(){
+  const list=$('#rdList'), cnt=$('#rdCnt');
+  if(cnt) cnt.textContent=rdItems.length? '共 '+rdItems.length+' 章' : '';
+  if(!list) return;
+  if(!rdItems.length){ list.innerHTML='<div class="rd-empty">当前模块没有可跳转的章节标题</div>'; return }
+  let n0=0;
+  list.innerHTML=rdItems.map((x,i)=>{
+    const n=x.p? '<span class="rd-n"></span>' : `<span class="rd-n">${String(++n0).padStart(2,'0')}</span>`;
+    return `<div class="rd-item${i===rdCur?' cur':''}${x.p?' lv0':''}" onclick="rdJump(${i})">${n}<span>${esc(x.txt)}</span></div>`;
+  }).join('');
+  const c=list.querySelector('.rd-item.cur');
+  if(c){ try{ c.scrollIntoView({block:'center'}) }catch(e){} }
+}
+function rdBuild(){
+  rdItems=[]; rdCur=-1;
+  const scope=rdScope();
+  if(!scope) return false;
+  /* 只取「章」级标题，避免节标题在滚动中频繁跳动 */
+  let els=[...scope.querySelectorAll('.note-period-hd,.od-chapter-hd')].filter(e=>e.offsetParent!==null);
+  if(els.length<2) els=[...scope.querySelectorAll('.od-h1,.od-h2,.note-sec-hd')].filter(e=>e.offsetParent!==null);
+  rdItems=els.map(el=>{
+    const sp=el.querySelector('span');
+    const txt=((sp?sp.textContent:el.textContent)||'').replace(/[▸▾]/g,'').trim();
+    return {el:el, txt:txt, p:el.classList.contains('note-period-hd')};
+  }).filter(x=>x.txt);
+  const m=$('#rdMask');
+  if(m&&m.classList.contains('on')) rdListHtml();
+  return rdItems.length>0;
+}
+function rdSync(force){
+  if(rdTick&&!force) return;
+  rdItems=rdItems||[];
+  rdTick=true;
+  requestAnimationFrame(()=>{
+    rdTick=false;
+    const bar=$('#rdBar'), pill=$('#rdPill'), txt=$('#rdPillTxt');
+    const scope=rdScope();
+    if(!scope){
+      if(bar) bar.classList.remove('on');
+      if(pill) pill.classList.remove('on');
+      rdItems=[]; rdCur=-1; rdKey='';
+      return;
+    }
+    const box=$('#studyContent');
+    /* 内容或页签一变就重建索引：覆盖所有渲染路径，不用逐个挂钩子 */
+    const ps=box?[...box.querySelectorAll('.memo-panel')]:[];
+    const ai=ps.length? ps.findIndex(p=>p.classList.contains('active')) : '-';
+    const key=curCourse+'|'+curTab+'|'+ai+'|'+(box?box.innerHTML.length:0);
+    if(key!==rdKey){ rdKey=key; rdBuild() }
+    /* 顶部阅读进度 */
+    const doc=document.documentElement;
+    const max=doc.scrollHeight-window.innerHeight;
+    const pct=max>8? Math.min(100,Math.max(0, window.scrollY/max*100)) : 0;
+    if(bar){ bar.style.width=pct.toFixed(2)+'%'; bar.classList.add('on') }
+    if(!rdItems.length){ if(pill) pill.classList.remove('on'); return }
+    /* 当前章节：最后一个顶边越过 120px 的标题 */
+    let k=0;
+    for(let i=0;i<rdItems.length;i++){ if(rdItems[i].el.getBoundingClientRect().top<=120) k=i }
+    if(k!==rdCur||!pill.classList.contains('on')){
+      rdCur=k;
+      if(txt) txt.textContent=rdItems[k].txt;
+      if(pill) pill.classList.add('on');
+    }
+  });
+}
+function rdOpen(){
+  if(!rdItems.length) rdSync(true);
+  setTimeout(()=>{
+    if(!rdItems.length){ toast('当前模块没有章节目录'); return }
+    rdListHtml();
+    const m=$('#rdMask'); if(m) m.classList.add('on');
+  },0);
+}
+function rdClose(){ const m=$('#rdMask'); if(m) m.classList.remove('on') }
+function rdJump(i){
+  const it=rdItems[i]; if(!it) return;
+  rdClose();
+  /* 展开所有祖先折叠容器（章 / 时期 / 已折叠分组） */
+  let p=it.el.parentNode;
+  while(p&&p.nodeType===1){
+    if(p.classList){
+      if(p.classList.contains('od-chapter')&&!p.classList.contains('open')) p.classList.add('open');
+      if(p.classList.contains('note-period')&&!p.classList.contains('open')) p.classList.add('open');
+      if(p.classList.contains('collapsed')) p.classList.remove('collapsed');
+    }
+    p=p.parentNode;
+  }
+  const y=it.el.getBoundingClientRect().top+window.scrollY-104;
+  try{ window.scrollTo({top:y, behavior:'smooth'}) }catch(e){ window.scrollTo(0,y) }
+  rdCur=i;
+  const t=$('#rdPillTxt'); if(t) t.textContent=it.txt;
+}
+window.addEventListener('scroll',()=>rdSync(),{passive:true});
+window.addEventListener('resize',()=>{
+  if(curTab==='mindmap'&&isNarrowScreen()) switchTab('notes');
+  rdKey=''; rdSync(true);
+},{passive:true});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){ const m=$('#rdMask'); if(m&&m.classList.contains('on')){ rdClose(); e.preventDefault() } }
+});
 function restoreReadMark(){
   if(!curCourse||!RM_TABS.includes(curTab)) return;
   const marks=store.get('read_marks',{}), m=marks[curCourse]&&marks[curCourse][curTab];
