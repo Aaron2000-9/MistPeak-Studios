@@ -488,6 +488,7 @@ mark.anno-hl:hover{box-shadow:inset 0 0 0 999px rgba(128,128,128,.10)}
 /* 复习备考布局 */
 .study-layout{display:flex; gap:16px; align-items:flex-start}
 .study-side{width:264px; flex-shrink:0; position:sticky; top:76px; max-height:calc(100vh - 96px); overflow-y:auto}
+#sideFold{display:none}
 .side-group{font-size:12px; color:var(--primary); padding:10px 10px 5px; font-weight:700; border-bottom:1px solid var(--plight); margin-bottom:4px}
 .course-item{padding:7px 12px; border-radius:8px; cursor:pointer; font-size:13px; color:var(--text2); display:flex; align-items:center; gap:8px}
 .course-item:hover{background:var(--plight); color:var(--primary)}
@@ -496,10 +497,30 @@ mark.anno-hl:hover{box-shadow:inset 0 0 0 999px rgba(128,128,128,.10)}
 .course-item .cn{flex:1; min-width:0}
 .course-item .cr{font-size:11px; color:var(--text3)}
 .course-item .ct{font-size:10px; padding:0 6px; border-radius:8px; flex-shrink:0}
-.ct-政治课{background:var(--wlight); color:var(--warning)}
-.ct-文化基础课{background:var(--slight); color:var(--success)}
-.ct-专业课{background:var(--plight); color:var(--primary)}
+/* 课程四分类固定配色（不随主题主色漂移，保证四色始终可辨）：
+   政治课=橙 / 文化基础课=绿 / 专业课(必修)=蓝 / 专业课(选修)=紫 */
+.ct-政治课{background:#fdf3e0; color:#b45309}
+.ct-文化基础课{background:#e6f4ec; color:#0b7a44}
+.ct-专业课{background:#e8effd; color:#1a4bbf}
+.ct-专业课选{background:#f2eafd; color:#6b28b8}
+html.dark .ct-政治课{background:#3a2e18; color:#ffb84d}
+html.dark .ct-文化基础课{background:#17352a; color:#4cc38a}
+html.dark .ct-专业课{background:#22304d; color:#7aa8ff}
+html.dark .ct-专业课选{background:#2e2445; color:#b58cff}
 /* 复习备考 · 左侧课程搜索 */
+/* 章节练习：答题方式选择器 */
+.q-blank{margin:4px 0 8px; padding:6px 10px; border-radius:6px; background:var(--wlight); color:var(--warning); font-size:12px; line-height:1.6}
+.flow-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:10px; padding-top:10px; border-top:1px dashed var(--border)}
+.flow-sel{display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--text2); white-space:nowrap}
+.flow-sel select{font-size:12.5px; padding:5px 8px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text); outline:none; max-width:15em}
+.flow-sel select:focus{border-color:var(--primary)}
+@media (max-width:768px){
+  .flow-row{gap:6px}
+  .flow-row .small{font-size:11.5px; line-height:1.7}
+  .q-nav{flex-wrap:wrap; gap:6px}
+  .q-nav .flow-sel{order:9; width:100%; justify-content:flex-start; margin-top:4px}
+  .q-nav .flow-sel select{flex:1; max-width:none}
+}
 .course-search{position:relative; margin:2px 0 8px}
 .course-search input{width:100%; box-sizing:border-box; padding:7px 26px 7px 10px; border:1px solid var(--border); border-radius:8px; font-size:12.5px; background:var(--bg); color:var(--text); outline:none; transition:border-color .15s}
 .course-search input:focus{border-color:var(--primary); box-shadow:0 0 0 2px var(--plight)}
@@ -1309,11 +1330,38 @@ img,svg,video,iframe{max-width:100%; height:auto}
   .side-courses .course-list{display:contents}
   .side-courses .course-item{flex:0 0 auto; width:100%; box-sizing:border-box; padding:8px 2px !important; gap:0;
     justify-content:center; text-align:center; border-radius:9px; font-size:12px; line-height:1.2;
-    background:var(--bg); border:1px solid var(--border)}
+    background:var(--k-bg,var(--bg)); border:1px solid var(--k-bd,var(--border)); color:var(--k-fg,var(--text2))}
   .side-courses .course-item .cn-short{display:block; white-space:nowrap; overflow:visible}
   .side-courses .course-item .cc{display:none}
-  .side-courses .course-item.active{border-color:var(--primary); background:var(--plight); font-weight:700}
+  /* 四分类配色（延续 PC 端类别标签色系）：政治课=橙 / 文化基础课=绿 / 专业课(必修)=蓝 / 专业课(选修)=紫 */
+  .side-courses .course-item[data-kind="pol"]{--k-bg:#fdf3e0; --k-bd:#f0c68a; --k-fg:#b45309}
+  .side-courses .course-item[data-kind="cul"]{--k-bg:#e6f4ec; --k-bd:#9ed8b9; --k-fg:#0b7a44}
+  .side-courses .course-item[data-kind="pro"]{--k-bg:#e8effd; --k-bd:#a9c1f5; --k-fg:#1a4bbf}
+  .side-courses .course-item[data-kind="opt"]{--k-bg:#f2eafd; --k-bd:#c9aef0; --k-fg:#6b28b8}
+  html.dark .side-courses .course-item[data-kind="pol"]{--k-bg:#3a2e18; --k-bd:#6b5524; --k-fg:#ffb84d}
+  html.dark .side-courses .course-item[data-kind="cul"]{--k-bg:#17352a; --k-bd:#2d5c47; --k-fg:#4cc38a}
+  html.dark .side-courses .course-item[data-kind="pro"]{--k-bg:#22304d; --k-bd:#3a5386; --k-fg:#7aa8ff}
+  html.dark .side-courses .course-item[data-kind="opt"]{--k-bg:#2e2445; --k-bd:#4d3b73; --k-fg:#b58cff}
+  /* 四组之间留一道间隙，颜色分组边界更清楚 */
+  .side-courses .course-item[data-grp-first="1"]{margin-top:7px}
+  .side-courses .course-item:hover{background:var(--k-bg,var(--bg)); color:var(--k-fg,var(--text2))}
+  .side-courses .course-item.active{border-color:var(--k-fg,var(--primary)); background:var(--k-bg,var(--plight));
+    color:var(--k-fg,var(--primary)); font-weight:700; box-shadow:inset 0 0 0 1px var(--k-fg,var(--primary))}
   .side-chaps{display:none !important}
+  /* 科目列收起/展开：收起后右侧内容占满整宽，左边缘浮出一个小按钮随时叫回来 */
+  #sideFold{display:flex; position:fixed; left:0; top:44%; z-index:190;
+    width:22px; height:54px; padding:0; border-radius:0 12px 12px 0;
+    align-items:center; justify-content:center;
+    background:var(--card); border:1px solid var(--border); border-left:none;
+    box-shadow:0 3px 14px rgba(15,23,42,.16); color:var(--primary);
+    font-size:13px; font-weight:700; cursor:pointer; -webkit-tap-highlight-color:transparent}
+  #sideFold.off{display:none}
+  .study-layout.side-folded .study-side{display:none}
+  .study-layout.side-folded .study-main{flex:1 1 100%}
+  .side-fold-btn{display:flex; align-items:center; justify-content:center; gap:3px;
+    padding:5px 0 7px; margin:0 0 5px; font-size:11.5px; color:var(--text3);
+    border-bottom:1px dashed var(--border); cursor:pointer; -webkit-tap-highlight-color:transparent}
+  .side-fold-btn:active{color:var(--primary)}
   /* 科目卡片层：手机上固定 2 列 */
   .mod-grid{grid-template-columns:repeat(2,1fr); gap:9px}
   .mod-card{min-height:88px; padding:12px 11px}
@@ -1359,7 +1407,11 @@ img,svg,video,iframe{max-width:100%; height:auto}
   /* 表单：16px 防止 iOS 聚焦时自动放大 */
   input,select,textarea{font-size:16px}
   .dialog{padding:18px 16px; max-height:86vh; border-radius:12px}
-  .exam-timer{top:58px; padding:8px 12px; font-size:15px}
+  /* 手机端计时条：整卷信息文字较多时允许换行，避免挤成一列竖排 */
+  .exam-timer{top:58px; padding:8px 12px; font-size:15px; flex-wrap:wrap; gap:6px 8px}
+  .exam-timer > span{min-width:0}
+  .exam-timer > span:nth-child(3){flex:1 1 100%; font-size:11.5px; font-weight:400; opacity:.85}
+  .exam-timer .btn{margin-left:auto}
   .pomo{right:10px; bottom:10px}
   /* 触控目标 */
   .nav-btn,.stab,.sub-tab,.memo-tab,.icon-btn{min-height:36px}
@@ -1684,6 +1736,76 @@ html.dark #rdPill{box-shadow:0 4px 16px rgba(0,0,0,.42)}
   /* 手机端去掉思维导图：窄屏下缩略图整张只能缩到 20%，节点文字不可辨认 */
   .stab[data-tab="mindmap"]{display:none}
 }
+
+/* ===================================================================
+   正文可读性统一层（考试大纲 / 学习笔记 / 考点速记 / 真题解析 共用）
+   原来同一篇文章里字号 12/12.5/13/13.5 混用、行高 1.7~1.95 混用、
+   首行缩进有的 2em 有的 0，看起来像排版错乱。这里统一成一套规格：
+   —— 中文正文两端对齐，行末整齐，减少「一个字掉到下一行」的孤字行
+   —— line-break:strict 让标点不落在行首；overflow-wrap 只断长英文/URL
+   =================================================================== */
+.outline-doc .od-p,
+.outline-doc .od-intro,
+.note-body-list > li,
+.memo-panel .note-body-list > li,
+.t3-qs .t3-qp,
+.t3-ans .t3-qp{
+  text-align:justify;
+  text-justify:inter-ideograph;
+  line-break:strict;
+  word-break:normal;
+  overflow-wrap:break-word;
+}
+/* 大纲正文：统一 13px / 1.9 / 首行缩进 2 字（覆盖渲染时写的行内样式） */
+.outline-doc .od-p{
+  font-size:13px !important;
+  line-height:1.9 !important;
+  text-indent:2em !important;
+  margin:7px 0 !important;
+  color:var(--text);
+}
+/* 列表式正文（笔记 / 速记）：不缩进，靠段间距分条 */
+.note-body-list > li,
+.memo-panel .note-body-list > li{
+  font-size:13px !important;
+  line-height:1.9 !important;
+  margin:8px 0 !important;
+  text-indent:0 !important;
+}
+/* 大纲章节头部信息里的编者竖线改为普通排布，去掉那条像杂质的竖杠 */
+.od-cover .od-meta .od-author{border-left:none; padding-left:0; margin-left:0}
+/* 关键词红色略降饱和、不加粗：原资料把考点整句标红加粗（笔记里 1300 余处），
+   满屏橙红粗体很吵；这里只留颜色做区分，字重回到正文级 */
+.kr{color:#c2410c; font-weight:400}
+html.dark .kr{color:#fb923c}
+
+@media (max-width:768px){
+  /* 手机端正文再放大一档，窄屏更好读 */
+  .outline-doc .od-p{font-size:13.5px !important; line-height:1.92 !important}
+  .note-body-list > li,
+  .memo-panel .note-body-list > li{font-size:13px !important; line-height:1.9 !important; margin:9px 0 !important}
+  /* 表格在窄屏放不下：原来 .note-table-wrap 是 overflow:hidden，右侧列会被直接裁掉且无法滑动 */
+  .note-table-wrap{overflow-x:auto; -webkit-overflow-scrolling:touch}
+  .note-table-wrap .note-table{min-width:100%}
+  /* 先压一档字号与内边距，多数两列表格这样就能整屏放下；实在放不下的再横滑 */
+  .note-table{font-size:11.5px}
+  .note-table th,.note-table td{padding:7px 8px}
+  /* 宽表格：保留完整列宽横向滑动，同时把第一列粘住，
+     滑动时行标签（类型 / 项目）始终可见，不会滑到一半不知道在看哪一行 */
+  .note-table th:first-child,.note-table td:first-child{
+    position:sticky; left:0; z-index:2; background:var(--card);
+    box-shadow:1px 0 0 var(--border);
+  }
+  .note-table th:first-child{background:#f8fafc; z-index:3; width:auto}
+  /* 首列宽度交给内容，别被原来为竖排表头写的 width:1% 压窄 */
+  .note-table td:first-child{white-space:nowrap}
+  html.dark .note-table th:first-child{background:#1b2431}
+  /* 需要横滑的表格右侧给一道阴影，提示「右边还有内容」 */
+  .note-table-wrap.scrollable{box-shadow:inset -16px 0 14px -14px rgba(15,23,42,.34)}
+  html.dark .note-table-wrap.scrollable{box-shadow:inset -16px 0 14px -14px rgba(0,0,0,.6)}
+  /* 题型分析的表格同理，改为容器内横滑 */
+  .t3-dbody{overflow-x:auto; -webkit-overflow-scrolling:touch}
+}
 </style>
 </head>
 <body>
@@ -1911,6 +2033,7 @@ html.dark #rdPill{box-shadow:0 4px 16px rgba(0,0,0,.42)}
 <section class="page" id="page-study">
   <div class="study-layout">
     <aside class="study-side">
+      <div class="side-fold-btn" onclick="sideToggle()" title="收起科目列">◂ 收起</div>
       <div class="card side-courses" style="padding:10px 12px;margin-bottom:10px">
         <div class="course-search">
           <input id="courseSearch" type="text" placeholder="搜索课程名称或代码" autocomplete="off" oninput="filterCourseList()">
@@ -1946,6 +2069,7 @@ html.dark #rdPill{box-shadow:0 4px 16px rgba(0,0,0,.42)}
       </div>
       <div id="studyContent"></div>
     </div>
+    <button id="sideFold" onclick="sideToggle()" title="展开科目" aria-label="展开科目">☰</button>
   </div>
 </section>
 
@@ -16674,16 +16798,26 @@ var studyView='content';
 function isPractice(code){ const s=STUDY[code]; return s&&s.note }
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]] } return a }
 
+/* 课程四分类（配色用）：政治课 / 文化基础课 / 专业课(必修) / 专业课(选修) */
+function courseKind(c){
+  if(!c.req) return 'opt';
+  if(c.cat==='政治课') return 'pol';
+  if(c.cat==='文化基础课') return 'cul';
+  return 'pro';
+}
 function catTag(c){
   const m={政治课:'ct-政治课',文化基础课:'ct-文化基础课',专业课:'ct-专业课'};
+  const k=courseKind(c);
+  if(k==='opt') return `<span class="ct ct-专业课选">专业课·选修</span>`;
   return `<span class="ct ${m[c.cat]||'ct-专业课'}">${c.cat}</span>`;
 }
 function renderCourseList(){
-  const item=c=>`<div class="course-item" data-code="${c.code}" onclick="selectCourse('${c.code}')"><span class="cc">${c.code}</span><span class="cn"><span class="cn-full">${c.name}</span><span class="cn-short">${c.short||c.code}</span>${isPractice(c.code)?' <span class="tag tag-o" style="font-size:10px">实践</span>':''}</span>${catTag(c)}</div>`;
-  $('#clPol').innerHTML=COURSES.filter(c=>c.cat==='政治课'&&c.req).map(item).join('');
-  $('#clCul').innerHTML=COURSES.filter(c=>c.cat==='文化基础课'&&c.req).map(item).join('');
-  $('#clPro').innerHTML=COURSES.filter(c=>c.cat==='专业课'&&c.req).map(item).join('');
-  $('#clOpt').innerHTML=COURSES.filter(c=>!c.req).map(item).join('');
+  const item=(c,i)=>`<div class="course-item" data-code="${c.code}" data-kind="${courseKind(c)}"${i===0?' data-grp-first="1"':''} onclick="selectCourse('${c.code}')"><span class="cc">${c.code}</span><span class="cn"><span class="cn-full">${c.name}</span><span class="cn-short">${c.short||c.code}</span>${isPractice(c.code)?' <span class="tag tag-o" style="font-size:10px">实践</span>':''}</span>${catTag(c)}</div>`;
+  const group=fn=>COURSES.filter(fn).map((c,i)=>item(c,i)).join('');
+  $('#clPol').innerHTML=group(c=>c.cat==='政治课'&&c.req);
+  $('#clCul').innerHTML=group(c=>c.cat==='文化基础课'&&c.req);
+  $('#clPro').innerHTML=group(c=>c.cat==='专业课'&&c.req);
+  $('#clOpt').innerHTML=group(c=>!c.req);
   markCourseActive();
   renderCourseBanner();
 }
@@ -16868,7 +17002,107 @@ function syncStudyChrome(){
   if(bn) bn.style.display = (!curCourse||cardView||nar) ? 'none' : '';
 }
 function isNarrowScreen(){ try{ return window.matchMedia('(max-width:768px)').matches }catch(e){ return false } }
+/* 手机端科目列收起 / 展开：收起后右侧内容占满整宽，读卡片和正文更宽松 */
+var sideFolded=false;
+function sideToggle(force){
+  sideFolded = (typeof force==='boolean') ? force : !sideFolded;
+  const lay=document.querySelector('.study-layout');
+  if(lay) lay.classList.toggle('side-folded', sideFolded);
+  const fb=document.getElementById('sideFold');
+  if(fb) fb.classList.toggle('off', !sideFolded);
+  try{ store.set('study_side_folded', sideFolded) }catch(e){}
+}
+(function(){
+  function boot(){
+    let f=false;
+    try{ f=!!(window.store&&store.get?store.get('study_side_folded',false):false) }catch(e){}
+    if(f) sideToggle(true);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot);
+  else setTimeout(boot,0);
+})();
 function renderStudyContent(){
+  const r=renderStudyContentCore();
+  /* 源资料里混入的空格（如「（ 组织结构设计…产生 。）」）会把完整句子切断、
+     把标点挤到下一行，渲染后统一清洗一遍中文文本。 */
+  try{ txtClean($('#studyContent')) }catch(e){}
+  return r;
+}
+/* 清理中文正文里的多余空格：
+   —— 汉字之间、汉字与中文标点之间、中文标点两侧的空格一律去掉
+   —— 含中文的文本里，半角括号包数字统一成全角（(1)→（1）），避免与原文全角混排
+   —— pre / code / 公式 / 单行控件跳过，不动代码缩进与公式 */
+function txtClean(root){
+  if(!root) return;
+  /* 原资料把考点整句写成 <span style="color:#d83931;font-weight:600">，学习笔记里多达 1300 余处，
+     满屏橙红粗体非常吵。这里统一归化成 .kr 类，颜色与字重交给 CSS 统一控制。 */
+  root.querySelectorAll('span[style*="#d83931"],span[style*="#D83931"]').forEach(sp=>{
+    sp.removeAttribute('style');
+    if(sp.classList) sp.classList.add('kr');
+  });
+  const SKIP={PRE:1,CODE:1,SCRIPT:1,STYLE:1,TEXTAREA:1,INPUT:1};
+  const CJK=/[\u4e00-\u9fa5]/;
+  const C='[\\u4e00-\\u9fa5\\u3000-\\u303f\\uff01-\\uff65]';
+  const RE_BOTH=new RegExp('('+C+')\\s+(?='+C+')','g');
+  const RE_TAIL=/\s+([\u3000-\u303f\uff01-\uff65])/g;
+  const RE_HEAD=/([\u3000-\u303f\uff01-\uff65])\s+/g;
+  const RE_PH1=/\((\s*\d{1,2}\s*)\)/g, RE_PH2=/（\s*(\d{1,2})\s*）/g;
+  const RE_PH3=/\((\s*[一二三四五六七八九十]{1,3}\s*)\)/g;
+  /* 行内编号「1.xx 2.xx」「特点有：1.xx。2.xx。」：笔记列表项里一个点一行。
+     数字后面常带空格（原文是「2. 供应商」），所以要允许 [\s]*；至少 2 处才拆，
+     避免把「1.本课程…」这种只有单个编号的正常段落劈开。 */
+  const RE_LIST=/([\u4e00-\u9fa5。；、，：])\s*(?=\d{1,2}[.、．][\s\u3000]*[\u4e00-\u9fa5])/g;
+  function inNoteList(node){
+    const p=node.parentNode;
+    return p&&p.nodeName==='LI'&&p.parentNode&&/note-body-list/.test(p.parentNode.className||'');
+  }
+  function edge(node,dir){
+    let c=dir<0?node.previousSibling:node.nextSibling;
+    while(c){
+      if(c.nodeType===3){ const s=c.nodeValue.trim(); if(s) return dir<0?s.slice(-1):s.charAt(0) }
+      else if(c.nodeType===1){ const s=(c.textContent||'').trim(); if(s) return dir<0?s.slice(-1):s.charAt(0) }
+      c=dir<0?c.previousSibling:c.nextSibling;
+    }
+    return '';
+  }
+  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:function(n){
+    const p=n.parentNode;
+    if(!p||SKIP[p.nodeName]) return NodeFilter.FILTER_REJECT;
+    if(p.closest&&p.closest('pre,code,mjx-container,.memo-code')) return NodeFilter.FILTER_REJECT;
+    return NodeFilter.FILTER_ACCEPT;
+  }});
+  const nodes=[]; let n;
+  while((n=walker.nextNode())) nodes.push(n);
+  for(const t of nodes){
+    let v=t.nodeValue;
+    if(!v||v.length<2||!CJK.test(v)) continue;
+    const o=v;
+    v=v.replace(RE_BOTH,'$1').replace(RE_TAIL,'$1').replace(RE_HEAD,'$1');
+    v=v.replace(RE_PH1,'（$1）').replace(RE_PH2,'（$1）').replace(RE_PH3,'（$1）');
+    if(/^\s+/.test(v)&&CJK.test(edge(t,-1)||'')) v=v.replace(/^\s+/,'');
+    if(/\s+$/.test(v)&&CJK.test(edge(t,1)||'')) v=v.replace(/\s+$/,'');
+    if(v!==o) t.nodeValue=v;
+    if(inNoteList(t)){
+      const marked = (v.match(RE_LIST)||[]).length>=2 ? v.replace(RE_LIST,'$1\u0001') : null;
+      if(marked&&marked.indexOf('\u0001')>=0){
+        const seg=marked.split('\u0001');
+        if(seg.length>1){
+          const frag=document.createDocumentFragment();
+          seg.forEach((s,i)=>{
+            if(i>0) frag.appendChild(document.createElement('br'));
+            if(s) frag.appendChild(document.createTextNode(s));
+          });
+          if(t.parentNode) t.parentNode.replaceChild(frag,t);
+        }
+      }
+    }
+  }
+  /* 窄屏放不下的表格才需要横滑，给一个右侧阴影提示，免得以为右边数据丢了 */
+  root.querySelectorAll('.note-table-wrap,.t3-dbody').forEach(function(w){
+    if(w.classList) w.classList.toggle('scrollable', w.scrollWidth>w.clientWidth+2);
+  });
+}
+function renderStudyContentCore(){
   syncStudyChrome();
   if(!curCourse){ showStudyIntro(); return; }
   /* 手机端卡片层：选完科目先看模块卡片，点卡片才进具体内容 */
@@ -17435,8 +17669,8 @@ function renderOutlineLocal(s){
           });
           // 重点章节提示只在第一个 part 之后
           if(pi===0){
-            if(d.focus) html+=`<div class="od-note"><b>📌 重点章节：</b>${esc(d.focus)}</div>`;
-            if(d.unfocus) html+=`<div class="od-note"><b>📌 不考核章节：</b>${esc(d.unfocus)}</div>`;
+            if(d.focus) html+=`<div class="od-note"><b>📌 重点章节：</b>${esc(String(d.focus).replace(/^重点章节[:：]?\s*/,''))}</div>`;
+            if(d.unfocus) html+=`<div class="od-note"><b>📌 不考核章节：</b>${esc(String(d.unfocus).replace(/^(不考核|一般了解)章节[:：]?\s*/,''))}</div>`;
           }
         }
         if(p.intro) html+=`<div class="od-p od-intro">${esc(p.intro).replace(/\*\*([^*]+?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>')}</div>`;
@@ -18456,6 +18690,14 @@ function figView(img){
   ov.querySelector('img').src=img.src;
   ov.classList.add('on');
 }
+/* 题库页专用：题目几乎不含 TeX，仅当页面文本里出现 $...$ 或 \( \) 时才触发 MathJax，
+   避免每次判分重渲染都把整卷 DOM 交给 MathJax 扫一遍（45 题时约百毫秒级开销） */
+function typesetQuizMath(){
+  const el=document.getElementById('studyContent'); if(!el) return;
+  const txt=el.textContent||'';
+  if(!/\$[^\s$][^$]{0,120}\$|\\\(|\\\[/.test(txt)) return;
+  typesetStudyMath();
+}
 function typesetStudyMath(){
   var el=document.getElementById('studyContent');
   if(!el) return;
@@ -18538,7 +18780,7 @@ function renderNotes(s){
   });
   html+='</div>';
   $('#studyContent').innerHTML=html;
-  typesetStudyMath();
+  typesetQuizMath();
 }
 /* ---- 考点速记 ---- */
 function renderCards(s){
@@ -19003,7 +19245,9 @@ function renderQuizHome(){
       <button class="btn btn-s" onclick="$$('#chPick input').forEach(i=>i.checked=true)">全选</button>
       <button class="btn btn-s" onclick="$$('#chPick input').forEach(i=>i.checked=false)">清空</button>
       <span class="muted" style="margin-left:auto">本科累计作答 ${st.total} 题 · 正确率 ${acc}%</span>
-    </div></div>`;
+    </div>
+    <div class="flow-row">${flowSelectHtml()}<span class="small muted">答题方式随时可改，练习中在卡片底部也能切换。选「选完即判分并跳下一题」时，多选题仍需勾完再提交。</span></div>
+    </div>`;
   }else if(qzSub==='mock'){
     const msets=(typeof MOCK!=='undefined'&&MOCK[curCourse])||[];
     if(msets.length){
@@ -19041,6 +19285,76 @@ function isRightOpt(q,oi){ return q.t==='多选'?q.a.includes(oi):q.a===oi }
 function isMyOpt(my,oi){ if(my===undefined) return false; return Array.isArray(my)?my.includes(oi):my===oi }
 function arrEq(a,b){ return a.length===b.length&&a.every(x=>b.includes(x)) }
 function isSubj(t){ return t==='简答'||t==='填空'||t==='计算'||t==='证明' }
+/* ===== 题型归一化：题库里题型写法不统一（多选/多选题、论述/案例/短文写作/概括段落/填词补文/
+   完形补文/阅读判断/阅读选择/填句补文…），且部分题的 o / a 缺失或答案是字母。
+   不归一化会导致：① 多选题被当单选（只能勾一个、判分恒错）；② 缺 o 的题在整卷渲染时抛异常
+   → 模拟考试/历年真题点进去白屏卡住。这里按「数据结构」而非题型字符串判定，一次性归一。
+   原始题型名保留在 q.t0，界面展示仍用原名。 ===== */
+function qLetterIdx(s){
+  const m=String(s==null?'':s).trim().match(/^[（(]?\s*([A-Ha-h])\s*[）)]?$/);
+  return m? 'ABCDEFGH'.indexOf(m[1].toUpperCase()) : -1;
+}
+function qJudgeA(a){
+  if(a===true||a===0) return 0;
+  if(a===false||a===1) return 1;
+  const s=String(a==null?'':a).trim();
+  if(/^(正确|对|是|真|T|True|√|Y|Yes)$/i.test(s)) return 0;
+  if(/^(错误|错|否|假|F|False|×|N|No)$/i.test(s)) return 1;
+  const li=qLetterIdx(s); if(li===0||li===1) return li;
+  return 0;
+}
+function normOneQ(q){
+  if(!q||typeof q!=='object'||q.__nq) return q;
+  q.__nq=1; q.t0=q.t;
+  const o=Array.isArray(q.o)?q.o.filter(x=>x!=null&&String(x).trim()!==''):null;
+  const oOk=!!(o&&o.length>=2);
+  if(!oOk){                        // 无选项 → 主观题（简述/论述/案例/写作/计算/证明/阅读选择…）
+    if(!Array.isArray(q.o)) q.o=null;
+    if(q.t!=='填空') q.t='简答';
+    if(typeof q.a!=='string') q.a=q.a==null?'':String(q.a);
+    if(!String(q.a).trim()) q.__blank=1;   // 题干在、答案与选项都没录入的占位题
+    return q;
+  }
+  q.o=o;
+  const raw=String(q.t||'');
+  if(raw==='判断'||raw==='判断题'||(/判断/.test(raw)&&o.length<=3&&/正确|对|True/i.test(String(o[0])))){ q.t='判断'; q.a=qJudgeA(q.a); return q }
+  const forcedMulti=(raw==='多选'||raw==='多选题');
+  let arr=Array.isArray(q.a)?q.a.map(x=>typeof x==='string'?qLetterIdx(x):x):null;
+  if(forcedMulti){
+    if(!arr||!arr.length) arr=[q.a].map(x=>typeof x==='string'?qLetterIdx(x):x);
+    arr=arr.filter(i=>Number.isInteger(i)&&i>=0&&i<o.length);
+    if(arr.length){ q.t='多选'; q.a=arr.sort((x,y)=>x-y); return q }
+    q.t='简答'; q.o=null; q.a=''; return q;   // 答案残缺 → 降级主观题，避免整卷崩
+  }
+  if(arr&&arr.length){
+    arr=arr.filter(i=>Number.isInteger(i)&&i>=0&&i<o.length);
+    if(arr.length){ q.t='多选'; q.a=arr.sort((x,y)=>x-y); return q }
+  }
+  let ai=Number.isInteger(q.a)?q.a:qLetterIdx(q.a);
+  if(Number.isInteger(ai)&&ai>=0&&ai<o.length){ q.t='单选'; q.a=ai; return q }
+  q.t='简答'; q.o=null; q.a=q.a==null?'':String(q.a); return q;
+}
+function normalizeQuizData(){
+  const walk=(arr)=>{ if(!Array.isArray(arr)) return; arr.forEach(normOneQ) };
+  try{ Object.keys(BANK||{}).forEach(cd=>walk(BANK[cd])) }catch(e){}
+  try{ Object.keys(PAST||{}).forEach(cd=>(PAST[cd]||[]).forEach(p=>walk(p&&p.qs))) }catch(e){}
+  // 错题本里的历史记录也统一（旧记录可能是「多选题」或字母答案），保证重刷/展示不崩
+  try{
+    ['wrong_chapter','wrong_exam'].forEach(function(bk){
+      const arr=store.get(bk,[]); let ch=false;
+      arr.forEach(function(w){
+        if(!w||w.__nq) return;
+        const before=w.t+'|'+JSON.stringify(w.a);
+        normOneQ(w);
+        if(before!==w.t+'|'+JSON.stringify(w.a)) ch=true;
+      });
+      if(ch) store.set(bk,arr);
+    });
+  }catch(e){}
+}
+/* 展示用题型名：优先显示题目原始题型（论述/案例/阅读理解…），归一化后的类型只用于判分逻辑 */
+function qTag(q){ return esc((q&&(q.t0||q.t))||'') }
+
 function fmtAns(q){
   if(q.t==='判断') return q.a===0?'正确':'错误';
   if(q.t==='多选') return q.a.map(i=>'ABCDEFGH'[i]).join('、');
@@ -19048,22 +19362,63 @@ function fmtAns(q){
   if(q.t==='填空') return '参考答案：'+(q.a||'');
   return 'ABCDEFGH'[q.a]+'. '+(q.o?q.o[q.a]:'');
 }
+/* ---- 章节练习答题方式（三种，用户可自选，持久化） ----
+   manual   提交后手动点「下一题」（默认，适合要精读解析）
+   autonext 提交后稍停自动跳到下一题
+   picknext 选项一点即判分并跳到下一题（主观题仍需提交） */
+const QFLOWS=[['manual','提交后手动下一题'],['autonext','提交后自动下一题'],['picknext','选完即判分并跳下一题']];
+function quizFlow(){
+  let v='manual'; try{ v=store.get('quiz_flow','manual') }catch(_){}
+  return QFLOWS.some(x=>x[0]===v)?v:'manual';
+}
+function flowName(v){ const f=QFLOWS.find(x=>x[0]===(v||quizFlow())); return f?f[1]:QFLOWS[0][1] }
+function setQuizFlow(v){
+  try{ store.set('quiz_flow',v) }catch(_){}
+  toast('答题方式：'+flowName(v));
+  if(qz&&(qz.mode==='chapter'||qz.mode==='review')){ cancelQAutoNext(); renderChapterQ() }
+}
+function flowSelectHtml(){
+  const cur=quizFlow();
+  return `<label class="flow-sel" title="答题方式可随时切换">答题方式 <select onchange="setQuizFlow(this.value)">`+
+    QFLOWS.map(f=>`<option value="${f[0]}"${f[0]===cur?' selected':''}>${f[1]}</option>`).join('')+`</select></label>`;
+}
+function cancelQAutoNext(){ if(qz&&qz._autoTimer){ clearTimeout(qz._autoTimer); qz._autoTimer=null } }
+/* 判分后按当前模式决定是否自动跳下一题 */
+function scheduleQAutoNext(mode){
+  if(!qz) return;
+  cancelQAutoNext();
+  const flow=quizFlow();
+  if(flow==='manual') return;
+  if(flow==='picknext'&&mode==='multi') return;   // 多选需要逐个勾选，不自动跳
+  const i=qz.idx, total=qz.qs.length;
+  const jd=qz.judged[i];
+  if(!jd||jd.right===null) return;                // 主观题待自评，不跳
+  if(i>=total-1) return;                          // 最后一题：停住不跳
+  const delay=flow==='picknext'?650:1300;
+  qz._autoTimer=setTimeout(()=>{
+    qz._autoTimer=null;
+    if(!qz) return;
+    if(qz.idx!==i) return;                        // 用户已自己翻页
+    if(qz.judged[i]) { qz.idx=Math.min(total-1,i+1); renderChapterQ() }  // 只跳已判分的题
+  },delay);
+}
 function renderChapterQ(){
   const q=qz.qs[qz.idx], i=qz.idx, j=qz.judged[i], total=qz.qs.length;
   const judgedArr=Object.values(qz.judged);
   const autoCnt=judgedArr.filter(x=>x.right!==null).length;
   const rightCnt=judgedArr.filter(x=>x.right===true).length;
   let opts='';
-  if(isSubj(q.t)){
+  const objArr=(q.t==='判断'&&!(q.o&&q.o.length))?['正确','错误']:(Array.isArray(q.o)?q.o:null);
+  const isObj=!isSubj(q.t)&&objArr&&objArr.length>=2;
+  if(!isObj){
     if(q.t==='填空'){
       opts=`<textarea class="ans-input" id="ansIn" style="min-height:40px" placeholder="在此填入答案…" ${j?'readonly':''}>${j?esc(j.my||''):esc(qz.answers[i]||'')}</textarea>`;
     }else{
       opts=`<textarea class="ans-input" id="ansIn" placeholder="在此输入你的答案…" ${j?'disabled':''}>${j?esc(j.my||''):''}</textarea>`;
     }
   }else{
-    const arr=q.t==='判断'?['正确','错误']:q.o;
     const multi=q.t==='多选';
-    opts=arr.map((o,oi)=>{
+    opts=objArr.map((o,oi)=>{
       let cls='q-opt';
       if(j){ cls+=' dis'; if(isRightOpt(q,oi)) cls+=' right'; else if(isMyOpt(j.my,oi)) cls+=' wrong' }
       else if(isMyOpt(qz.answers[i],oi)) cls+=' sel';
@@ -19071,8 +19426,11 @@ function renderChapterQ(){
     }).join('');
   }
   let act='';
-  if(!j) act=`<button class="btn btn-p" onclick="judgeChapter()">提交</button>`;
-  else{
+  if(!j){
+    const flow=quizFlow();
+    const hint=isObj&&q.t==='多选'&&flow==='picknext'?'<span class="muted" style="margin-left:8px">多选题勾选完再点提交</span>':'';
+    act=`<button class="btn btn-p" onclick="judgeChapter()">提交</button>${hint}`;
+  }else{
     act=`<div class="q-analysis show"><span class="aa">${j.right===null?'参考答案':(j.right?'✓ 回答正确':'✗ 回答错误')}</span><br>`+
       (isSubj(q.t)?`你的答案：${esc(j.my||'（未作答）')}<br>参考答案：${esc(q.a)}`:`正确答案：<b>${fmtAns(q)}</b>`)+
       (q.e?`<br>解析：${q.e}`:'')+`</div>`;
@@ -19091,23 +19449,29 @@ function renderChapterQ(){
     }
   }
   $('#studyContent').innerHTML=`<div class="q-card">
-    <div class="q-meta">${qz.mode==='review'?`<span class="tag tag-p">错题重刷</span><span class="tag tag-o">${(courseOf(q.course)||{}).short||''}</span>`:''}<span class="tag tag-b">${q.t}</span><span class="tag">${chSp(q.ch)}</span><span class="muted">第 ${i+1} / ${total} 题</span>
+    <div class="q-meta">${qz.mode==='review'?`<span class="tag tag-p">错题重刷</span><span class="tag tag-o">${(courseOf(q.course)||{}).short||''}</span>`:''}<span class="tag tag-b">${qTag(q)}</span><span class="tag">${chSp(q.ch)}</span><span class="muted">第 ${i+1} / ${total} 题</span>
     <span class="muted" style="margin-left:auto">本次正确率 ${autoCnt?Math.round(rightCnt/autoCnt*100):0}%（${rightCnt}/${autoCnt}）</span></div>
     <div class="q-progress"><i style="width:${Math.round(judgedArr.length/total*100)}%"></i></div>
     <div class="q-title">${i+1}. ${q.q}</div>
+    ${q.__blank?'<p class="q-blank">⚠ 本题原始资料只录入了题干，选项与答案暂缺，建议对照教材补充或先跳过。</p>':''}
     ${opts}${multiTip(q)}
     <div class="qz-bar" style="margin-top:12px">${act}</div>
     <div class="q-nav">
       <button class="btn btn-s" ${i===0?'disabled':''} onclick="navQ(-1)">← 上一题</button>
       <button class="btn btn-s" ${i===total-1?'disabled':''} onclick="navQ(1)">下一题 →</button>
+      ${flowSelectHtml()}
       <button class="btn btn-s btn-d" style="margin-left:auto" onclick="endChapter()">结束练习</button>
     </div></div>`;
+  typesetQuizMath();
 }
 function pickOpt(oi,multi){
   if(!qz||qz.judged[qz.idx]) return;
   const i=qz.idx;
   if(multi){ const cur=qz.answers[i]||[]; const p=cur.indexOf(oi); if(p>=0) cur.splice(p,1); else cur.push(oi); qz.answers[i]=cur }
   else qz.answers[i]=oi;
+  const q=qz.qs[i];
+  /* 选完即判模式：单选/判断类点一下就判分；多选仍要用户勾完再提交 */
+  if(!multi && quizFlow()==='picknext' && !isSubj(q.t) && q.t!=='多选'){ judgeChapter(); return }
   renderChapterQ();
 }
 function judgeChapter(){
@@ -19128,10 +19492,11 @@ function judgeChapter(){
   if(qz.mode==='review'){ const m=qz.revMap[i]; if(m&&right!==null) wrongRvApply(m.book,m.idx,right===true) }
   else if(right===false&&addWrongCore('wrong_chapter',i)) setTimeout(()=>toast('答错已自动加入错题本'),50);
   renderChapterQ();
+  scheduleQAutoNext(q.t);
 }
-function selfMark(ok){ const i=qz.idx; const q=qz.qs[i]; qz.judged[i].right=ok; bumpStat(q.course||qz.course,ok,q.t,q.ch);
+function selfMark(ok){ const i=qz.idx; const q=qz.qs[i]; cancelQAutoNext(); qz.judged[i].right=ok; bumpStat(q.course||qz.course,ok,q.t,q.ch);
   if(qz.mode==='review'){ const m=qz.revMap[i]; if(m) wrongRvApply(m.book,m.idx,ok) }
-  else if(!ok&&addWrongCore('wrong_chapter',i)) setTimeout(()=>toast('已自动加入错题本'),50); renderChapterQ() }
+  else if(!ok&&addWrongCore('wrong_chapter',i)) setTimeout(()=>toast('已自动加入错题本'),50); renderChapterQ(); scheduleQAutoNext(q.t) }
 function bumpStat(course,ok,t,ch){
   const st=store.get('quiz_stats',{});
   st[course]=st[course]||{total:0,right:0,byType:{},byCh:{}};
@@ -19141,8 +19506,9 @@ function bumpStat(course,ok,t,ch){
   if(ch!==undefined&&ch!==null&&ch!==''){ const k=String(ch); o.byCh[k]=o.byCh[k]||{total:0,right:0}; o.byCh[k].total++; if(ok) o.byCh[k].right++ }
   store.set('quiz_stats',st);
 }
-function navQ(d){ qz.idx=Math.min(qz.qs.length-1,Math.max(0,qz.idx+d)); renderChapterQ() }
+function navQ(d){ cancelQAutoNext(); qz.idx=Math.min(qz.qs.length-1,Math.max(0,qz.idx+d)); renderChapterQ() }
 function endChapter(silent){
+  cancelQAutoNext();
   if(qz&&qz.start&&!pomoRun){ const mins=(Date.now()-qz.start)/60000; if(mins>=0.5) logMinutes(mins) }
   const wasRv=!!qz&&qz.mode==='review';
   qz=null; if(!silent) renderQuizHome();
@@ -19180,7 +19546,7 @@ function startWrongReview(course){
   wrongMigrateRv();
   const due=wrongDueList(course);
   if(!due.length) return toast(course?'本科目暂无到期待重刷的错题':'暂无到期错题，下一轮还没到');
-  const qs=due.map(function(x){ const w=x.w; return {course:w.course,ch:w.ch,t:w.t,q:w.q,o:w.o,a:w.a,e:w.exp||''} });
+  const qs=due.map(function(x){ const w=x.w; return {course:w.course,ch:w.ch,t:w.t,t0:w.t0||w.t,q:w.q,o:w.o,a:w.a,e:w.exp||''} });
   if(!curCourse) curCourse=qs[0].course;
   switchTab('quiz');
   qz={mode:'review',course:qs[0].course,qs:qs,idx:0,answers:{},judged:{},added:{},
@@ -19200,10 +19566,11 @@ function addWrongCore(book,examIdx){
   let rec,idx=examIdx;
   if(book==='wrong_chapter') idx=qz.idx;
   const q=qz.qs[idx];
+  if(q&&q.__blank) return false;   // 占位题（无选项无答案）不进错题本
   if(book==='wrong_chapter'){
-    rec={course:qz.course,ch:q.ch,t:q.t,q:q.q,o:q.o||null,a:q.a,my:qz.judged[idx].my,exp:q.e||'',src:'章节练习 · '+q.ch,time:today(),rv:srsAddDays(today(),1),ef:2.5,ivl:1,reps:0};
+    rec={course:qz.course,ch:q.ch,t:q.t,t0:q.t0||q.t,q:q.q,o:q.o||null,a:q.a,my:qz.judged[idx].my,exp:q.e||'',src:'章节练习 · '+q.ch,time:today(),rv:srsAddDays(today(),1),ef:2.5,ivl:1,reps:0};
   }else{
-    rec={course:qz.course,ch:q.ch,t:q.t,q:q.q,o:q.o||null,a:q.a,my:qz.answers[idx],exp:q.e||'',src:qz.src,time:today(),rv:srsAddDays(today(),1),ef:2.5,ivl:1,reps:0};
+    rec={course:qz.course,ch:q.ch,t:q.t,t0:q.t0||q.t,q:q.q,o:q.o||null,a:q.a,my:qz.answers[idx],exp:q.e||'',src:qz.src,time:today(),rv:srsAddDays(today(),1),ef:2.5,ivl:1,reps:0};
   }
   qz.added[idx]=true;
   const arr=store.get(book,[]);
@@ -19211,12 +19578,16 @@ function addWrongCore(book,examIdx){
   return false;
 }
 function addWrong(book,examIdx){
+  cancelQAutoNext();   // 用户要收藏错题，别再自动跳到下一题
   addWrongCore(book,examIdx);
   if(book==='wrong_chapter') renderChapterQ(); else renderExam();
   toast('已加入错题本');
 }
 /* ---- 模拟考试 / 历年真题 ---- */
 function startExam(mode,pastIdx){
+  // 上一份卷子若还挂着定时器（异常退出/直接换卷），先清掉，避免多份倒计时叠加
+  if(qz&&qz.timer){ clearInterval(qz.timer) }
+  if(typeof cancelQAutoNext==='function') cancelQAutoNext();
   let qs,src;
   if(mode==='mock'){
     const mockSets=(typeof MOCK!=='undefined'&&MOCK[curCourse])||[];
@@ -19236,6 +19607,7 @@ function startExam(mode,pastIdx){
   }
   qz={mode,course:curCourse,qs,answers:{},added:{},selfMark:{},src,left:150*60,submitted:false,start:Date.now()};
   qz.timer=setInterval(()=>{
+    if(!qz){ try{ clearInterval(this) }catch(_){} return }
     qz.left--;
     const el=$('#examTimerNum'); if(el) el.textContent=fmtTime(qz.left);
     // 历年真题：最后 15 分钟提醒（仅真题模式，只提醒一次）
@@ -19248,7 +19620,13 @@ function startExam(mode,pastIdx){
     if(qz.left<=0){ clearInterval(qz.timer); toast('⏰ 考试时间到，自动交卷'); submitExam(true) }
   },1000);
   pomoAutoStartForQuiz();
-  renderExam();
+  try{ renderExam() }
+  catch(err){
+    // 兜底：单题数据异常不该让整卷白屏
+    console.error(err);
+    const el=document.getElementById('studyContent');
+    if(el) el.innerHTML='<div class="card"><h3>试卷渲染出错</h3><p class="muted">已记录错误信息，请点下方按钮返回题库后重新进入；若反复出现，把这条信息发给开发者：</p><p class="small" style="color:var(--danger)">'+esc(String(err&&err.message||err))+'</p><button class="btn btn-p" onclick="endExam()">返回题库</button></div>';
+  }
 }
 /* ---- 历年真题：最后 15 分钟提醒（仅真题模式，模拟考试不受影响） ---- */
 const EXAM_WARN_SEC=15*60;
@@ -19263,17 +19641,18 @@ function renderExam(){
   ${sub?`<span style="margin-left:auto" id="examScore">${examScoreText()}</span>`:`<button class="btn btn-p btn-s" style="margin-left:auto" onclick="submitExam(false)">提交试卷</button>`}</div>`;
   html+=qz.qs.map((q,i)=>{
     const my=qz.answers[i];
+    const objArr=(q.t==='判断'&&!(q.o&&q.o.length))?['正确','错误']:(Array.isArray(q.o)?q.o:null);
+    const isObj=!isSubj(q.t)&&objArr&&objArr.length>=2;
     let opts;
-    if(isSubj(q.t)){
+    if(!isObj){
       if(q.t==='填空'){
         opts=`<textarea class="ans-input" style="min-height:40px" placeholder="在此填入答案…" ${sub?'readonly':''} onchange="setExAns(${i},this.value)">${esc(my||'')}</textarea>`;
       }else{
         opts=`<textarea class="ans-input" placeholder="在此作答…" ${sub?'disabled':''} onchange="setExAns(${i},this.value)">${esc(my||'')}</textarea>`;
       }
     }else{
-      const arr=q.t==='判断'?['正确','错误']:q.o;
       const multi=q.t==='多选';
-      opts=arr.map((o,oi)=>{
+      opts=objArr.map((o,oi)=>{
         let cls='q-opt';
         if(sub){ cls+=' dis'; if(isRightOpt(q,oi)) cls+=' right'; else if(isMyOpt(my,oi)) cls+=' wrong' }
         else if(isMyOpt(my,oi)) cls+=' sel';
@@ -19284,17 +19663,18 @@ function renderExam(){
     if(sub){
       const r=examQRight(i);
       tail=`<div class="q-analysis show"><span class="aa">${r===null?'主观题 · 请对照参考答案自评':(r?'✓ 回答正确':'✗ 回答错误')}</span><br>`+
-        (isSubj(q.t)?`参考答案：${esc(q.a)}`:`正确答案：<b>${fmtAns(q)}</b>`)+(q.e?`<br>解析：${q.e}`:'')+`</div>`;
+        (isSubj(q.t)||!isObj?`参考答案：${esc(q.a)}`:`正确答案：<b>${fmtAns(q)}</b>`)+(q.e?`<br>解析：${q.e}`:'')+`</div>`;
       if(r===null&&qz.selfMark[i]===undefined) tail+=`<div class="qz-bar" style="margin-top:8px"><span class="muted">自评：</span><button class="btn btn-s" onclick="examSelfMark(${i},true)">我答对了</button><button class="btn btn-s btn-d" onclick="examSelfMark(${i},false)">我答错了</button></div>`;
       if(r===false&&!qz.added[i]) tail+=`<button class="btn btn-s" style="margin-top:8px" onclick="addWrong('wrong_exam',${i})">📕 加入错题本</button>`;
       if(qz.added[i]) tail+=`<span class="tag tag-g" style="display:inline-block;margin-top:8px">已加入错题本</span>`;
     }
-    return `<div class="q-card" style="margin-bottom:12px"><div class="q-meta"><span class="tag tag-b">${q.t}</span><span class="tag">${chSp(q.ch)}</span></div>
-    <div class="q-title">${i+1}. ${q.q}</div>${opts}${multiTip(q)}${tail}</div>`;
+    return `<div class="q-card" style="margin-bottom:12px"><div class="q-meta"><span class="tag tag-b">${qTag(q)}</span><span class="tag">${chSp(q.ch)}</span></div>
+    <div class="q-title">${i+1}. ${q.q}</div>${q.__blank?'<p class="q-blank">⚠ 本题原始资料只缺选项与答案（占位题，不计入得分）</p>':''}${opts}${multiTip(q)}${tail}</div>`;
   }).join('');
   html+=sub?`<div style="text-align:center;margin:16px 0"><button class="btn" onclick="endExam()">返回题库</button></div>`
     :`<div style="text-align:center;margin:16px 0"><button class="btn btn-p" style="padding:10px 40px" onclick="submitExam(false)">提交试卷</button></div>`;
   $('#studyContent').innerHTML=html;
+  typesetStudyMath();
 }
 function pickExOpt(i,oi,multi,el){
   if(qz.submitted) return;
@@ -19316,8 +19696,9 @@ function examQRight(i){
   return q.t==='多选'?arrEq(my,q.a):my===q.a;
 }
 function examScoreText(){
-  const total=qz.qs.length;
-  const right=qz.qs.filter((q,i)=>examQRight(i)===true).length;
+  const idx=qz.qs.map((q,i)=>i).filter(i=>!qz.qs[i].__blank);
+  const total=idx.length||qz.qs.length;
+  const right=idx.filter(i=>examQRight(i)===true).length;
   return `得分 ${Math.round(right/total*100)} 分（答对 ${right}/${total}）`;
 }
 function submitExam(auto){
@@ -19334,14 +19715,14 @@ function submitExam(auto){
   clearInterval(qz.timer);
   qz.submitted=true;
   if(!pomoRun){ const mins=(Date.now()-qz.start)/60000; if(mins>=0.5) logMinutes(mins); }
-  qz.qs.forEach((q,i)=>{ if(!isSubj(q.t)) bumpStat(qz.course,examQRight(i),q.t,q.ch) });
+  qz.qs.forEach((q,i)=>{ if(!isSubj(q.t)&&!q.__blank) bumpStat(qz.course,examQRight(i),q.t,q.ch) });
   let autoN=0;
-  qz.qs.forEach((q,i)=>{ if(examQRight(i)===false&&addWrongCore('wrong_exam',i)) autoN++ });
+  qz.qs.forEach((q,i)=>{ if(!q.__blank&&examQRight(i)===false&&addWrongCore('wrong_exam',i)) autoN++ });
   renderExam();
   toast('已交卷，查看得分与解析'+(autoN?`（${autoN} 道错题已自动加入错题本）`:''));
 }
 function examSelfMark(i,ok){ qz.selfMark[i]=ok; bumpStat(qz.course,ok,qz.qs[i].t,qz.qs[i].ch); if(!ok&&addWrongCore('wrong_exam',i)) setTimeout(()=>toast('已自动加入错题本'),50); renderExam() }
-function endExam(){ qz=null; renderQuizHome() }
+function endExam(){ if(qz&&qz.timer) clearInterval(qz.timer); cancelQAutoNext(); qz=null; renderQuizHome() }
 /* ---- 错题本 ---- */
 function renderWrong(){
   // 按当前科目过滤：各科目错题本只显示本科目收录的错题（i 为全量数组中的原始索引，删除时用）
@@ -19377,7 +19758,7 @@ function renderWrong(){
     const myTxt=isSubj(w.t)?esc(w.my||'（未作答）'):(w.my===undefined?'未作答':((w.t==='多选'&&Array.isArray(w.my))?w.my.map(x=>'ABCDEFGH'[x]).join('、'):(w.t==='判断'?(w.my===0?'正确':'错误'):(w.t==='多选'?'ABCDEFGH'[w.my]:'ABCDEFGH'[w.my]))));
     const rightTxt=w.t==='简答'?esc(w.a):fmtAns({t:w.t,o:w.o,a:w.a});
     return `<div class="wrong-item">
-      <div class="q-meta"><span class="tag tag-p">${c?c.short:w.course}</span><span class="tag tag-b">${w.t}</span><span class="muted">来源：${w.src}</span><span class="small" style="margin-left:auto">收藏于 ${w.time}${w.rv?(' · 下次复习 '+w.rv+(w.rv<=today()?'（待重刷）':'')):''}${(w.reps||w.ivl)?(' · SM-2 第 '+(w.reps||0)+' 次/间隔 '+(w.ivl||1)+' 天'):''}</span></div>
+      <div class="q-meta"><span class="tag tag-p">${c?c.short:w.course}</span><span class="tag tag-b">${esc(w.t0||w.t)}</span><span class="muted">来源：${w.src}</span><span class="small" style="margin-left:auto">收藏于 ${w.time}${w.rv?(' · 下次复习 '+w.rv+(w.rv<=today()?'（待重刷）':'')):''}${(w.reps||w.ivl)?(' · SM-2 第 '+(w.reps||0)+' 次/间隔 '+(w.ivl||1)+' 天'):''}</span></div>
       <div class="q-title">${w.q}</div>
       ${optsHtml}
       <div class="q-analysis show">你的答案：<b style="color:var(--danger)">${myTxt}</b>　正确答案：<b class="aa">${rightTxt}</b>${w.exp?`<br>解析：${w.exp}`:''}</div>
@@ -19571,6 +19952,8 @@ function renderReport(){
   $('#studyContent').innerHTML=overview+`<div class="grid g2">${typeCard}${chCard}</div>`+`<div class="grid g2">${gapCard}${errDistCard}</div>`+tipsCard;
 }
 function quickQuiz(){ curTab='quiz'; if(!curCourse && COURSES[0]) selectCourse(COURSES[0].code); go('study'); if(curCourse) switchTab('quiz') }
+/* 启动即统一题库题型（多选题别名 / 无选项的主观题 / 字母答案），否则整卷渲染会崩 */
+normalizeQuizData();
 renderCourseList();
 
 /* ================= 设置中心·界面 ================= */
