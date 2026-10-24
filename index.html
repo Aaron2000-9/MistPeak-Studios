@@ -124,6 +124,319 @@ a{color:var(--primary); text-decoration:none}
   #taskList{max-height:320px}
 }
 @media (max-width:768px){ .g-plan3{grid-template-columns:1fr} .g-plan3 .card:nth-child(3){grid-column:auto} }
+/* ===== 我的学习 · 概览 / 复盘 / 明细 三页切换 ===== */
+.my-head{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin:0 0 14px}
+.my-seg{display:flex; gap:2px; padding:3px; background:var(--bg); border:1px solid var(--border); border-radius:99px; width:min(400px,100%)}
+.my-seg .ms-b{flex:1 1 0; min-width:0; font-size:13px; font-weight:500; color:var(--text2); background:none;
+  border:none; border-radius:99px; padding:6px 0; cursor:pointer; font-family:inherit; line-height:1.4;
+  -webkit-tap-highlight-color:transparent}
+.my-seg .ms-b.on{background:var(--card); color:var(--text); box-shadow:0 1px 3px rgba(15,23,42,.10)}
+html.dark .my-seg .ms-b.on{background:#2a2f36; box-shadow:none; color:#e8eaed}
+.my-tip{margin-left:auto; font-size:12px; color:var(--text3)}
+.my-pane{display:none}
+.my-pane.on{display:block}
+/* 计划摘要（概览页顶部）：四格横排，每格「周期名 + 状态 / 细条 / 数字」三行，
+   整块高度压到 ~70px，跟一行指标条差不多，不再一层楼一条粗条 */
+.scale-mini{display:flex; gap:10px}
+.sm-cell{flex:1 1 0; min-width:0; padding:8px 11px 9px; border-radius:10px;
+  background:var(--bg); border:1px solid var(--border)}
+.sm-hd{display:flex; align-items:baseline; gap:6px}
+.sm-nm{font-size:11.5px; font-weight:600; color:var(--text2); white-space:nowrap;
+  overflow:hidden; text-overflow:ellipsis; min-width:0}
+.nm-short{display:none}
+.sm-tag{margin-left:auto; font-size:11px; font-weight:600; white-space:nowrap; flex:0 0 auto}
+.sm-cell.s-red .sm-tag{color:#dc2626}
+.sm-cell.s-org .sm-tag{color:#c2410c}
+.sm-cell.s-grn .sm-tag{color:#15803d}
+.sm-cell.s-mut .sm-tag{color:var(--text3)}
+html.dark .sm-cell.s-red .sm-tag{color:#ff7b72}
+html.dark .sm-cell.s-org .sm-tag{color:#ffb066}
+html.dark .sm-cell.s-grn .sm-tag{color:#4ade80}
+.sm-bar{position:relative; height:5px; border-radius:3px; background:var(--border); margin:7px 0 6px; overflow:hidden}
+.sm-bar i{position:absolute; left:0; top:0; height:100%; border-radius:3px; display:block}
+.sm-bar .t{background:var(--text3); opacity:.38}
+.sm-bar .k{background:var(--primary)}
+.sm-cell.s-red .sm-bar .k{background:#dc2626}
+.sm-cell.s-org .sm-bar .k{background:#c2410c}
+.sm-cell.s-grn .sm-bar .k{background:#15803d}
+.sm-cell.s-mut .sm-bar .k{background:var(--text3)}
+html.dark .sm-cell.s-red .sm-bar .k{background:#ff7b72}
+html.dark .sm-cell.s-org .sm-bar .k{background:#ffb066}
+html.dark .sm-cell.s-grn .sm-bar .k{background:#4ade80}
+.sm-ft{font-size:11px; color:var(--text3); font-variant-numeric:tabular-nums;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.sm-ft b{color:var(--text2); font-weight:600}
+.sm-tip{margin-top:9px; font-size:11.5px; line-height:1.6; color:var(--text2)}
+.sm-tip.warn{color:#c2410c}
+html.dark .sm-tip.warn{color:#ffb066}
+/* 计划刻度：浅色时间条在下、实色任务条在上，两条一对照就知道落后还是超前 */
+.scale-row{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap}
+.scale-nm{flex:0 0 106px; font-size:12.5px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.scale-nums{font-size:11.5px; color:var(--text2); font-variant-numeric:tabular-nums; white-space:nowrap}
+.scale-tag{margin-left:auto; font-size:11.5px; font-weight:600; white-space:nowrap}
+.scale-earn{position:relative; height:6px; border-radius:3px; background:var(--border); margin:5px 0 13px}
+.scale-earn i{position:absolute; left:0; top:0; height:100%; border-radius:3px; display:block}
+.scale-earn .b-time{background:var(--text3); opacity:.40}
+.scale-earn .b-task{background:var(--primary)}
+.scale-earn.s-red .b-task{background:#dc2626}
+.scale-earn.s-org .b-task{background:#c2410c}
+.scale-earn.s-grn .b-task{background:#15803d}
+.scale-earn.s-mut .b-task{background:var(--border)}
+.scale-tag.s-red{color:#dc2626}
+.scale-tag.s-org{color:#c2410c}
+.scale-tag.s-grn{color:#15803d}
+.scale-tag.s-mut{color:var(--text3)}
+html.dark .scale-tag.s-red{color:#ff7b72}
+html.dark .scale-tag.s-org{color:#ffb066}
+html.dark .scale-tag.s-grn{color:#4ade80}
+html.dark .scale-earn.s-red .b-task{background:#ff7b72}
+html.dark .scale-earn.s-org .b-task{background:#ffb066}
+html.dark .scale-earn.s-grn .b-task{background:#4ade80}
+.scale-note{margin-top:4px; padding:8px 11px; border-radius:9px; background:var(--bg); font-size:12px; line-height:1.7; color:var(--text2)}
+/* ===== 计划页 · 五级周期 ===== */
+.pl-top{margin-bottom:14px}
+.pl-bar{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px}
+.pl-lv{display:flex; gap:2px; padding:3px; background:var(--bg); border:1px solid var(--border); border-radius:99px}
+.pl-lv button{font-size:12.5px; padding:5px 15px; border-radius:99px; border:none; background:none;
+  color:var(--text2); cursor:pointer; font-family:inherit; white-space:nowrap; line-height:1.4}
+.pl-lv button.on{background:var(--card); color:var(--text); font-weight:600; box-shadow:0 1px 2px rgba(15,23,42,.08)}
+html.dark .pl-lv button.on{background:#2a2f36; box-shadow:none; color:#e8eaed}
+.pl-hint{font-size:11.5px; color:var(--text3)}
+.pl-chips{display:flex; gap:5px; flex-wrap:wrap; margin-bottom:11px}
+.pl-chip{font-size:12px; padding:4px 11px; border-radius:8px; border:1px solid var(--border); background:var(--card);
+  color:var(--text2); cursor:pointer; font-family:inherit; white-space:nowrap; line-height:1.55}
+.pl-chip:hover{border-color:var(--primary); color:var(--primary)}
+.pl-chip.on{background:var(--primary); border-color:var(--primary); color:#fff; font-weight:600}
+html.dark .pl-chip.on{color:#0f1216}
+.pl-chip .c-dot{display:inline-block; width:4px; height:4px; border-radius:50%; background:#dc2626;
+  margin-left:4px; vertical-align:2px}
+.pl-crumb{display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-size:12.5px; color:var(--text2)}
+.pl-crumb a{color:var(--text2); cursor:pointer; text-decoration:none; border-bottom:1px dashed transparent}
+.pl-crumb a:hover{color:var(--primary); border-bottom-color:var(--primary)}
+.pl-crumb b{color:var(--text); font-weight:600}
+.pl-sep{color:var(--text3); font-size:11px}
+.pl-main{display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:24px}
+.pl-goal{display:grid; grid-template-columns:1fr; gap:8px}
+.pl-fld{display:flex; align-items:center; gap:8px; min-width:0}
+.pl-fld>label{flex:0 0 68px; font-size:12px; color:var(--text3); white-space:nowrap}
+.pl-fld input{flex:1 1 auto; min-width:0; font-size:12.5px; padding:6px 9px; border:1px solid var(--border);
+  border-radius:7px; background:var(--bg); color:var(--text); font-family:inherit}
+.pl-fld input:focus{outline:none; border-color:var(--primary)}
+.pl-fld .u{flex:0 0 auto; font-size:11.5px; color:var(--text3)}
+.pl-prog{border-left:1px dashed var(--border); padding-left:24px; min-width:0}
+.pl-nums{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:13px 0 10px}
+.pl-num{background:var(--bg); border-radius:9px; padding:8px 10px; min-width:0}
+.pl-num .k{font-size:11.5px; color:var(--text3); line-height:1.4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.pl-num .v{font-size:17px; font-weight:700; color:var(--text); font-variant-numeric:tabular-nums; line-height:1.35}
+.pl-adv{font-size:12px; line-height:1.6; color:var(--text2)}.pl-adv.warn{color:#c2410c}
+.pl-line{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap}
+.pl-line .pl-k{font-size:12px; color:var(--text3); white-space:nowrap}
+.pl-line .pl-v{font-size:11.5px; color:var(--text2); font-variant-numeric:tabular-nums; white-space:nowrap}
+.pl-adv.good{color:#15803d}
+html.dark .pl-adv.warn{color:#ffb066}
+html.dark .pl-adv.good{color:#4ade80}
+.pl-act{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; padding-top:12px; border-top:1px dashed var(--border)}
+.pl-act .btn{font-size:12px; padding:5px 13px}
+table.pl-tb{table-layout:fixed; width:100%; border-collapse:collapse; font-size:12.5px}
+table.pl-tb th{font-size:11.5px; color:var(--text3); font-weight:400; text-align:left; padding:0 8px 7px;
+  border-bottom:1px solid var(--border); white-space:nowrap}
+table.pl-tb td{padding:9px 8px; border-bottom:1px solid var(--border); vertical-align:middle;
+  word-break:normal; overflow-wrap:break-word}
+table.pl-tb tbody tr{cursor:pointer}
+table.pl-tb tbody tr:hover{background:var(--bg)}
+table.pl-tb tr.now{background:var(--bg)}
+table.pl-tb tr.now td:first-child{box-shadow:inset 3px 0 0 var(--primary)}
+table.pl-tb th:nth-child(1),table.pl-tb td:nth-child(1){width:23%}
+table.pl-tb th:nth-child(2),table.pl-tb td:nth-child(2){width:29%}
+table.pl-tb th:nth-child(3),table.pl-tb td:nth-child(3){width:13%}
+table.pl-tb th:nth-child(4),table.pl-tb td:nth-child(4){width:21%}
+table.pl-tb th:nth-child(5),table.pl-tb td:nth-child(5){width:14%}
+.pl-mini{display:flex; align-items:center; gap:6px}
+.pl-mini i{flex:1 1 auto; height:5px; border-radius:3px; background:var(--border); overflow:hidden; min-width:22px}
+.pl-mini i b{display:block; height:100%; border-radius:3px; background:var(--primary)}
+.pl-mini em{flex:0 0 auto; font-style:normal; font-size:11px; color:var(--text3); font-variant-numeric:tabular-nums}
+.pl-mini.s-red i b{background:#dc2626}
+.pl-mini.s-org i b{background:#c2410c}
+.pl-mini.s-grn i b{background:#15803d}
+.pl-mini.s-mut i b{background:var(--border)}
+.pl-mile{display:grid; grid-template-columns:repeat(auto-fit,minmax(118px,1fr)); gap:9px}
+.pl-mile .mi{border-left:2px solid var(--border); padding-left:9px; min-width:0}
+.pl-mile .mi .d{font-size:11px; color:var(--text3); line-height:1.4}
+.pl-mile .mi .t{font-size:12.5px; color:var(--text); margin-top:2px; line-height:1.45; word-break:normal}
+.pl-mile .mi.hot{border-left-color:#dc2626}
+html.dark .pl-mile .mi.hot{border-left-color:#ff7b72}
+.pl-day{border-left:2px solid var(--border); padding-left:10px; margin-bottom:10px}
+.pl-day.has{border-left-color:#15803d}
+.pl-day.today{border-left-color:var(--primary)}
+.pl-day .hd{display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size:12px}
+.pl-day .hd b{font-weight:600; color:var(--text)}
+.pl-day .ti{font-size:11.5px; color:var(--text2); margin-top:3px; line-height:1.5}
+@media (max-width:768px){
+  .my-seg{width:100%}
+  .pl-hint{flex:1 1 100%}
+  .pl-lv{width:100%}
+  .pl-lv button{flex:1 1 0; padding:5px 0}
+  /* 手机端月份/周次条改成一行横滑，否则 12 个月会占三行 */
+  .pl-chips{flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
+    padding-bottom:5px; scrollbar-width:none}
+  .pl-chips::-webkit-scrollbar{height:0; display:none}
+  .pl-chip{flex:0 0 auto}
+  .pl-main{grid-template-columns:1fr; gap:14px}
+  .pl-prog{border-left:none; padding-left:0; border-top:1px dashed var(--border); padding-top:13px}
+  .pl-fld>label{flex:0 0 56px}
+  table.pl-tb{display:block}
+  table.pl-tb thead{display:none}
+  table.pl-tb tbody{display:block}
+  table.pl-tb tbody tr{display:flex; flex-wrap:wrap; align-items:center; gap:3px 12px;
+    padding:9px 0; border-bottom:1px solid var(--border)}
+  table.pl-tb td{display:block; border:none; padding:0; width:auto !important}
+  table.pl-tb td.p1{flex:1 1 100%; font-weight:600; font-size:13px}
+  table.pl-tb td.p2{flex:1 1 100%; font-size:11.5px; color:var(--text2)}
+  table.pl-tb td.p3,table.pl-tb td.p5{flex:0 0 auto; font-size:11.5px; color:var(--text2)}
+  table.pl-tb td.p4{flex:0 0 auto; width:96px}
+  table.pl-tb td.p3::before,table.pl-tb td.p5::before{content:attr(data-l) " "; color:var(--text3); font-size:11px}
+  table.pl-tb tr.now td:first-child{box-shadow:none}
+  table.pl-tb tr.now{background:none}
+  table.pl-tb tr.now td.p1{color:var(--primary)}
+}
+/* 今日速览条 */
+.ov-strip{display:flex; flex-wrap:wrap; gap:5px 22px; align-items:baseline}
+.ov-strip .os-i{font-size:12.5px; color:var(--text2); white-space:nowrap}
+.ov-strip .os-i b{font-size:15px; font-weight:700; color:var(--text); font-variant-numeric:tabular-nums; margin:0 2px}
+/* 成绩与掌握度：5 列，左表右建议两栏；「已答 / 正确率」不再占列，
+   单科细项见「明细 → 做题」Tab，这里只在右栏顶部留一行总览（见 renderStudyAnalysis） */
+.tb-wrap{overflow-x:auto; -webkit-overflow-scrolling:touch}
+.score-flex{display:flex; gap:22px; flex-wrap:wrap; align-items:flex-start}
+.score-main{flex:1 1 540px; min-width:0}
+.score-side{flex:1 1 330px; min-width:0; border-left:1px dashed var(--border); padding-left:22px;
+  position:sticky; top:88px}
+table.tb-score{table-layout:fixed; width:100%; min-width:540px}
+table.tb-score th,table.tb-score td{white-space:normal; word-break:normal; overflow-wrap:break-word}
+table.tb-score td .tag{white-space:nowrap}
+table.tb-score th:nth-child(1),table.tb-score td:nth-child(1){width:32%}
+table.tb-score th:nth-child(2),table.tb-score td:nth-child(2){width:10%}
+table.tb-score th:nth-child(3),table.tb-score td:nth-child(3){width:15%}
+table.tb-score th:nth-child(4),table.tb-score td:nth-child(4){width:17%}
+table.tb-score th:nth-child(5),table.tb-score td:nth-child(5){width:26%}
+.tb-score .sc-code{font-size:11px; color:var(--text3); margin-left:5px; font-variant-numeric:tabular-nums}
+/* 右栏顶部：刷题掌握度总览（一行，不占列也不再列 12 门课） */
+.quiz-sum{display:flex; flex-wrap:wrap; gap:4px 14px; align-items:baseline; margin-bottom:12px;
+  padding:8px 11px; border-radius:9px; background:var(--bg); font-size:12px; color:var(--text2)}
+.quiz-sum b{font-size:14.5px; font-weight:700; color:var(--text); font-variant-numeric:tabular-nums; margin:0 1px}
+.quiz-sum .qs-lk{margin-left:auto; font-size:11.5px; color:var(--primary); cursor:pointer; white-space:nowrap}
+/* 右栏「刷题掌握度」小表：只列刷过的科目，3 列紧凑排，不撑高右栏太长 */
+table.tb-qz{table-layout:fixed; width:100%; font-size:12px}
+table.tb-qz th{padding:6px 8px; font-size:11.5px}
+table.tb-qz td{padding:6px 8px; border-bottom:1px solid var(--border); vertical-align:middle}
+table.tb-qz th:nth-child(1),table.tb-qz td:nth-child(1){width:42%}
+table.tb-qz th:nth-child(2),table.tb-qz td:nth-child(2){width:18%; text-align:right; font-variant-numeric:tabular-nums}
+table.tb-qz th:nth-child(3),table.tb-qz td:nth-child(3){width:40%; text-align:right; white-space:nowrap}
+table.tb-qz td:nth-child(3) .tag{font-size:11px; padding:0 6px; margin:0 0 0 2px}
+.tb-qz .qz-nm{white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+/* 掌握度三档：固定 hex，深色单独覆盖，不随四套主题漂移 */
+.acc-g{color:#15803d; font-weight:600}
+.acc-o{color:#c2410c; font-weight:600}
+.acc-r{color:#dc2626; font-weight:600}
+html.dark .acc-g{color:#4ade80}
+html.dark .acc-o{color:#ffb066}
+html.dark .acc-r{color:#ff7b72}
+.score-advice{margin-top:14px; padding-top:12px; border-top:1px dashed var(--border)}
+/* 窄屏两栏会换行，此时分隔线从上改左，避免出现孤立的左边框 */
+@media (max-width:980px){
+  .score-side{border-left:none; padding-left:0; border-top:1px dashed var(--border); padding-top:14px;
+    flex:1 1 100%; position:static}
+}
+/* ===== 明细库 ===== */
+.dt-bar{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:12px}
+.dt-rg{display:flex; gap:2px; padding:3px; background:var(--bg); border:1px solid var(--border); border-radius:99px}
+.dt-rg button{font-size:12px; padding:4px 11px; border-radius:99px; border:none; background:none;
+  color:var(--text2); cursor:pointer; font-family:inherit; white-space:nowrap}
+.dt-rg button.on{background:var(--card); color:var(--text); font-weight:600; box-shadow:0 1px 2px rgba(15,23,42,.08)}
+html.dark .dt-rg button.on{background:#2a2f36; box-shadow:none; color:#e8eaed}
+.dt-q{flex:1 1 150px; min-width:0; padding:6px 10px; border:1px solid var(--border); border-radius:8px;
+  background:var(--bg); color:var(--text); font-size:12.5px; font-family:inherit}
+.dt-sel{flex:0 0 auto; max-width:170px; padding:6px 8px; border:1px solid var(--border); border-radius:8px;
+  background:var(--bg); color:var(--text); font-size:12.5px; font-family:inherit}
+.dt-tabs{display:flex; gap:2px; border-bottom:1px solid var(--border); margin-bottom:12px; overflow-x:auto; scrollbar-width:none}
+.dt-tabs::-webkit-scrollbar{display:none}
+.dt-tabs button{font-size:13px; padding:8px 12px; border:none; background:none; color:var(--text2);
+  cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; font-family:inherit}
+.dt-tabs button.on{color:var(--primary); border-bottom-color:var(--primary); font-weight:600}
+.dt-crumb{display:flex; gap:6px; align-items:center; flex-wrap:wrap; font-size:12px;
+  color:var(--text3); margin-bottom:10px; min-height:17px}
+.dt-crumb .dc-a{color:var(--primary); cursor:pointer}
+.dt-crumb .dc-a:hover{text-decoration:underline}
+.dt-wrap{overflow-x:auto; -webkit-overflow-scrolling:touch}
+/* 明细表统一口径：列宽按「该列最长字段」自适应，padding 左右各 14px ≈ 两个汉字宽的呼吸位。
+   表头沿用全站 table.tb 的视觉（浅蓝底 + 主色字），不再画竖线——竖线多点一多就成网格，
+   只留行分隔线更干净；行悬停整行变色，方便横向读长行。
+   .dt-tbw 用于含长文本列的表：表格铺满容器，右侧空间先给长文本用，真的放不下才折行。 */
+table.dt-tb{table-layout:auto; width:auto; max-width:100%; border-collapse:separate; border-spacing:0}
+table.dt-tb.dt-tbw{width:100%}
+table.dt-tb th,table.dt-tb td{white-space:nowrap; word-break:normal; overflow-wrap:normal;
+  padding:9px 14px; border-bottom:1px solid var(--border); text-align:center; vertical-align:middle}
+table.dt-tb thead th{background:var(--plight); color:var(--primary); font-weight:600}
+table.dt-tb thead th:first-child{border-radius:8px 0 0 8px}
+table.dt-tb thead th:last-child{border-radius:0 8px 8px 0}
+/* 首列（日期 / 科目）与长文本列左对齐，其余数字与状态保持居中 */
+table.dt-tb th:first-child,table.dt-tb td.d-date{text-align:left}
+/* 长文本列的表头跟着正文左对齐，否则「任务/学了什么」表头居中、正文靠左，视觉上是两套对齐 */
+table.dt-tb th.ta-l{text-align:left}
+table.dt-tb td.d-txt{white-space:normal; overflow-wrap:anywhere; text-align:left; min-width:200px}
+/* 计划表周期列：日期与「周一/今天」并到一行，中间留两个字宽的空隙 */
+.dt-sub{font-size:11px; color:var(--text3); font-weight:400; margin-left:14px}
+table.dt-tb tr.lv-row{cursor:pointer}
+table.dt-tb tbody tr:hover td{background:var(--bg)}
+table.dt-tb thead tr:hover th{background:var(--plight)}
+table.dt-tb tr.sum-row td{font-weight:600; color:var(--text); background:var(--bg)}
+/* 「明细 → 做题」表专用：科目走全称、单行不折行；其后各列一律居中。
+   宽度按内容定档——17 字科名 + 6 个窄列 = 780px 保底，900px 封顶；靠左对齐，不居中。 */
+table.dt-tbq{table-layout:fixed; width:100%; min-width:780px; max-width:900px}
+table.dt-tbq th:first-child{text-align:left}
+.dt-empty{padding:26px 6px; text-align:center; color:var(--text3); font-size:13px; line-height:1.8}
+.dt-act{font-size:12px; color:var(--primary); cursor:pointer; white-space:nowrap}
+@media (max-width:768px){
+  .my-tip{margin-left:0; flex:1 1 100%; font-size:11.5px}
+  .scale-hint{display:none}
+  /* 手机端计划摘要：四格改 2×2，格内文字不截断 */
+  .scale-mini{flex-wrap:wrap; gap:8px}
+  .sm-cell{flex:1 1 calc(50% - 4px)}
+  .sm-nm{font-size:11px}
+  .sm-nm.has-short .nm-full{display:none}
+  .sm-nm.has-short .nm-short{display:inline}
+  .sm-ft{font-size:10.5px}
+  /* 速览：手机上一行挤 6 项会连成一句，改成三列两行的指标矩阵 */
+  .ov-strip{display:grid; grid-template-columns:repeat(3,1fr); gap:13px 6px}
+  .ov-strip .os-i{white-space:normal; display:flex; flex-direction:column; font-size:11.5px; color:var(--text3)}
+  .ov-strip .os-i b{font-size:16px; margin:1px 0 0; color:var(--text)}
+  .dt-q{flex:1 1 100%}
+  .dt-sel{flex:1 1 auto; max-width:none}
+  .dt-wrap{overflow-x:visible}
+  table.dt-tb{min-width:0; display:block; table-layout:auto}
+  /* 做题表在 PC 有 720px 保底宽度，手机端要放回 0，否则整页横向溢出 */
+  table.dt-tbq{min-width:0}
+  table.dt-tb thead{display:none}
+  table.dt-tb tbody{display:block}
+  table.dt-tb tr{display:flex; flex-wrap:wrap; align-items:baseline; padding:9px 0; border-bottom:1px solid var(--border)}
+  table.dt-tb td{display:block; border:none; padding:0; width:auto !important}
+  table.dt-tb td.d-date{flex:0 0 auto; font-weight:600; color:var(--text); margin-right:auto}
+  /* 做题表手机端：科目走全称后（最长 17 字）会和数字挤同一行，让它独占一行排在数据之上 */
+  table.dt-tbq td.d-date{flex:1 1 100%; margin-right:0; font-size:12.5px}
+  /* 错题与状态原本紧贴，手机上会连成「错题 275% 待巩固」，补一段间距 */
+  table.dt-tbq td.d-mid + td.d-state{margin-left:10px}
+  /* 做题表「建议」列（补薄弱章节/集中突破）在手机独占一行，取消右对齐与缩进，否则会浮在半空 */
+  table.dt-tbq td.d-state.muted{flex:1 1 100%; text-align:left; margin-left:0; margin-top:2px}
+  table.dt-tb td.d-state{flex:0 0 auto; text-align:right; font-weight:600; margin-left:10px}
+  /* 每个数据格都补 10px 左间距：平铺成一行时「复述 0达成 未排」会连成一句 */
+  table.dt-tb td.d-mid{flex:0 0 auto; font-size:11.5px; color:var(--text2); margin:5px 0 0 10px}
+  /* 长文本列（任务/学了什么/知识点）手机上独占一行，否则一列几百字会把行挤散 */
+  table.dt-tb td.d-txt{flex:1 1 100%; max-width:none; min-width:0; margin-top:4px; font-size:12px; color:var(--text2); text-align:left}
+  /* 计划表 7 列平铺会被推成「日期 … 计划0 完成0」的错位，日期单独占一行 */
+  table.dt-tbd td.d-date{flex:1 1 100%; margin-right:0; text-align:left}
+  /* 手机上表头隐藏了，靠 data-l 把列名补回来，否则只剩一串数字认不出 */
+  table.dt-tb td.d-mid::before,table.dt-tb td.d-txt::before,table.dt-tb td.d-state[data-l]::before{content:attr(data-l) " "; color:var(--text3); font-weight:400}
+  table.dt-tb tr.sum-row td{background:none}
+}
 .btn{border:1px solid var(--border); background:var(--card); color:var(--text); padding:7px 16px; border-radius:8px; font-size:13px}
 .btn:hover{border-color:var(--primary); color:var(--primary)}
 .btn-p{background:var(--primary); border-color:var(--primary); color:#fff}
@@ -184,6 +497,54 @@ table.tb-ch th:nth-child(4),table.tb-ch td:nth-child(4){width:21%}
 table.tb-ch th:nth-child(5),table.tb-ch td:nth-child(5){width:13%}
 table.tb-ch td:nth-child(4){white-space:nowrap}
 table.tb-ch td:nth-child(4) .tag{white-space:nowrap; font-size:11.5px; padding:1px 6px}
+/* 实践课考核表（专业信息·本专业表 / 专业查询·各专业表共用）：
+   三列 = 课程 | 考核时间 | 地点·方式。按 40/24/36 分配——课程名最长（带代码），
+   地点最长且「方式」另起一行放在其下，时间列只放短串，给足地点才不会被挤成两行。 */
+.prac-key{display:flex; flex-wrap:wrap; gap:8px; margin:0 0 12px}
+.prac-key .pk-item{flex:1 1 148px; min-width:0; background:var(--bg); border:1px solid var(--border); border-radius:9px; padding:7px 10px; display:flex; flex-direction:column; gap:2px}
+.prac-key .pk-k{font-size:11.5px; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.prac-key .pk-v{font-size:13.5px; font-weight:700; color:var(--primary); line-height:1.35}
+table.tb-prac{table-layout:fixed; width:100%}
+table.tb-prac th{white-space:normal}
+table.tb-prac th:nth-child(1),table.tb-prac td:nth-child(1){width:40%}
+table.tb-prac th:nth-child(2),table.tb-prac td:nth-child(2){width:24%}
+table.tb-prac th:nth-child(3),table.tb-prac td:nth-child(3){width:36%}
+table.tb-prac td{padding:7px 10px; word-break:normal; overflow-wrap:break-word; line-height:1.6}
+table.tb-prac .pc-when{color:var(--text2); font-size:12.5px; font-variant-numeric:tabular-nums; white-space:nowrap}
+table.tb-prac .pc-mode{font-size:11.5px; color:var(--text3); margin-top:2px}
+table.tb-prac tr.pc-off td{background:transparent; color:var(--text3)}
+table.tb-prac tr.pc-off .pc-code{color:var(--text3)}
+table.tb-prac tr.pc-off .pc-when{color:#b45309; white-space:normal}
+html.dark table.tb-prac .pc-mode{color:#8b93a1}
+html.dark table.tb-prac tr.pc-off .pc-when{color:#f0b429}
+table.tb-prac tr.grp td{background:var(--bg); border-bottom:1px solid var(--border); padding:6px 10px}
+table.tb-prac tr.grp .g-time{font-weight:700; color:var(--primary); font-size:13px}
+table.tb-prac tr.grp .g-place{color:var(--text2); font-size:12px; margin-left:8px}
+table.tb-prac .pc-code{font-size:11.5px; color:var(--text3); margin-right:5px; font-variant-numeric:tabular-nums}
+html.dark table.tb-prac tr.grp .g-time{color:#7aa8ff}
+/* 深色下 --bg 比卡片还暗，chip 会像挖了一个洞、组标题行会变成一条黑带，
+   所以深色单独换成比卡片略亮的底色与 --plight 的深蓝带 */
+html.dark .prac-key .pk-item{background:#1b1f25; border-color:#343941}
+html.dark table.tb-prac tr.grp td{background:var(--plight)}
+@media (max-width:768px){
+  /* 手机端：表格改为「时段标题 + 课程条目」的堆叠结构，不再横向挤压 */
+  .prac-key .pk-item{flex:1 1 45%}
+  .prac-key .pk-v{font-size:12.5px}
+  table.tb-prac{font-size:13px}
+  table.tb-prac thead{display:none}
+  table.tb-prac,table.tb-prac tbody,table.tb-prac tr,table.tb-prac td{display:block; width:auto !important}
+  table.tb-prac tr.grp{margin:12px 0 0}
+  table.tb-prac tr.grp:first-child{margin-top:0}
+  table.tb-prac tr.grp td{background:var(--plight); border:0; border-radius:8px; padding:6px 9px; line-height:1.5}
+  table.tb-prac tr.grp .g-time{font-size:12.5px}
+  table.tb-prac tr.grp .g-place{display:block; margin:1px 0 0; font-size:11.5px}
+  table.tb-prac tr:not(.grp){padding:8px 2px 7px; border-bottom:1px solid var(--border)}
+  table.tb-prac tr:not(.grp) td{border:0; padding:0}
+  table.tb-prac tr:not(.grp) td:last-child{font-size:11.5px; color:var(--text3); margin-top:2px}
+  table.tb-prac tr:not(.grp) td:first-child{line-height:1.55}
+  table.tb-prac .pc-when{font-size:12px; white-space:normal}
+  table.tb-prac tr.pc-off .pc-when{font-size:12px}
+}
 /* 考试课程表：课程代码列左侧留白，前两列整体右移 */
 #majorTable th:first-child,#majorTable td:first-child{padding-left:24px}
 /* 教材及大纲表：课程列用全称，各列单行不换行 */
@@ -502,7 +863,33 @@ mark.anno-hl:hover{box-shadow:inset 0 0 0 999px rgba(128,128,128,.10)}
 /* 复习备考布局 */
 .study-layout{display:flex; gap:16px; align-items:flex-start}
 .study-side{width:264px; flex-shrink:0; position:sticky; top:76px; max-height:calc(100vh - 96px); overflow-y:auto}
-#sideFold{display:none}
+/* 科目列收起/展开：原先只有 ≤768px 生效，PC 点「收起」无反馈。改为全端可用。
+   收起后左侧科目列隐藏、主区占满整宽，屏幕左边缘浮出 ☰ 随时叫回来。 */
+.study-layout.side-folded .study-side{display:none}
+.study-layout.side-folded .study-main{flex:1 1 100%}
+/* 浮出的 ☰ 叫回按钮：定位样式提到全局（原先只写在窄屏媒体查询里，PC 收起后无处可点） */
+#sideFold{display:none; position:fixed; left:0; top:44%; z-index:190;
+  width:22px; height:54px; padding:0; border-radius:0 12px 12px 0;
+  align-items:center; justify-content:center;
+  background:var(--card); border:1px solid var(--border); border-left:none;
+  box-shadow:0 3px 14px rgba(15,23,42,.16); color:var(--primary);
+  font-size:13px; font-weight:700; cursor:pointer; -webkit-tap-highlight-color:transparent;
+  transition:width .15s, background .15s}
+#sideFold:hover{width:26px; background:var(--plight)}
+/* 科目卡片头部：左边「科目」标题、右边「收起」三横杠按钮，同属一张卡，不再单独占一行 */
+.cs-head{display:flex; align-items:center; gap:8px; margin:0 0 8px}
+.cs-title{font-size:13px; font-weight:700; color:var(--text)}
+/* 收起按钮：PC 与手机同一形态（32×28 三横杠方按钮） */
+.side-fold-btn{display:inline-flex; align-items:center; justify-content:center;
+  width:32px; height:28px; padding:0; margin:0 0 0 auto;
+  background:var(--card); border:1px solid var(--border); border-radius:8px;
+  color:var(--text2); font:inherit; cursor:pointer;
+  box-shadow:0 1px 2px rgba(15,23,42,.05);
+  transition:color .15s, border-color .15s, background .15s}
+.side-fold-btn:hover{color:var(--primary); border-color:var(--primary); background:var(--plight)}
+.side-fold-btn:active{transform:scale(.95)}
+.side-fold-btn:focus-visible{outline:2px solid var(--primary); outline-offset:2px}
+.side-fold-btn .sfb-ico{width:16px; height:16px; display:block}
 .side-group{font-size:12px; color:var(--primary); padding:10px 10px 5px; font-weight:700; border-bottom:1px solid var(--plight); margin-bottom:4px}
 .course-item{padding:7px 12px; border-radius:8px; cursor:pointer; font-size:13px; color:var(--text2); display:flex; align-items:center; gap:8px}
 .course-item:hover{background:var(--plight); color:var(--primary)}
@@ -1361,7 +1748,7 @@ img,svg,video,iframe{max-width:100%; height:auto}
   .side-courses .course-item:hover{background:var(--k-bg,var(--bg)); color:var(--k-fg,var(--text2))}
   .side-courses .course-item.active{border-color:var(--k-fg,var(--primary)); background:var(--k-bg,var(--plight));
     color:var(--k-fg,var(--primary)); font-weight:700; box-shadow:inset 0 0 0 1px var(--k-fg,var(--primary))}
-  .side-chaps{display:none !important}
+  /* 章节导航已从科目列下方移到页面右侧（#chDirBtn / #chDirPanel），左侧不再占位 */
   /* 科目列收起/展开：收起后右侧内容占满整宽，左边缘浮出一个小按钮随时叫回来 */
   #sideFold{display:flex; position:fixed; left:0; top:44%; z-index:190;
     width:22px; height:54px; padding:0; border-radius:0 12px 12px 0;
@@ -1372,10 +1759,15 @@ img,svg,video,iframe{max-width:100%; height:auto}
   #sideFold.off{display:none}
   .study-layout.side-folded .study-side{display:none}
   .study-layout.side-folded .study-main{flex:1 1 100%}
-  .side-fold-btn{display:flex; align-items:center; justify-content:center; gap:3px;
-    padding:5px 0 7px; margin:0 0 5px; font-size:11.5px; color:var(--text3);
-    border-bottom:1px dashed var(--border); cursor:pointer; -webkit-tap-highlight-color:transparent}
-  .side-fold-btn:active{color:var(--primary)}
+  /* 收起按钮在手机端与 PC 保持同一形态（卡片头部右侧的三横杠方按钮），不再独占一行文字。
+     手机端科目列只有 82px 宽，头部东西要收紧：标题 12px、间距 4px、按钮缩到 26×24（图标 13px），
+     否则按钮占掉列宽近四成。 */
+  .cs-head{gap:4px; margin-bottom:6px}
+  .cs-title{font-size:12px}
+  .side-fold-btn{width:26px; height:24px; border-radius:7px}
+  .side-fold-btn .sfb-ico{width:13px; height:13px}
+  /* 收起后左边缘浮出的 ☰（宽 22px）会压到内容卡片左边框：主区 x=12，补 12px 内边距让开 */
+  .study-layout.side-folded .study-main{padding-left:12px}
   /* 科目卡片层：手机上固定 2 列 */
   .mod-grid{grid-template-columns:repeat(2,1fr); gap:9px}
   .mod-card{min-height:88px; padding:12px 11px}
@@ -1691,6 +2083,62 @@ html.dark .t3-oo span.ok{color:#5ddc8b}
 .t3-ans{margin-top:6px; font-size:12.5px; line-height:1.75; color:var(--text2); background:var(--bg); border-radius:7px; padding:7px 10px; white-space:pre-wrap}
 .t3-ans>b{color:var(--text3); font-weight:600; font-size:11.5px; display:block; margin-bottom:2px}
 .t3-ans em{font-style:normal; color:var(--primary); font-weight:600; font-size:11.5px}
+/* 考点标签：挂在每道真题的期号/题型之后，标明该题对应的大纲知识点 */
+.t3-kp{font-size:11px; padding:1px 7px; border-radius:8px; background:var(--bg); border:1px solid var(--border);
+  color:var(--text2); max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+/* 解析块：左侧细竖线区分于参考答案的灰底块，避免两块糊成一片 */
+.t3-exp{margin-top:7px; font-size:12.5px; line-height:1.75; color:var(--text2); padding-left:9px;
+  border-left:2px solid var(--plight)}
+.t3-exp>b{color:var(--primary); font-weight:600; font-size:11.5px; display:block; margin-bottom:2px}
+.t3-exp.t3-rule{border-left-color:var(--border); color:var(--text3); font-size:12px}
+.t3-exp.t3-rule>b{color:var(--text3)}
+html.dark .t3-exp{border-left-color:rgba(148,163,184,.45)}
+html.dark .t3-exp.t3-rule{border-left-color:var(--border)}
+/* ===== AI 生成内容 =====
+   凡是原卷/题库里没有、由 AI 写出来或抽出来的内容，一律带紫色标识 + 紫色左竖线，
+   与「参考答案」（灰底）和「解析」（主题色竖线）在视觉上完全分开。
+   颜色用固定 hex，不绑 --primary：主题切换（violet/paper 等）会改主色，标识会跟着漂移、失去区分意义。 */
+.ai-badge{display:inline-block; font-size:10px; line-height:1.6; padding:0 5px; border-radius:6px;
+  font-weight:700; letter-spacing:.2px; vertical-align:1px; margin-left:5px; white-space:nowrap;
+  background:#f3ecfe; color:#6b28b8; border:1px solid #ddd0fa}
+html.dark .ai-badge{background:rgba(139,92,246,.22); color:#cbb2fd; border-color:rgba(167,139,250,.45)}
+.t3-exp.t3-aiexp{border-left-color:#8b5cf6}
+.t3-exp.t3-aiexp>b{color:#6b28b8}
+html.dark .t3-exp.t3-aiexp{border-left-color:#a78bfa}
+html.dark .t3-exp.t3-aiexp>b{color:#cbb2fd}
+/* 缺口说明：原卷确实没有的东西，直说，不拿 AI 内容冒充 */
+.t3-na{margin-top:6px; font-size:11.5px; line-height:1.6; color:var(--text3)}
+/* 答题骨架：从参考答案里抽要点清单，不改写内容 */
+.t3-skel{margin-top:7px; font-size:12px; line-height:1.7; color:var(--text2)}
+.t3-skel>b{color:#6b28b8; font-weight:600; font-size:11.5px}
+html.dark .t3-skel>b{color:#cbb2fd}
+.t3-skel .sk-n{font-size:11px; color:var(--text3); margin-left:6px}
+.t3-skel .sk-chips{display:flex; flex-wrap:wrap; gap:4px; margin-top:4px}
+.t3-skel .sk-chips i{font-style:normal; font-size:11px; line-height:1.65; padding:1px 7px; border-radius:7px;
+  background:#f6f1fe; color:#5b21b6; border:1px solid #e6dcfb}
+html.dark .t3-skel .sk-chips i{background:rgba(139,92,246,.16); color:#cbb2fd; border-color:rgba(167,139,250,.32)}
+/* 高频考点榜 */
+.t3-hp{width:100%; border-collapse:collapse; table-layout:fixed; font-size:12px}
+.t3-hp th{text-align:left; font-size:11.5px; color:var(--text3); font-weight:600;
+  padding:5px 8px; border-bottom:1px solid var(--border); white-space:nowrap}
+.t3-hp td{padding:8px 8px; border-bottom:1px solid var(--border); vertical-align:top; color:var(--text2); line-height:1.5}
+.t3-hp tr:last-child td{border-bottom:0}
+.t3-hp .hp-k{color:var(--text); font-weight:600; font-size:12.5px}
+.t3-hp .hp-sub{font-size:11px; color:var(--text3); margin-top:3px}
+.t3-hp .hp-bar{height:4px; border-radius:2px; background:var(--border); margin-top:5px; overflow:hidden}
+.t3-hp .hp-bar i{display:block; height:100%; border-radius:2px; background:var(--primary)}
+.t3-hp .hp-tag{display:inline-block; font-size:10.5px; line-height:1.6; padding:0 6px; border-radius:7px;
+  margin-left:6px; font-weight:600; vertical-align:1px}
+.t3-hp .hp-hot{background:#fdece4; color:#c2410c}
+.t3-hp .hp-mid{background:#e6f4ec; color:#0b7a44}
+.t3-hp .hp-low{background:#f1f5f9; color:#64748b}
+html.dark .t3-hp .hp-hot{background:rgba(194,65,12,.22); color:#fdba74}
+html.dark .t3-hp .hp-mid{background:rgba(11,122,68,.24); color:#6ee7a8}
+html.dark .t3-hp .hp-low{background:rgba(148,163,184,.16); color:#cbd5e1}
+.t3-hp th:nth-child(1),.t3-hp td:nth-child(1){width:42%}
+.t3-hp th:nth-child(2),.t3-hp td:nth-child(2){width:22%}
+.t3-hp th:nth-child(3),.t3-hp td:nth-child(3){width:12%}
+.t3-hp th:nth-child(4),.t3-hp td:nth-child(4){width:24%}
 .t3-more{font-size:11.5px; color:var(--text3); margin-top:2px}
 .t3-empty{font-size:12px; color:var(--text3); padding:4px 0}
 @media (max-width:768px){
@@ -1712,6 +2160,17 @@ html.dark .t3-oo span.ok{color:#5ddc8b}
   .t3-mini{font-size:10.5px; padding:0 5px}
   .t3-hide-sm{display:none}
   .t3-ans{font-size:12px; padding:6px 8px}
+  .t3-exp{font-size:12px; padding-left:7px}
+  .t3-hp{font-size:11.5px}
+  .t3-hp th,.t3-hp td{padding:6px 5px}
+  .t3-hp .hp-k{font-size:12px}
+  .t3-hp .hp-sub{font-size:10.5px; margin-top:2px}
+  .t3-hp th:nth-child(1),.t3-hp td:nth-child(1){width:46%}
+  .t3-hp th:nth-child(2),.t3-hp td:nth-child(2){display:none}  /* 窄屏隐藏章节列：考点名已含章内语义 */
+  .t3-hp th:nth-child(3),.t3-hp td:nth-child(3){width:20%}
+  .t3-hp th:nth-child(4),.t3-hp td:nth-child(4){width:34%}
+  .t3-hp .hp-tag{margin-left:5px; margin-top:0}
+  .t3-hp .hp-last{display:none}      /* 窄屏省掉「最近」行：一行文字成本太高，最近考期在 PC 上看 */
   .t3-d>summary{font-size:12.5px; padding:8px 10px}
   .t3-dbody{padding:9px 10px 11px}
 }
@@ -1746,6 +2205,56 @@ html.dark .t3-oo span.ok{color:#5ddc8b}
 .rd-item.lv0 .rd-n{min-width:0; width:0}
 .rd-empty{padding:24px 16px; text-align:center; color:var(--text3); font-size:13px; line-height:1.7}
 html.dark #rdPill{box-shadow:0 4px 16px rgba(0,0,0,.42)}
+/* ================= 章节目录（PC 右侧悬浮） =================
+   原来「章节导航」钉在左侧科目列下方，和科目列表抢长度、且一进页面就常驻。
+   改成：右侧贴边只露一个「目录」小标识（三横杠 + 目录），点开才从右侧滑出章节面板，
+   面板底部「收起」。只有「当前有章节可跳 + 处在正文类页签」时才出现标识。 */
+/* top 用 32% 而不是 50%：右侧 50% 处已有「直达顶部/底部」按钮（.jump-btn，40×40，z-index 150），
+   两者常同时出现，必须上下错开，否则叠在一起互相遮挡。 */
+#chDirBtn{position:fixed; right:0; top:32%; z-index:190; display:none;
+  flex-direction:column; align-items:center; justify-content:center; gap:4px;
+  width:46px; padding:10px 0 9px; border-radius:11px 0 0 11px;
+  background:var(--card); border:1px solid var(--border); border-right:none;
+  color:var(--text2); font:inherit; font-size:11px; line-height:1; cursor:pointer;
+  box-shadow:0 3px 14px rgba(15,23,42,.14); -webkit-tap-highlight-color:transparent;
+  transition:width .15s, background .15s, color .15s}
+#chDirBtn.on{display:flex}
+#chDirBtn:hover{width:50px; color:var(--primary); background:var(--plight)}
+#chDirBtn svg{width:16px; height:16px; display:block}
+#chDirBtn.open{background:var(--primary); border-color:var(--primary); color:#fff}
+#chDirMask{position:fixed; inset:0; z-index:1690; display:none}
+#chDirMask.on{display:block}
+#chDirPanel{position:absolute; right:0; top:50%; transform:translate(100%,-50%);
+  width:292px; max-width:88vw; max-height:72vh; display:flex; flex-direction:column;
+  background:var(--card); border:1px solid var(--border); border-right:none;
+  border-radius:14px 0 0 14px; box-shadow:-10px 0 30px rgba(15,23,42,.18);
+  transition:transform .24s cubic-bezier(.22,.61,.36,1)}
+#chDirMask.on #chDirPanel{transform:translate(0,-50%)}
+#chDirPanel .cd-hd{display:flex; align-items:center; gap:7px; padding:13px 16px 10px; flex:none;
+  border-bottom:1px solid var(--border); font-size:13.5px; font-weight:700; color:var(--text)}
+#chDirPanel .cd-cnt{font-size:11.5px; font-weight:400; color:var(--text3)}
+#chDirPanel .cd-body{flex:1 1 auto; min-height:0; overflow-y:auto; padding:6px 8px 10px;
+  -webkit-overflow-scrolling:touch}
+#chDirPanel #chList{max-height:none; overflow:visible}
+#chDirPanel .ch-item{position:relative; padding:8px 10px 8px 14px; border-radius:7px; font-size:12.5px; line-height:1.5}
+/* hover=灰底、当前章=主题色底 + 左侧竖条 + 加粗：两种状态必须能区分，
+   否则鼠标停在面板上时会出现「两项都高亮」的错觉 */
+#chDirPanel .ch-item:hover{background:var(--bg); color:var(--text)}
+#chDirPanel .ch-item.active{font-weight:600; background:var(--plight); color:var(--primary)}
+#chDirPanel .ch-item.active::before{content:""; position:absolute; left:4px; top:9px; bottom:9px;
+  width:3px; border-radius:2px; background:var(--primary)}
+html.dark #chDirPanel .ch-item:hover{background:#262a30; color:var(--text)}
+html.dark #chDirPanel .ch-item.active{background:var(--plight); color:var(--primary)}
+#chDirPanel .cd-foot{flex:none; margin:2px 12px 13px; padding:9px 0; border-radius:9px; cursor:pointer;
+  background:var(--plight); border:1px solid var(--border); color:var(--primary);
+  font:inherit; font-size:12.5px; font-weight:600; transition:background .15s, border-color .15s}
+#chDirPanel .cd-foot:hover{border-color:var(--primary)}
+html.dark #chDirBtn{box-shadow:0 3px 14px rgba(0,0,0,.42)}
+html.dark #chDirPanel{box-shadow:-10px 0 30px rgba(0,0,0,.5)}
+@media (max-width:768px){
+  /* 手机端沿用底部「目录」胶囊（#rdPill），右侧贴边标识不出现 */
+  #chDirBtn{display:none !important}
+}
 @media (max-width:768px){
   #rdPill.on{display:inline-flex}
   /* 手机端去掉思维导图：窄屏下缩略图整张只能缩到 20%，节点文字不可辨认 */
@@ -1952,7 +2461,7 @@ html.dark .kr{color:#fb923c}
       <tbody id="homeNodesTb"></tbody>
     </table>
     <p class="small" style="margin-top:8px" id="nodeSource">※ 时间取自当期考期数据，实际以官方通知为准。</p>
-    <div class="hl-box" style="margin-top:10px">🛠️ <b>实践课程提醒</b>：<span id="nodePracTip">本期实践类课程报考时间见上方节点表</span>，考核费由<b>组考学校</b>收缴、考核安排由主考校确定后陆续公布。本专业主考校为北京理工大学，请关注
+    <div class="hl-box" style="margin-top:10px">🛠️ <b>实践课程提醒</b>：<span id="nodePracTip">本期实践类课程报考时间见上方节点表</span>，考核费由<b>组考学校</b>收缴；<b>2026 年下半年考核安排北理工已公布</b>（时间 / 地点 / 方式见「专业信息 · 实践课程考核」，本专业本期 4 门）。本专业主考校为北京理工大学，请关注
       <a href="https://sce.bit.edu.cn/entry/v2/sub/18e0fc41c2a7907029549812cd101d41" target="_blank" style="color:var(--primary)">北理工继续教育学院「自学考试·通知公告」</a>；
       详见「新手指南 · 第 3 步」与「专业信息 · 实践课程考核」。</div>
   </div>
@@ -2002,7 +2511,7 @@ html.dark .kr{color:#fb923c}
   <div class="card">
     <h3 id="schedNowTitle">🗓 近期考试安排</h3>
     <div id="schedNow"></div>
-    <div class="hl-box">同一时间段只能选 1 门课，每期最多报 4 门。安排报考时注意避开同一单元的课程冲突。实践课考试时间由主考院校（北理工）另行通知。</div>
+    <div class="hl-box">同一时间段只能选 1 门课，每期最多报 4 门。安排报考时注意避开同一单元的课程冲突。实践课考核的时间、地点与方式见下方「实践课程考核」卡片。</div>
   </div>
   <div class="card">
     <h3>🛠 实践课程考核 · <span id="pracCalName">本期</span>（报考 / 缴费 / 考核安排）</h3>
@@ -2012,13 +2521,21 @@ html.dark .kr{color:#fb923c}
       <tr><td>网上报考</td><td id="pracRegWindow">—</td><td>考试院官网 → 自考个人中心（zikao.bjeea.cn）→「<span id="pracCalName2">本期</span>实践类课程报考」；逾期不予办理。报考后核对《报考凭单》。</td></tr>
       <tr><td>报考资格</td><td>—</td><td>已取得北京市自考考籍者，或 <span id="pracFreshName">本期</span>新生注册成功者；<b>实践课报考期间不办理新生注册</b>。</td></tr>
       <tr><td>缴　费</td><td>由<b>组考学校</b>收缴，时间与方式于报考期间公布在报考首页</td><td>考生凭《报考凭单》按组考校（北理工）规定的时间和方式缴费。注意：与笔试课的 30 元/科次官网缴费<b>不是一回事</b>。</td></tr>
-      <tr><td>考核安排</td><td><b>由主考校确定并陆续公布</b></td><td>考核内容、方式、时间、地点均以北理工公布为准。关注渠道见下方提示框。</td></tr>
-      <tr><td>准考证打印</td><td>考核前一周</td><td>须先按组考校规定完成缴费；个人中心 →「业务办理 → 准考证打印」→ 选「实践类课程」，A4 纸打印。持准考证 + 身份证件原件 + 组考校规定物品参加考核。</td></tr>
+      <tr><td>考核安排</td><td><b>已公布</b>（本期明细见下方）</td><td>考核内容、方式、时间、地点均以北理工公布为准。关注渠道见下方提示框。</td></tr>
+      <tr><td>准考证打印</td><td>11 月 2 日后（本期）</td><td>须先按组考校规定完成缴费；个人中心 →「业务办理 → 准考证打印」→ 选「实践类课程」，A4 纸打印。持准考证 + 身份证件原件 + 组考校规定物品参加考核。</td></tr>
       <tr><td>成绩发布</td><td id="pracScoreDate">—</td><td>登录个人中心查询。</td></tr>
     </table>
     <div class="hl-box">📢 <b>考核安排由组考校确定并公布</b>——请考生关注
       <a href="https://sce.bit.edu.cn/entry/v2/sub/18e0fc41c2a7907029549812cd101d41" target="_blank" style="color:var(--primary)"><b>北京理工大学继续教育学院网站（自学考试 · 通知公告）</b></a>；
       同时留意北京教育考试院官网自学考试栏目「信息发布台」与微信公众号「北京自考」。</div>
+    <h4 style="font-size:14px;margin:20px 0 6px;color:var(--primary)">本专业实践课考核安排<span id="pracMyName" style="font-weight:400;font-size:12.5px;color:var(--text3);margin-left:8px">工商管理（专升本）</span></h4>
+    <div id="pracMyBox"><p class="muted">加载中…</p></div>
+    <ul class="small" style="margin:10px 0 0;padding-left:18px;line-height:1.8">
+      <li>入校须在闸机处刷本人身份证，<b>外校机动车无法进入校内</b>；须持身份证原件 + 准考证入场，缺一不可。</li>
+      <li>开考 <b>30 分钟后禁止入场</b>，开考 <b>1 小时后可交卷离场</b>；自备黑色签字笔、计算器（仅限无存储功能）。</li>
+      <li>除允许携带的纸质资料外，<b>禁止携带任何电子设备及无线接收传送设备</b>进入考场。</li>
+      <li>原文：<a href="https://mp.weixin.qq.com/s?__biz=MzA5NTcyNjgzOQ==&amp;mid=2650363082&amp;idx=1&amp;sn=eb8a5d0f3c6e15b2fd3ee39d94b778ff" target="_blank" style="color:var(--primary)">北京自考《北京理工大学 2026 年下半年自考实践类课程考核安排》</a>（2026-10-23）</li>
+    </ul>
     <h4 style="font-size:14px;margin:14px 0 6px;color:var(--primary)">北理工「实践课程过程化助学项目」（第二期 · 2026-06-22）</h4>
     <p class="small" style="margin:0 0 6px">「线上助学 + 过程考核」模式，过程性考核成绩按 <b>30%</b> 计入课程最终成绩（最终 = 过程性×30% + 终结性×70%），成绩<b>有效期 1.5 年</b>、按取高原则记录，可多次参加。</p>
     <table class="tb">
@@ -2059,8 +2576,11 @@ html.dark .kr{color:#fb923c}
 <section class="page" id="page-study">
   <div class="study-layout">
     <aside class="study-side">
-      <div class="side-fold-btn" onclick="sideToggle()" title="收起科目列">◂ 收起</div>
       <div class="card side-courses" style="padding:10px 12px;margin-bottom:10px">
+        <div class="cs-head">
+          <span class="cs-title">科目</span>
+          <button type="button" class="side-fold-btn" onclick="sideToggle()" title="收起科目列" aria-label="收起科目列"><svg class="sfb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+        </div>
         <div class="course-search">
           <input id="courseSearch" type="text" placeholder="搜索课程名称或代码" autocomplete="off" oninput="filterCourseList()">
           <button class="cs-clear" id="csClear" type="button" title="清空" onclick="clearCourseSearch()">✕</button>
@@ -2074,10 +2594,6 @@ html.dark .kr{color:#fb923c}
         <div class="side-group">专业课（选修 · 6选4）</div>
         <div class="course-list" id="clOpt"></div>
         <p class="small" id="clEmpty" style="display:none;padding:6px 8px 2px;color:var(--text3)">没有匹配的课程，换个关键词试试</p>
-      </div>
-      <div class="card side-chaps" style="padding:10px 12px">
-        <div class="side-group">章节导航</div>
-        <div id="chList"><p class="small" style="padding:4px 8px">先选择课程</p></div>
       </div>
     </aside>
     <div class="study-main">
@@ -2110,6 +2626,20 @@ html.dark .kr{color:#fb923c}
       <button class="rd-x" type="button" onclick="rdClose()" aria-label="关闭">✕</button>
     </div>
     <div id="rdList"></div>
+  </div>
+</div>
+
+<!-- 章节目录（PC 右侧悬浮）：平时只露一个「目录」小标识，点开才滑出章节列表，底部「收起」。
+     章节数据与跳转沿用原来的 #chList / jumpChapter，只是换了个位置。 -->
+<button id="chDirBtn" type="button" onclick="chDirOpen()" title="章节目录" aria-label="打开章节目录">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+  <span>目录</span>
+</button>
+<div id="chDirMask" onclick="chDirClose()">
+  <div id="chDirPanel" onclick="event.stopPropagation()" role="dialog" aria-label="章节目录">
+    <div class="cd-hd">📖 目录<span class="cd-cnt" id="chDirCnt"></span></div>
+    <div class="cd-body"><div id="chList"><p class="small" style="padding:4px 8px">先选择课程</p></div></div>
+    <button class="cd-foot" type="button" onclick="chDirClose()">收起</button>
   </div>
 </div>
 
@@ -2192,6 +2722,24 @@ html.dark .kr{color:#fb923c}
 
 <!-- ============ 我的学习 ============ -->
 <section class="page" id="page-my">
+  <div class="my-head">
+    <div class="my-seg" id="mySeg">
+      <button type="button" class="ms-b on" data-pane="ov" onclick="myPane('ov')">概览</button>
+      <button type="button" class="ms-b" data-pane="pl" onclick="myPane('pl')">计划</button>
+      <button type="button" class="ms-b" data-pane="rv" onclick="myPane('rv')">复盘</button>
+      <button type="button" class="ms-b" data-pane="dt" onclick="myPane('dt')">明细</button>
+    </div>
+    <span class="my-tip" id="mySegTip"></span>
+  </div>
+
+  <!-- ================= 页一 · 概览 ================= -->
+  <div class="my-pane on" id="myPane-ov">
+  <div class="card" style="margin-bottom:14px">
+    <h3>📏 计划摘要 <span class="muted scale-hint" style="font-weight:400">彩条短于灰条＝落后</span>
+      <span class="exp-bar" style="margin-left:auto"><button type="button" class="btn btn-s" onclick="myPane('pl')">完整计划 →</button></span></h3>
+    <div id="scaleBox"></div>
+  </div>
+  <div class="card ov-strip" id="ovStrip" style="margin-bottom:14px;padding:12px 16px"></div>
   <div class="grid g-plan3">
     <div class="card" id="homeCheckinCard">
       <h3>📅 学习打卡 <span class="muted" style="font-weight:400" id="ckStreak"></span></h3>
@@ -2225,6 +2773,47 @@ html.dark .kr{color:#fb923c}
       </div>
     </div>
   </div>
+
+  <div class="card" style="margin-top:14px">
+    <h3>🎯 成绩与掌握度 <span class="muted" style="font-weight:400">点击分数直接填写，60 分及格自动标记通过</span></h3>
+    <div class="score-flex">
+      <div class="score-main">
+        <div class="tb-wrap">
+        <table class="tb tb-score" id="scoreTable">
+          <tr><th>课程</th><th>学分</th><th>成绩</th><th>状态</th><th>考期备注</th></tr>
+        </table>
+        </div>
+        <p class="muted" style="margin-top:8px" id="scoreSum"></p>
+      </div>
+      <div class="score-side"><div id="studyAnalysis"></div></div>
+    </div>
+  </div>
+  </div>
+
+  <!-- ================= 页二 · 计划 ================= -->
+  <div class="my-pane" id="myPane-pl">
+  <div class="card pl-top">
+    <div class="pl-bar">
+      <div class="pl-lv" id="plLv">
+        <button type="button" data-lv="y" onclick="plSetLv('y')">年</button>
+        <button type="button" data-lv="h" onclick="plSetLv('h')">半年</button>
+        <button type="button" data-lv="q" onclick="plSetLv('q')">季度</button>
+        <button type="button" data-lv="m" onclick="plSetLv('m')">月</button>
+        <button type="button" data-lv="w" onclick="plSetLv('w')">周</button>
+      </div>
+      <span class="pl-hint">目标由你写，进度按任务与学习时长自动汇总</span>
+    </div>
+    <div class="pl-chips" id="plChips"></div>
+    <div class="pl-crumb" id="plCrumb"></div>
+  </div>
+
+  <div id="plCard"></div>
+  <div id="plChild"></div>
+  <div id="plMile"></div>
+  </div>
+
+  <!-- ================= 页三 · 复盘 ================= -->
+  <div class="my-pane" id="myPane-rv">
   <div class="grid g2">
     <div class="card">
       <h3>📝 每日反思 <span class="muted" style="font-weight:400">记下学了什么、哪里没懂，AI 会追问检验你是不是真懂</span>
@@ -2277,19 +2866,34 @@ html.dark .kr{color:#fb923c}
     <div id="agentSteps" style="margin-top:10px"></div>
     <div id="agentResult" style="margin-top:12px"></div>
   </div>
+  </div>
+
+  <!-- ================= 页四 · 明细 ================= -->
+  <div class="my-pane" id="myPane-dt">
   <div class="card">
-    <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start">
-      <div style="flex:1 1 520px;min-width:0">
-        <h3>🎯 成绩管理 <span class="muted" style="font-weight:400">点击分数直接填写，60 分及格自动标记通过</span></h3>
-        <table class="tb" id="scoreTable">
-          <tr><th>课程</th><th>学分</th><th>成绩</th><th>状态</th><th>考期备注</th></tr>
-        </table>
-        <p class="muted" style="margin-top:8px" id="scoreSum"></p>
+    <div class="dt-bar">
+      <div class="dt-rg" id="dtRange">
+        <button type="button" data-rg="week" onclick="dtSetRange('week')">本周</button>
+        <button type="button" data-rg="month" onclick="dtSetRange('month')">本月</button>
+        <button type="button" data-rg="period" class="on" onclick="dtSetRange('period')">本考期</button>
+        <button type="button" data-rg="year" onclick="dtSetRange('year')">本年</button>
+        <button type="button" data-rg="all" onclick="dtSetRange('all')">全部</button>
       </div>
-      <div style="flex:1 1 340px;min-width:0;border-left:1px dashed var(--border);padding-left:18px">
-        <div id="studyAnalysis"></div>
-      </div>
+      <input class="dt-q" id="dtQ" placeholder="搜索关键词" oninput="dtSearch(this.value)">
+      <select class="dt-sel" id="dtCourse" onchange="dtPickCourse(this.value)"></select>
     </div>
+    <div class="dt-tabs" id="dtTabs">
+      <button type="button" class="on" data-tb="plan" onclick="dtSetTab('plan')">计划</button>
+      <button type="button" data-tb="task" onclick="dtSetTab('task')">任务</button>
+      <button type="button" data-tb="refl" onclick="dtSetTab('refl')">反思</button>
+      <button type="button" data-tb="feyn" onclick="dtSetTab('feyn')">复述</button>
+      <button type="button" data-tb="week" onclick="dtSetTab('week')">周报</button>
+      <button type="button" data-tb="ck" onclick="dtSetTab('ck')">打卡</button>
+      <button type="button" data-tb="quiz" onclick="dtSetTab('quiz')">做题</button>
+    </div>
+    <div class="dt-crumb" id="dtCrumb"></div>
+    <div id="dtBody"></div>
+  </div>
   </div>
 </section>
 
@@ -2528,6 +3132,16 @@ function cnDate(s){ if(!s) return '—'; const d=new Date(s+'T00:00:00'); return
 function cnFull(s){ if(!s) return '—'; const d=new Date(s+'T00:00:00'); return d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日' }
 function cnRange(a,b){ if(!a) return '—'; if(!b||b===a) return cnFull(a);
   return cnFull(a)+'—'+(String(a).slice(0,4)===String(b).slice(0,4)?cnDate(b):cnFull(b)) }
+/* ---------- 实践课考核安排：唯一数据源是 sg_calendar.js 的 period.pracExam ----------
+   未公布时返回 null，各处文案自动回退到「由主考院校公布」的说法，不会写出假日期。 */
+function pracExamOf(p){
+  const x=(p||{}).pracExam;
+  if(!x||!x.slots||!x.slots.length) return null;
+  const onsite=x.slots.filter(function(s){ return s.date&&!s.online }).map(function(s){ return s.date }).sort();
+  const st=x.onsiteStart||onsite[0]||null, ed=x.onsiteEnd||onsite[onsite.length-1]||st;
+  return { raw:x, start:st, end:ed, school:x.school||'主考院校',
+    ticketFrom:x.ticketFrom||null, onlineIssue:x.onlineIssue||null, onlineDue:x.onlineDue||null };
+}
 function rulePeriod(y,half){
   const ex=nthSat(y,half===1?4:10,half===1?2:4), s1=isoD(ex);
   const e=new Date(ex); e.setDate(e.getDate()+1);
@@ -2559,11 +3173,18 @@ function periodAt(when){
 }
 function periodNodes(p){
   const f=function(a,b){ return (b&&b!==a)?(cnFull(a)+'—'+cnDate(b)):cnFull(a) };
+  /* 实践课考核：组考校已公布现场安排就用真实日期（含地点），没公布才回退到「报考后至考前」 */
+  const _pe=pracExamOf(p);
+  const pracNode=_pe
+    ? {t:'实践课程考核', txt:cnFull(_pe.start)+'—'+cnDate(_pe.end)+'（'+(_pe.raw.place||_pe.school)+'）',
+       segs:[[_pe.start,_pe.end]], label:'待考核'}
+    : {t:'实践课程考核（组考校公布）', txt:'报考后至考前，各主考院校陆续公布',
+       segs:[[p.pracRegStart,p.examStart]], label:'关注通知'};
   return [
     {t:'新生注册', txt:f(p.freshRegStart,p.freshRegEnd), segs:[[p.freshRegStart,p.freshRegEnd||p.freshRegStart]], label:'新生第一步'},
     {t:'笔试课程报考', txt:f(p.regStart,p.regEnd), segs:[[p.regStart,p.regEnd]], label:'待进行'},
     {t:'实践课程报考', txt:f(p.pracRegStart,p.pracRegEnd), segs:[[p.pracRegStart,p.pracRegEnd]], label:'待进行'},
-    {t:'实践课程考核（组考校公布）', txt:'报考后至考前，各主考院校陆续公布', segs:[[p.pracRegStart,p.examStart]], label:'关注通知'},
+    pracNode,
     {t:'笔试考试', txt:f(p.examStart,p.examEnd), segs:[[p.examStart,p.examEnd]], label:'待进行'},
     {t:'成绩发布', txt:cnFull(p.scoreDate), segs:[[p.scoreDate,p.scoreDate]], label:'考后关注'},
     {t:'毕业申报 / 论文申报', txt:f(p.gradStart,p.gradEnd)+' / '+f(p.paperStart,p.paperEnd), segs:[[p.gradStart,p.paperEnd]], label:'符合条件者'}
@@ -2682,6 +3303,7 @@ function go(page,sub){
   if(page==='settings') renderSettings();
   if(page==='study'&&!curCourse) showStudyIntro();
   if(page==='majors') renderMajorTree();
+  if(typeof chDirSync==='function') chDirSync();   /* 「目录」标识只在复习备考页出现 */
   if(typeof syncCalText==='function') syncCalText();   /* 指南/专业页可能是切页时才渲染，切页后补一次考期文案 */
 }
 $$('.nav-btn').forEach(b=>{ if(b.dataset.page) b.onclick=()=>go(b.dataset.page) });
@@ -3042,6 +3664,22 @@ function renderMajorDetail(){
   // === Tab 4: 近期考试安排 ===
   else if(tab==='schedule'){
     const upper = MAJOR_SCHEDULE.upper, lower = MAJOR_SCHEDULE.lower, prac = MAJOR_SCHEDULE.practice;
+    /* 实践课卡片：本专业有实践课且组考校已公布安排，才用真实日期与考点；
+       没实践课的专业（如金融学）沿用笼统说法，不要凭空给它安一个考试日期 */
+    const pracCard = (function(){
+      const pe=pracExamOf(CAL_P);
+      if(!pe || !pracCoursesOf(cur.code).length) return prac;
+      if(!pracRowsOf(cur.code).length){
+        return { title:'🛠️ 实践课程考核', time:'本期安排未包含本专业课程',
+          note:'本专业实践课本期未组织，留意下一期 '+pe.school+' 通知' };
+      }
+      return { title:'🛠️ 实践课程考核',
+        time:cnDate(pe.start)+'—'+cnDate(pe.end)+' 现场（'+pe.school+'）',
+        note:'准考证 '+cnDate(pe.ticketFrom)+' 起打印，地点见下方「本期实践课考核安排」' };
+    })();
+    const pracNote = (pracExamOf(CAL_P) && pracCoursesOf(cur.code).length)
+      ? '实践课考核的时间与地点见下方「本期实践课考核安排」'
+      : '实践课考试时间由主考院校('+(cur.school||'各主考院校')+')另行通知';
     const periodData = MAJOR_SCHEDULE_BY_MAJOR[cur.code];
     // 工具:把课程项规范成 {n,c,d}(允许字符串/对象混传),并查全局课程表补全 code
     const normCourse = (raw) => {
@@ -3104,7 +3742,7 @@ function renderMajorDetail(){
       scheduleTableHtml = `
         <h4 style="margin-top:18px">📚 本专业近期考试安排(${_SESS_Y} 年)</h4>
         ${periodData.sessions.map(renderSession).join('')}
-        <div class="major-note">※ 同一时间段只能选 1 门课,每期最多报 4 门。安排报考时注意避同一单元的课程冲突。实践课考试时间由主考院校(${cur.school || '各主考院校'})另行通知。</div>
+        <div class="major-note">※ 同一时间段只能选 1 门课,每期最多报 4 门。安排报考时注意避同一单元的课程冲突。${pracNote}。</div>
       `;
     } else {
       // 无真实数据:按本专业课程清单智能排布,标"参考排布·待官方核实"
@@ -3141,7 +3779,7 @@ function renderMajorDetail(){
           </div>
           ${renderSession({ title: "上半年·"+cnRange((periodOfKey(_SESS_Y+'-04')||{}).examStart,(periodOfKey(_SESS_Y+'-04')||{}).examEnd), days: inferredDays1 })}
           ${renderSession({ title: "下半年·"+cnRange((periodOfKey(_SESS_Y+'-10')||{}).examStart,(periodOfKey(_SESS_Y+'-10')||{}).examEnd), days: inferredDays2 })}
-          <div class="major-note">※ 同一时间段只能选 1 门课,每期最多报 4 门。安排报考时注意避同一单元的课程冲突。实践课考试时间由主考院校(${cur.school || '各主考院校'})另行通知。</div>
+          <div class="major-note">※ 同一时间段只能选 1 门课,每期最多报 4 门。安排报考时注意避同一单元的课程冲突。${pracNote}。</div>
         `;
       }
     }
@@ -3152,9 +3790,10 @@ function renderMajorDetail(){
         <div class="sched-grid">
           <div class="sched-card"><h5>${upper.title}</h5><div class="sched-time">⏰ ${upper.time}</div><div class="sched-note">${upper.note}</div></div>
           <div class="sched-card"><h5>${lower.title}</h5><div class="sched-time">⏰ ${lower.time}</div><div class="sched-note">${lower.note}</div></div>
-          <div class="sched-card"><h5>${prac.title}</h5><div class="sched-time">⏰ ${prac.time}</div><div class="sched-note">${prac.note}</div></div>
+          <div class="sched-card"><h5>${pracCard.title}</h5><div class="sched-time">⏰ ${pracCard.time}</div><div class="sched-note">${pracCard.note}</div></div>
         </div>
         ${scheduleTableHtml}
+        ${pracMajorBlockHtml(cur.code)}
       </div>`;
   }
   // === Tab 5: 新旧课程顶替 ===
@@ -3240,7 +3879,9 @@ function syncCalText(){
   if(src) src.textContent='※ 时间整理自'+(C.province||'北京')+'教育考试院'+(C.checkedAt?('（数据核查 '+C.checkedAt+'）'):'')
     +(P.official?'，本考期为官方公告时间':'，本考期为按历年规律推算的预计时间')
     +'，实际以当期官方通知为准。';
-  setT('nodePracTip','本期实践类课程报考 '+rg(P.pracRegStart,P.pracRegEnd));
+  setT('nodePracTip','本期实践类课程报考 '+rg(P.pracRegStart,P.pracRegEnd)
+    +((function(){ const _pe=pracExamOf(P);
+        return _pe?('，现场考核 '+cnDate(_pe.start)+'—'+cnDate(_pe.end)+'（'+_pe.school+'）'):'，考核安排由主考校确定后公布' })()));
   // 专业信息 · 实践课程考核
   setT('pracCalName',nm+tag);
   setT('pracCalName2',nm);
@@ -3266,6 +3907,8 @@ function syncCalText(){
   setT('planExamLabel',mm?(mm+'月考期'):'本期考期');
   /* 专业信息 · 近期考试安排（日期与单元全部来自滚动考期档案，不再写死） */
   if(typeof renderSchedNow==='function') renderSchedNow();
+  /* 专业信息 · 本专业实践课考核表（只列本专业，其余归到专业查询） */
+  if(typeof renderPracMy==='function') renderPracMy();
 }
 /* ================= 近期考试安排（动态，数据源 = SCHED_BY_PERIOD） ================= */
 function schedTableHtml(days){
@@ -3335,10 +3978,15 @@ function tick(){
     : '成绩发布：'+cnDate(CAL_P.scoreDate)+' · 毕业申报：'+cnRange(CAL_P.gradStart,CAL_P.gradEnd);
   const pracS=new Date(CAL_P.pracRegStart+'T09:00:00'), pracE=new Date(CAL_P.pracRegEnd+'T17:00:00');
   const pracTxt=$('#practiceTip');
-  if(pracTxt) pracTxt.textContent = now<pracS
-    ? '📋 实践课报考：'+cnRange(CAL_P.pracRegStart,CAL_P.pracRegEnd)
-    : now<pracE ? '🔔 实践课报考进行中：截至 '+cnDate(CAL_P.pracRegEnd)
-    : '📋 实践课考核安排由各主考院校公布 · 成绩 '+cnDate(CAL_P.scoreDate)+' 发布';
+  if(pracTxt){
+    const _pe=pracExamOf(CAL_P);
+    pracTxt.textContent = now<pracS
+      ? '📋 实践课报考：'+cnRange(CAL_P.pracRegStart,CAL_P.pracRegEnd)
+      : now<pracE ? '🔔 实践课报考进行中：截至 '+cnDate(CAL_P.pracRegEnd)
+      : _pe
+        ? '📋 实践课考核：'+cnDate(_pe.start)+'—'+cnDate(_pe.end)+' 现场（'+_pe.school+'）· 准考证 '+cnDate(_pe.ticketFrom)+' 起打印'
+        : '📋 实践课考核安排由各主考院校公布 · 成绩 '+cnDate(CAL_P.scoreDate)+' 发布';
+  }
   // 黄历 / 农历整块重建每天只会变一次，原来每秒重建一次，是无谓的主要开销
   const dk=today();
   if(dk!==_heroCalDay){ _heroCalDay=dk; renderHeroCal() }
@@ -3651,6 +4299,150 @@ function renderNodes(){
     const st=nodeState(n, today);
     return '<tr><td>'+n.t+'</td><td>'+n.txt+'</td><td><span class="tag '+st[1]+'">'+st[0]+'</span></td></tr>';
   }).join('');
+}
+/* ================= 实践课归属与展示 =================
+   两个数据源各管一段，互不重复：
+     ① MAJOR_COURSES（各专业课程计划）→ 判断某门实践课属于哪些专业，做「反查」，不给课程硬写归属
+     ② sg_calendar.js 的 period.pracExam → 时间 / 地点 / 方式
+   改一处，四处同步：首页节点表、倒计时卡提示、专业信息·本专业考核表、专业查询·各专业近期考试安排。 */
+const MY_MAJOR_CODE='01B0020';                 /* 本专业：工商管理（专升本）· 北京理工大学 */
+function majorMetaOf(code){
+  const ms=(typeof MAJORS!=='undefined')?MAJORS:{};
+  for(const cat in ms){
+    const specs=(ms[cat]&&ms[cat].specs)||{};
+    for(const lvl in specs){
+      const hit=(specs[lvl]||[]).filter(function(x){ return x.code===code })[0];
+      if(hit) return {code:code, name:hit.name, level:lvl, cat:cat, school:hit.school||''};
+    }
+  }
+  return null;
+}
+function majorNameOf(code){ const m=majorMetaOf(code); return m?m.name:'' }
+function majorCourseList(code){
+  return ((typeof MAJOR_COURSES!=='undefined')&&MAJOR_COURSES[code])||[];
+}
+function isPracCourse(c){ return String((c&&c.method)||'').indexOf('实践')>-1 }
+function pracCoursesOf(code){ return majorCourseList(code).filter(isPracCourse) }
+/* 某专业在本期考核安排里的实践课（现场在前、线上在后，各自按时间排序） */
+function pracRowsOf(code){
+  const pe=pracExamOf(CAL_P); if(!pe) return [];
+  const mine=pracCoursesOf(code).map(function(c){ return c.code });
+  const rows=[];
+  pe.raw.slots.forEach(function(s){
+    (s.courses||[]).forEach(function(c){
+      if(mine.indexOf(c.code)<0) return;
+      rows.push({ code:c.code, name:c.name, mode:c.mode||'',
+        date:s.date, clock:s.clock||'', place:s.place||'', online:!!s.online });
+    });
+  });
+  rows.sort(function(a,b){
+    if(a.online!==b.online) return a.online?1:-1;
+    return ((a.date+'')+(a.clock||''))<((b.date+'')+(b.clock||''))?-1:1;
+  });
+  return rows;
+}
+/* 本专业计划内有、但本期安排里没有的实践课 */
+function pracMissingOf(code,rows){
+  const got=(rows||[]).map(function(r){ return r.code });
+  return pracCoursesOf(code).filter(function(c){ return got.indexOf(c.code)<0 });
+}
+/* 一门实践课被哪些专业计划收录（可能多个专业共用，如 14159 工商/会计/人力都有） */
+function majorsOfPracCourse(cc){
+  const all=(typeof MAJOR_COURSES!=='undefined')?MAJOR_COURSES:{};
+  return Object.keys(all).filter(function(mc){
+    return majorCourseList(mc).some(function(c){ return c.code===cc && isPracCourse(c) });
+  });
+}
+/* 跳到「专业查询 → 某专业 → 近期考试安排」 */
+function majorJump(code,label){
+  const m=majorMetaOf(code);
+  if(!m) return esc(label||code);
+  return '<a href="javascript:;" style="color:var(--primary)" onclick="go(\'majors\');selectMajor(\''+m.code+'\',\''+m.level+'\',\''+m.cat+'\');switchMajorTab(\'schedule\')">'+esc(label||m.name)+'</a>';
+}
+function pracWhen(r){
+  const t=String(r.clock||'').replace(/—/g,'–');
+  return cnDate(r.date)+' '+t;
+}
+function pracTblHtml(rows,miss,missTip){
+  return '<table class="tb tb-prac"><colgroup><col><col style="width:26%"><col style="width:34%"></colgroup>'
+    +'<thead><tr><th>课程</th><th>考核时间</th><th>地点 / 方式</th></tr></thead><tbody>'
+    +rows.map(function(r){
+        return '<tr><td><span class="pc-code">'+r.code+'</span>'+esc(r.name)+'</td>'
+          +'<td class="pc-when">'+pracWhen(r)+'</td>'
+          +'<td>'+esc(r.place)+(r.mode?('<div class="pc-mode">'+esc(r.mode)+'</div>'):'')+'</td></tr>';
+      }).join('')
+    +miss.map(function(c){
+        return '<tr class="pc-off"><td><span class="pc-code">'+c.code+'</span>'+esc(c.name)+'</td>'
+          +'<td colspan="2" class="pc-when">'+(missTip||'本期未安排，待下一期通知')+'</td></tr>';
+      }).join('')
+    +'</tbody></table>';
+}
+/* —— 专业信息页：本专业实践课表（其余专业的课归到「专业查询」）—— */
+function renderPracMy(){
+  const box=document.getElementById('pracMyBox'); if(!box) return;
+  const pe=pracExamOf(CAL_P);
+  const nmEl=document.getElementById('pracMyName');
+  const myName=majorNameOf(MY_MAJOR_CODE)||'本专业';
+  if(nmEl) nmEl.textContent=myName+'，共 '+pracCoursesOf(MY_MAJOR_CODE).length+' 门实践课';
+  if(!pe){
+    box.innerHTML='<p class="muted">本考期实践类课程考核安排<b>尚未公布</b>，公布后此处自动显示本专业每门课的时间与地点。</p>';
+    return;
+  }
+  const rows=pracRowsOf(MY_MAJOR_CODE), miss=pracMissingOf(MY_MAJOR_CODE,rows);
+  const key='<div class="prac-key">'
+    +'<div class="pk-item"><span class="pk-k">本专业现场考核</span><span class="pk-v">'+cnDate(pe.start)+'—'+cnDate(pe.end)+'</span></div>'
+    +(pe.ticketFrom?'<div class="pk-item"><span class="pk-k">准考证打印</span><span class="pk-v">'+cnDate(pe.ticketFrom)+' 起</span></div>':'')
+    +(pe.onlineIssue?'<div class="pk-item"><span class="pk-k">线上作业题目发出</span><span class="pk-v">'+cnDate(pe.onlineIssue)+'</span></div>':'')
+    +(pe.onlineDue?'<div class="pk-item"><span class="pk-k">线上作业截止</span><span class="pk-v">'+cnDate(pe.onlineDue)+' 24:00</span></div>':'')
+    +'</div>';
+  /* 其余课程归集到专业名，附跳转 */
+  const allCodes=[];
+  pe.raw.slots.forEach(function(s){ (s.courses||[]).forEach(function(c){ if(allCodes.indexOf(c.code)<0) allCodes.push(c.code) }) });
+  const myCodes=pracCoursesOf(MY_MAJOR_CODE).map(function(c){ return c.code });
+  const otherCodes=allCodes.filter(function(c){ return myCodes.indexOf(c)<0 });
+  const otherMajors=[];
+  const orphan=[];
+  otherCodes.forEach(function(cc){
+    const ms=majorsOfPracCourse(cc);
+    if(!ms.length){ orphan.push(cc); return }
+    ms.forEach(function(mc){ if(otherMajors.indexOf(mc)<0) otherMajors.push(mc) });
+  });
+  let otherHtml='';
+  if(otherCodes.length){
+    const seen={}, links=[];
+    otherMajors.forEach(function(mc){
+      const nm=majorNameOf(mc)||mc;
+      if(seen[nm]) return; seen[nm]=1;
+      links.push(majorJump(mc,nm));
+    });
+    otherHtml='<div class="hl-box" style="margin-top:10px;font-size:12.5px;line-height:1.8">📎 <b>其余 '+otherCodes.length+' 门不是本专业的课</b>'
+      +(links.length?('，分属 '+links.join('、')+' 等专业计划，已归入 <b>专业查询 → 对应专业 → 近期考试安排</b> 中，本页不再罗列'):'')
+      +(orphan.length?('；其中 '+orphan.map(function(cc){
+          const r=(function(){ let o=null;
+            pe.raw.slots.forEach(function(s){ (s.courses||[]).forEach(function(c){ if(c.code===cc) o=o||c }) });
+            return o })();
+          return '<b>'+cc+'</b> '+(r?esc(r.name):'');
+        }).join('、')+' 未匹配到本站已收录的专业计划，属其他开考专业，可忽略'):'')
+      +'。</div>';
+  }
+  box.innerHTML=key+pracTblHtml(rows,miss,'本期安排未包含，留意下一期通知')+otherHtml;
+}
+/* —— 专业查询页：点进哪个专业，只看该专业的实践课安排（不是本专业的课不出现在这里）—— */
+function pracMajorBlockHtml(code){
+  const pe=pracExamOf(CAL_P), mys=pracCoursesOf(code);
+  if(!pe||!mys.length) return '';
+  const rows=pracRowsOf(code), miss=pracMissingOf(code,rows);
+  const head='<h4 style="font-size:14px;margin:20px 0 6px;color:var(--primary)">🛠 本期实践课考核安排（'+esc(pe.school)+' 组织）</h4>';
+  if(!rows.length){
+    return head+'<div class="major-note" style="background:var(--bg);border-radius:8px;padding:10px 14px;font-size:12.5px;line-height:1.75">'
+      +'本专业计划内 <b>'+mys.length+'</b> 门实践考核课（'+mys.map(function(c){ return c.code+' '+esc(c.name) }).join('、')+'）'
+      +'<b>本期未纳入</b>已公布的考核安排，请等下一期通知。</div>';
+  }
+  return head
+    +'<p class="small" style="margin:0 0 8px">只列本专业计划内的实践考核课；准考证 <b>'+cnDate(pe.ticketFrom)+' 起</b>打印，考场号与座位号以准考证为准。</p>'
+    +pracTblHtml(rows,miss,'本期安排未包含，留意下一期通知')
+    +'<div class="major-note">※ 时间与地点源自 '+(pe.raw.published?cnFull(pe.raw.published)+' ':'')+'<b>'+esc(pe.school)+'</b> 公布的《'+esc(pe.raw.title||'实践类课程考核安排')+'》'
+    +(pe.raw.place?'，考点 '+esc(pe.raw.place):'')+'。实际以官方通知为准。</div>';
 }
 /* 今日任务卡的高度对齐已改为纯 CSS（见 .home-behavior / .ht-inner）：
    卡内内容绝对定位、不参与行高计算，三卡靠 align-items:stretch 自动等高，
@@ -4385,9 +5177,778 @@ function filterMajor(f){
 function renderMy(){
   // 各卡片独立渲染：某个出错不影响其他卡片
   [['renderScores',renderScores],['renderTasks',renderTasks],['renderCalendar',renderCalendar],['renderPlan',renderPlan],['renderStudyAnalysis',renderStudyAnalysis],
-   ['renderReflections',renderReflections],['renderFeynman',renderFeynman],['renderWeekly',renderWeekly],['renderAgentReview',renderAgentReview]]
+   ['renderReflections',renderReflections],['renderFeynman',renderFeynman],['renderWeekly',renderWeekly],['renderAgentReview',renderAgentReview],
+   ['renderOvStrip',renderOvStrip],['renderScale',renderScale],['renderPlanPage',renderPlanPage],['syncMyTip',syncMyTip],['renderDetail',renderDetail]]
     .forEach(([name,fn])=>{ try{ fn() }catch(e){ console.error('[我的学习] '+name+' 渲染失败:',e) } });
 }
+
+/* ================= 我的学习 · 概览 / 计划 / 复盘 / 明细 四页 ================= */
+var MY_PANE='ov';
+function myPane(p){
+  if(p!=='ov'&&p!=='pl'&&p!=='rv'&&p!=='dt') p=MY_PANE;
+  MY_PANE=p;
+  ['ov','pl','rv','dt'].forEach(function(k){
+    const el=document.getElementById('myPane-'+k);
+    if(el) el.classList.toggle('on', k===p);
+  });
+  const bs=document.querySelectorAll('#mySeg .ms-b');
+  for(let i=0;i<bs.length;i++) bs[i].classList.toggle('on', bs[i].getAttribute('data-pane')===p);
+  try{ store.set('my_pane',p) }catch(e){}
+  if(p==='dt') renderDetail();
+  if(p==='pl') renderPlanPage();
+}
+/* 分段控件右侧那句提示：告诉用户多久没记录了，不用逐页翻 */
+function syncMyTip(){
+  const el=document.getElementById('mySegTip'); if(!el) return;
+  const r=store.get('reflections',[])||[], f=store.get('feynman',[])||[];
+  const ds=[];
+  if(r.length&&r[0].date) ds.push(r[0].date);
+  if(f.length&&f[0].date) ds.push(f[0].date);
+  ds.sort();
+  const last=ds.length?ds[ds.length-1]:'';
+  el.textContent = last ? ('上次记录 '+(last===today()?'今天':last)) : '还没有反思或复述记录';
+}
+
+/* ---- 日期工具（明细库与刻度共用） ---- */
+function dtDstr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0') }
+function dtParse(s){ const p=String(s||'').split('-'); return new Date(+p[0]||1970,(+p[1]||1)-1,+p[2]||1) }
+function dtWeekNo(d){
+  const t=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+  const dow=(t.getDay()+6)%7; t.setDate(t.getDate()-dow+3);
+  const ft=new Date(t.getFullYear(),0,4);
+  const fdow=(ft.getDay()+6)%7; ft.setDate(ft.getDate()-fdow+3);
+  return 1+Math.round((t-ft)/(7*86400000));
+}
+/* 考期备考周期：以上一次考试后的 120 天为备考窗口，终点是本考期考试最后一天 */
+function dtExamRange(){
+  try{
+    if(typeof CAL_P!=='undefined'&&CAL_P&&CAL_P.examEnd){
+      const e=dtParse(CAL_P.examEnd);
+      return {from:dtDstr(new Date(e.getTime()-120*86400000)), to:CAL_P.examEnd, name:CAL_P.name||'本期考期'};
+    }
+  }catch(e){}
+  const n=new Date();
+  return {from:dtDstr(n), to:dtDstr(new Date(n.getTime()+120*86400000)), name:'本期考期'};
+}
+function dtEarliest(){
+  const ds=[];
+  (store.get('tasks',[])||[]).forEach(function(t){ if(t.date) ds.push(t.date) });
+  const sl=store.get('study_log',{})||{}; for(const d in sl) ds.push(d);
+  (store.get('checkins',[])||[]).forEach(function(d){ ds.push(d) });
+  (store.get('reflections',[])||[]).forEach(function(r){ if(r.date) ds.push(r.date) });
+  (store.get('feynman',[])||[]).forEach(function(r){ if(r.date) ds.push(r.date) });
+  ds.sort();
+  return ds.length?ds[0]:today();
+}
+/* 区间统计：任务配额 / 完成 / 学习时长 / 反思 / 复述 */
+function dtRangeStat(from,to){
+  const tasks=store.get('tasks',[])||[];
+  let total=0,done=0;
+  tasks.forEach(function(t){ if(t.date&&t.date>=from&&t.date<=to){ total++; if(t.done) done++ } });
+  const sl=store.get('study_log',{})||{}; let min=0;
+  for(const d in sl){ if(d>=from&&d<=to) min+=(+sl[d]||0) }
+  const refl=(store.get('reflections',[])||[]).filter(function(r){ return r.date&&r.date>=from&&r.date<=to }).length;
+  const feyn=(store.get('feynman',[])||[]).filter(function(r){ return r.date&&r.date>=from&&r.date<=to }).length;
+  return {total:total,done:done,min:min,refl:refl,feyn:feyn,rate:total?Math.round(done/total*100):null};
+}
+function dtPctTime(from,to){
+  const a=dtParse(from).getTime(), b=dtParse(to).getTime()+86399000, n=Date.now();
+  if(n<=a) return 0; if(n>=b) return 100;
+  return Math.round((n-a)/(b-a)*100);
+}
+
+/* ---- 计划刻度：灰条时间 vs 彩条任务 ---- */
+function renderScale(){
+  const box=document.getElementById('scaleBox'); if(!box) return;
+  const now=new Date(), y=now.getFullYear();
+  const dow=(now.getDay()+6)%7;
+  const mon=new Date(y,now.getMonth(),now.getDate()-dow);
+  const sun=new Date(mon.getFullYear(),mon.getMonth(),mon.getDate()+6);
+  const pr=dtExamRange();
+  const rows=[
+    {nm:'年 '+y, from:y+'-01-01', to:y+'-12-31'},
+    {nm:'考期 '+pr.name, snm:pr.name.replace(/^\d{4}年/,'')+'考期', from:pr.from, to:pr.to},
+    {nm:'月 '+(now.getMonth()+1)+' 月', from:dtDstr(new Date(y,now.getMonth(),1)), to:dtDstr(new Date(y,now.getMonth()+1,0))},
+    {nm:'周 第 '+dtWeekNo(now)+' 周', from:dtDstr(mon), to:dtDstr(sun)}
+  ];
+  let worst=null;
+  const html=rows.map(function(r){
+    const tp=dtPctTime(r.from,r.to);
+    const st=dtRangeStat(r.from,r.to);
+    let cls='s-mut', tag='未排任务', tk=null;
+    if(st.rate!==null){
+      tk=st.rate;
+      const diff=tk-tp;
+      if(diff<-15){ cls='s-red'; tag='落后 '+Math.abs(diff)+' 点' }
+      else if(diff<-5){ cls='s-org'; tag='落后 '+Math.abs(diff)+' 点' }
+      else if(diff>5){ cls='s-grn'; tag='超前 '+diff+' 点' }
+      else { cls='s-grn'; tag='基本同步' }
+      if(diff<-5&&(!worst||diff<worst.diff)) worst={diff:diff,nm:r.nm,to:r.to,st:st};
+    }
+    /* 剩余天数按「今天 0 点 → 周期末日」算，不额外 +1，否则考期在考试前一天会显示「剩 2 天」 */
+    const t0=new Date(); t0.setHours(0,0,0,0);
+    const leftD=Math.round((dtParse(r.to).getTime()-t0.getTime())/864e5);
+    const leftTxt=leftD>0?('剩 '+leftD+' 天'):(leftD===0?'今天截止':'已结束');
+    return '<div class="sm-cell '+cls+'">'
+      +'<div class="sm-hd"><span class="sm-nm'+(r.snm?' has-short':'')+'"><span class="nm-full">'+esc(r.nm)+'</span>'
+      +(r.snm?'<span class="nm-short">'+esc(r.snm)+'</span>':'')+'</span>'
+      +'<span class="sm-tag">'+tag+'</span></div>'
+      +'<div class="sm-bar"><i class="t" style="width:'+tp+'%"></i>'
+      +(tk===null?'':'<i class="k" style="width:'+tk+'%"></i>')+'</div>'
+      +'<div class="sm-ft">'+leftTxt+' · <b>'+st.done+'/'+st.total+'</b> 项</div>'
+      +'</div>';
+  }).join('');
+  let tip;
+  if(worst){
+    const left=Math.max(1,Math.ceil((dtParse(worst.to)-new Date())/86400000)+1);
+    const need=worst.st.total-worst.st.done;
+    tip='<div class="sm-tip warn">⚠️ '+esc(worst.nm)+' 最落后：还差 '+need+' 项，剩 '+left
+      +' 天，每天补 '+Math.max(1,Math.ceil(need/left))+' 项才追得平。</div>';
+  }else{
+    tip='<div class="sm-tip">进度 = 已完成任务 ÷ 该周期任务数；彩条短于灰条就是落后。某格显示「未排任务」说明这层还没排，去「计划」页排或点「考期倒排」。</div>';
+  }
+  box.innerHTML='<div class="scale-mini">'+html+'</div>'+tip;
+}
+
+/* ================= 计划页 · 五级周期（年 / 半年 / 季度 / 月 / 周） =================
+   设计口径：目标由用户手填（plan_targets 单键），进度从 tasks / study_log 按周期窗口现算。
+   考期（4 月 / 10 月）不单独做一级，以红点标记叠加在 chips 上。 */
+var PL_LV=['y','h','q','m','w'];
+var PL_LVN={y:'年',h:'半年',q:'季度',m:'月',w:'周'};
+var PL={lv:'m', id:'', init:false};
+
+function planAll(){ try{ return store.get('plan_targets',{})||{} }catch(e){ return {} } }
+function planGet(id){ return planAll()[id]||{} }
+function planSet(id,k,v){
+  const a=planAll(); const o=Object.assign({},a[id]||{}); o[k]=v; a[id]=o;
+  try{ store.set('plan_targets',a) }catch(e){}
+}
+function plP2(n){ return String(n).padStart(2,'0') }
+function plLvOf(id){
+  id=String(id||'');
+  if(/^\d{4}$/.test(id)) return 'y';
+  if(/^\d{4}H[12]$/.test(id)) return 'h';
+  if(/^\d{4}Q[1-4]$/.test(id)) return 'q';
+  if(/^\d{4}-W\d{1,2}$/.test(id)) return 'w';
+  if(/^\d{4}-\d{2}$/.test(id)) return 'm';
+  return '';
+}
+function plMeta(id){
+  const lv=plLvOf(id); if(!lv) return null;
+  const y=+String(id).slice(0,4);
+  if(lv==='y') return {id:id,lv:lv,y:y,name:y+' 年',short:y+' 年',
+    from:y+'-01-01', to:y+'-12-31', parent:''};
+  if(lv==='h'){
+    const h=+String(id).slice(5);
+    return {id:id,lv:lv,y:y,name:(h===1?'上半年':'下半年')+' H'+h,short:'H'+h,
+      from:y+'-'+(h===1?'01-01':'07-01'), to:y+'-'+(h===1?'06-30':'12-31'), parent:''+y};
+  }
+  if(lv==='q'){
+    const q=+String(id).slice(5), s=(q-1)*3+1, e=s+2;
+    return {id:id,lv:lv,y:y,name:'Q'+q+'（'+s+'–'+e+' 月）',short:'Q'+q,
+      from:y+'-'+plP2(s)+'-01', to:y+'-'+plP2(e)+'-'+new Date(y,e,0).getDate(),
+      parent:y+'H'+(q<=2?1:2)};
+  }
+  if(lv==='m'){
+    const mo=+String(id).slice(5), q=Math.floor((mo-1)/3)+1;
+    return {id:id,lv:lv,y:y,m:mo,name:mo+' 月',short:mo+' 月',
+      from:id+'-01', to:y+'-'+plP2(mo)+'-'+new Date(y,mo,0).getDate(), parent:y+'Q'+q};
+  }
+  const wn=+String(id).split('W')[1], mon=plWeekMon(y,wn);
+  return {id:id,lv:lv,y:y,wn:wn,name:'第 '+wn+' 周',short:'W'+wn,
+    from:dtDstr(mon), to:dtDstr(new Date(mon.getTime()+6*86400000)), parent:dtDstr(mon).slice(0,7)};
+}
+/* ISO 周 → 该周周一 */
+function plWeekMon(y,wn){
+  const jan4=new Date(y,0,4), dow=(jan4.getDay()+6)%7;
+  return new Date(new Date(y,0,4-dow).getTime()+(wn-1)*7*86400000);
+}
+/* 日期 → ISO 周 id（处理 12 月末 / 1 月初的跨年周） */
+function plWeekId(d){
+  let y=d.getFullYear(), wn=dtWeekNo(d);
+  if(wn===1&&d.getMonth()===11) y++;
+  if(wn>=52&&d.getMonth()===0) y--;
+  return y+'-W'+wn;
+}
+function plChildren(id){
+  const m=plMeta(id); if(!m) return [];
+  if(m.lv==='y') return [m.y+'H1',m.y+'H2'];
+  if(m.lv==='h'){ const q0=(String(id).slice(5)==='1')?1:3; return [m.y+'Q'+q0,m.y+'Q'+(q0+1)] }
+  if(m.lv==='q'){ const q=+String(id).slice(5), s=(q-1)*3+1;
+    return [0,1,2].map(function(i){ return m.y+'-'+plP2(s+i) }) }
+  if(m.lv==='m'){
+    const out=[], last=dtParse(m.to);
+    let d=dtParse(m.from), guard=0;
+    d=new Date(d.getTime()-((d.getDay()+6)%7)*86400000);
+    while(d<=last&&guard++<8){ out.push(plWeekId(d)); d=new Date(d.getTime()+7*86400000) }
+    return out;
+  }
+  return [];
+}
+function plChipList(cur){
+  const m=plMeta(cur); if(!m) return [];
+  /* 年份：已经过去的年份不再作为计划对象，列表固定从今年起，向后覆盖到当前选中年份 +2 */
+  if(m.lv==='y'){
+    const ny=new Date().getFullYear(), end=Math.max(m.y+2, ny+2), out=[];
+    for(let y=ny;y<=end;y++) out.push(''+y);
+    return out;
+  }
+  if(m.lv==='h') return [m.y+'H1',m.y+'H2'];
+  if(m.lv==='q') return [1,2,3,4].map(function(q){ return m.y+'Q'+q });
+  if(m.lv==='m') return [1,2,3,4,5,6,7,8,9,10,11,12].map(function(x){ return m.y+'-'+plP2(x) });
+  return plChildren(m.parent);
+}
+function plNow(lv){
+  const n=new Date(), y=n.getFullYear();
+  if(lv==='y') return ''+y;
+  if(lv==='h') return y+'H'+(n.getMonth()<6?1:2);
+  if(lv==='q') return y+'Q'+(Math.floor(n.getMonth()/3)+1);
+  if(lv==='m') return y+'-'+plP2(n.getMonth()+1);
+  return plWeekId(n);
+}
+/* 该周期内是否含考期考试日（chips 上的红点）。遍历全部考期，不只当前考期，
+   这样 2027 年 4 月那种「还没到的考期」也能标出来。 */
+function plHasExam(m){
+  try{
+    const ps=(window.SG_CALENDAR&&window.SG_CALENDAR.periods)||[];
+    for(let i=0;i<ps.length;i++){
+      const a=ps[i].examStart, b=ps[i].examEnd||a;
+      if(a&&!(b<m.from||a>m.to)) return true;
+    }
+    if(typeof CAL_P!=='undefined'&&CAL_P&&CAL_P.examStart){
+      const a=CAL_P.examStart, b=CAL_P.examEnd||a;
+      if(!(b<m.from||a>m.to)) return true;
+    }
+  }catch(e){}
+  return false;
+}
+/* 进度：时间走了多少 vs 任务完成多少 */
+function plProg(id){
+  const m=plMeta(id); if(!m) return null;
+  const st=dtRangeStat(m.from,m.to), t=planGet(id);
+  const tgt=+t.taskTarget||0, total=tgt>0?tgt:st.total;
+  const hourTgt=+t.hourTarget||0;
+  const rate=total?Math.round(Math.min(st.done,total)/total*100):null;
+  const tp=dtPctTime(m.from,m.to);
+  const hp=hourTgt?Math.round((st.min/60)/hourTgt*100):null;
+  let cls='s-mut', tag='未排任务', diff=null;
+  if(rate!==null){
+    diff=rate-tp;
+    if(tp>=100){ cls=(rate>=100)?'s-grn':'s-red'; tag=(rate>=100)?'已达成':'未完成' }
+    else if(diff<-15){ cls='s-red'; tag='落后 '+Math.abs(diff)+' 点' }
+    else if(diff<-5){ cls='s-org'; tag='落后 '+Math.abs(diff)+' 点' }
+    else if(diff>5){ cls='s-grn'; tag='超前 '+diff+' 点' }
+    else { cls='s-grn'; tag='基本同步' }
+  }
+  return {st:st, target:tgt, total:total, done:st.done, hourTgt:hourTgt, hmin:st.min, hp:hp,
+    rate:rate, tp:tp, cls:cls, tag:tag, diff:diff};
+}
+function plMini(p){
+  const w=p.rate===null?0:Math.min(100,p.rate);
+  return '<span class="pl-mini '+p.cls+'"><i><b style="width:'+w+'%"></b></i>'
+    +'<em>'+(p.rate===null?'—':p.rate+'%')+'</em></span>';
+}
+function plPlanText(id){
+  const t=planGet(id), m=plMeta(id), a=[];
+  if(t.courses) a.push(t.courses);
+  if(t.chapters) a.push(t.chapters);
+  if(a.length) return a.join(' · ');
+  const st=dtRangeStat(m.from,m.to);
+  return st.total?('已排 '+st.total+' 项任务'):'未写计划';
+}
+function plLvName(id){ return PL_LVN[plLvOf(id)]||'下级' }
+
+/* 切换周期：所有入口都走这里，保证 PL 与 store 一致 */
+function plGo(id){
+  const m=plMeta(id); if(!m) return false;
+  PL.id=id; PL.lv=m.lv;
+  try{ store.set('plan_lv',m.lv) }catch(e){}
+  return true;
+}
+function plSetLv(lv){
+  if(PL_LV.indexOf(lv)<0) return;
+  plGo(plNow(lv)); renderPlanPage();
+}
+function plPick(id){ if(plGo(id)) renderPlanPage() }
+function plSetFld(id,k,v){
+  if(k==='taskTarget'||k==='hourTarget') v=(v===''? '':Math.max(0,Math.round(+v||0)));
+  planSet(id,k,v);
+  plGo(id); renderPlanPage();
+}
+/* 把本级「任务数目标」平均拆到下一级，余数依次 +1 */
+function plSplitDown(){
+  const cur=PL.id, m=plMeta(cur); if(!m) return;
+  const tot=+planGet(cur).taskTarget||0, ch=plChildren(cur);
+  if(!ch.length){ toast('这一级没有下一级可以拆'); return }
+  if(!tot){ toast('先在「任务数目标」填一个数字，再拆到下级'); return }
+  const each=Math.floor(tot/ch.length), rem=tot-each*ch.length;
+  ch.forEach(function(k,i){ planSet(k,'taskTarget',each+(i<rem?1:0)) });
+  toast('已把 '+tot+' 项拆到 '+ch.length+' 个'+plLvName(ch[0]));
+  renderPlanPage();
+}
+function plClearLv(){
+  const a=planAll(); delete a[PL.id];
+  try{ store.set('plan_targets',a) }catch(e){}
+  renderPlanPage(); toast('已清空这一级的计划目标');
+}
+function plMileHtml(m){
+  let nodes=[];
+  try{ if(typeof CAL_NODES!=='undefined'&&CAL_NODES) nodes=CAL_NODES }catch(e){}
+  const hit=(nodes||[]).filter(function(n){
+    const segs=n.segs||[];
+    return segs.some(function(s){ return s&&s[0]&&s[1]&&!(s[1]<m.from||s[0]>m.to) });
+  });
+  if(!hit.length) return '';
+  return '<div class="card"><h3 style="margin:0 0 12px">关键节点 <span class="muted" style="font-weight:400">'
+    +'官方安排里落在这一级时间范围内的节点</span></h3><div class="pl-mile">'
+    + hit.map(function(n){
+        const hot=/考试|笔试|考核/.test(n.t||'');
+        return '<div class="mi'+(hot?' hot':'')+'"><div class="d">'+esc(n.txt||'')+'</div>'
+          +'<div class="t">'+esc(n.t||'')+'</div></div>';
+      }).join('') + '</div></div>';
+}
+function renderPlanPage(){
+  const box=document.getElementById('plCard'); if(!box) return;
+  // 以 store 为唯一真相：首次进入读存档；外部改了 plan_lv 也能跟上
+  let slv=''; try{ slv=store.get('plan_lv','') }catch(e){}
+  if(!PL.id){
+    PL.lv=PL_LV.indexOf(slv)>=0?slv:'m';
+    PL.id=plNow(PL.lv);
+  }else if(PL_LV.indexOf(slv)>=0&&slv!==PL.lv){
+    PL.lv=slv; PL.id=plNow(slv);
+  }
+  if(!plMeta(PL.id)||plMeta(PL.id).lv!==PL.lv) PL.id=plNow(PL.lv);
+  /* 过去的年份不给做计划：无论存档还是点选落到历史年份，一律拉回今年 */
+  const _pm0=plMeta(PL.id);
+  if(_pm0&&_pm0.lv==='y'&&_pm0.to<today()) PL.id=plNow('y');
+  const cur=PL.id, m=plMeta(cur), pg=plProg(cur), t=planGet(cur);
+
+  const lvBtns=document.querySelectorAll('#plLv button');
+  for(let i=0;i<lvBtns.length;i++) lvBtns[i].classList.toggle('on', lvBtns[i].getAttribute('data-lv')===PL.lv);
+
+  /* 周期 chips */
+  const cb=document.getElementById('plChips');
+  if(cb){
+    cb.innerHTML=plChipList(cur).map(function(id){
+      const mm=plMeta(id); if(!mm) return '';
+      const dot=plHasExam(mm)?'<i class="c-dot"></i>':'';
+      return '<button type="button" class="pl-chip'+(id===cur?' on':'')+'" onclick="plPick(\''+id+'\')">'
+        +esc(mm.short)+dot+'</button>';
+    }).join('');
+    // 手机端月份条是一行横滑：把选中的那一格滚进视野中间，否则打开时看不到高亮在哪
+    const onChip=cb.querySelector('.pl-chip.on');
+    if(onChip&&cb.scrollWidth>cb.clientWidth+2){
+      try{ cb.scrollLeft=Math.max(0, onChip.offsetLeft-cb.clientWidth/2+onChip.offsetWidth/2) }catch(e){}
+    }
+  }
+
+  /* 面包屑 */
+  const path=[]; let p=cur, guard=0;
+  while(p&&guard++<8){ const mm=plMeta(p); if(!mm) break; path.unshift(mm); p=mm.parent }
+  const crumb=document.getElementById('plCrumb');
+  if(crumb) crumb.innerHTML=path.map(function(mm,i){
+    return (i===path.length-1) ? ('<b>'+esc(mm.name)+'</b>')
+      : ('<a onclick="plPick(\''+mm.id+'\')">'+esc(mm.name)+'</a>');
+  }).join('<span class="pl-sep">›</span>')
+    +'<span style="flex:1 1 auto"></span>'
+    +'<span class="scale-tag '+pg.cls+'">'+esc(pg.tag)+'</span>';
+
+  /* 计划卡：左目标 / 右进度 */
+  const isPast = m.to < today();
+  let adv;
+  if(isPast){
+    adv='<div class="pl-adv">这一级已经结束：完成 '+pg.done+' / '+pg.total+' 项'
+      +(pg.rate!==null?'，达成 '+pg.rate+'%':'')+'。</div>';
+  }else if(pg.rate===null){
+    adv='<div class="pl-adv">这一级还没排任务。填了「任务数目标」就按目标算进度，不填就按实际排的任务算。</div>';
+  }else if(pg.diff<-5){
+    const left=Math.max(1,Math.ceil((dtParse(m.to)-new Date())/86400000)+1);
+    const need=Math.max(0,pg.total-pg.done);
+    adv='<div class="pl-adv warn">落后 '+Math.abs(pg.diff)+' 点：还差 '+need+' 项，剩 '+left
+      +' 天，每天要补 '+Math.max(1,Math.ceil(need/left))+' 项才追得平。</div>';
+  }else{
+    adv='<div class="pl-adv good">进度跟得上时间，保持当前节奏就行。</div>';
+  }
+  const hourTxt = pg.hourTgt?('目标 '+pg.hourTgt+' h'+(pg.hp!==null?'（'+pg.hp+'%）':'')):'未设时长目标';
+  const dTxt = (m.from.slice(0,4)===m.to.slice(0,4))
+    ? (cnDate(m.from)+' 至 '+cnDate(m.to))
+    : (cnFull(m.from)+' 至 '+cnFull(m.to));
+
+  box.innerHTML='<div class="card" style="margin-bottom:14px"><div class="pl-main">'
+    +'<div>'
+      +'<h3 style="margin:0 0 11px">'+esc(m.name)+' 计划目标 <span class="muted" style="font-weight:400">'+esc(dTxt)+'</span></h3>'
+      +'<div class="pl-goal">'
+        +'<div class="pl-fld"><label>科目</label><input type="text" value="'+esc(t.courses||'')+'" placeholder="如 近代史纲要、管理学原理" onchange="plSetFld(\''+cur+'\',\'courses\',this.value)"></div>'
+        +'<div class="pl-fld"><label>章节范围</label><input type="text" value="'+esc(t.chapters||'')+'" placeholder="如 1–7 章" onchange="plSetFld(\''+cur+'\',\'chapters\',this.value)"></div>'
+        +'<div class="pl-fld"><label>任务数目标</label><input type="number" min="0" value="'+(t.taskTarget||'')+'" placeholder="留空 = 按实际排的任务算" onchange="plSetFld(\''+cur+'\',\'taskTarget\',this.value)"><span class="u">项</span></div>'
+        +'<div class="pl-fld"><label>时长目标</label><input type="number" min="0" value="'+(t.hourTarget||'')+'" placeholder="如 20" onchange="plSetFld(\''+cur+'\',\'hourTarget\',this.value)"><span class="u">小时</span></div>'
+      +'</div>'
+      +'<div class="pl-act">'
+        +'<button type="button" class="btn btn-s" onclick="plSplitDown()" title="把本级任务数目标平均拆到下一级">按'+esc(plLvName((plChildren(cur)[0]||'')))+'均分到下级</button>'
+        +'<button type="button" class="btn btn-s" onclick="plClearLv()">清空这一级</button>'
+      +'</div>'
+    +'</div>'
+    +'<div class="pl-prog">'
+      +'<h3 style="margin:0 0 11px">完成情况</h3>'
+      +'<div class="pl-line"><span class="pl-k">时间</span><span class="pl-v">'+pg.tp+'%</span></div>'
+      +'<div class="scale-earn"><i class="b-time" style="width:'+pg.tp+'%"></i></div>'
+      +'<div class="pl-line"><span class="pl-k">任务</span><span class="pl-v">'
+        +(pg.rate===null?'—':pg.rate+'%')+'　完成 '+pg.done+' / '+pg.total+' 项</span></div>'
+      +'<div class="scale-earn '+pg.cls+'"><i class="b-time" style="width:'+pg.tp+'%"></i>'
+        +(pg.rate===null?'':'<i class="b-task" style="width:'+Math.min(100,pg.rate)+'%"></i>')+'</div>'
+      +'<div class="pl-nums">'
+        +'<div class="pl-num"><div class="k">计划任务</div><div class="v">'+(pg.total||'—')+'</div></div>'
+        +'<div class="pl-num"><div class="k">已完成</div><div class="v">'+pg.done+'</div></div>'
+        +'<div class="pl-num"><div class="k">学习时长</div><div class="v">'+(pg.hmin?Math.round(pg.hmin/60):0)+'<span style="font-size:11px;font-weight:400"> h</span></div></div>'
+      +'</div>'
+      +'<div style="font-size:11.5px;color:var(--text3);margin-bottom:9px">'+esc(hourTxt)+'</div>'
+      +adv
+    +'</div>'
+  +'</div></div>';
+
+  /* 拆到下一级 */
+  const ch=plChildren(cur);
+  let childHtml='';
+  if(ch.length&&m.lv!=='w'){
+    const rows=ch.map(function(k){
+      const cm=plMeta(k), cp=plProg(k);
+      const nowCls=(cm.from<=today()&&today()<=cm.to)?' class="now"':'';
+      return '<tr'+nowCls+' onclick="plPick(\''+k+'\')">'
+        +'<td class="p1">'+esc(cm.short)+' <span style="font-size:11px;color:var(--text3)">'+esc(cm.from.slice(5))+'</span></td>'
+        +'<td class="p2">'+esc(plPlanText(k))+'</td>'
+        +'<td class="p3" data-l="完成">'+cp.done+' / '+cp.total+'</td>'
+        +'<td class="p4">'+plMini(cp)+'</td>'
+        +'<td class="p5" data-l="状态">'+esc(cp.tag)+'</td></tr>';
+    }).join('');
+    childHtml='<div class="card" style="margin-bottom:14px">'
+      +'<h3 style="margin:0 0 12px">拆到'+esc(plLvName(ch[0]))+' <span class="muted" style="font-weight:400">点任意一行继续下钻</span></h3>'
+      +'<table class="pl-tb"><thead><tr><th>周期</th><th>计划</th><th>完成</th><th>进度</th><th>状态</th></tr></thead>'
+      +'<tbody>'+rows+'</tbody></table></div>';
+  }
+  if(m.lv==='w'){
+    const tasks=store.get('tasks',[])||[], ds=[];
+    for(let i=0;i<7;i++) ds.push(dtDstr(new Date(dtParse(m.from).getTime()+i*86400000)));
+    childHtml='<div class="card" style="margin-bottom:14px"><h3 style="margin:0 0 12px">本周 7 天任务</h3>'
+      + ds.map(function(d){
+          const ts=tasks.filter(function(x){ return x.date===d });
+          const dn=ts.filter(function(x){ return x.done }).length;
+          const isT=(d===today());
+          return '<div class="pl-day'+(ts.length?' has':'')+(isT?' today':'')+'">'
+            +'<div class="hd"><b>'+esc(d.slice(5))+(isT?' 今天':'')+'</b>'
+            +'<span style="font-size:11px;color:var(--text3)">'+(ts.length?(dn+' / '+ts.length+' 完成'):'未排任务')+'</span></div>'
+            + ts.map(function(x){
+                return '<div class="ti">'+(x.done?'✓ ':'· ')+esc(x.text||'')+'</div>';
+              }).join('')
+            +'</div>';
+        }).join('') + '</div>';
+  }
+  const cbox=document.getElementById('plChild');
+  if(cbox) cbox.innerHTML=childHtml;
+  const mbox=document.getElementById('plMile');
+  if(mbox) mbox.innerHTML=plMileHtml(m);
+}
+
+/* ---- 今日速览条 ---- */
+function renderOvStrip(){
+  const box=document.getElementById('ovStrip'); if(!box) return;
+  const scores=store.get('scores',{})||{};
+  const st=store.get('quiz_stats',{})||{};
+  const wrongs=(store.get('wrong_chapter',[])||[]).concat(store.get('wrong_exam',[])||[]);
+  const cks=store.get('checkins',[])||[];
+  let totalQ=0,rightQ=0;
+  for(const c in st){ totalQ+=(+(st[c]||{}).total||0); rightQ+=(+(st[c]||{}).right||0) }
+  const passed=COURSES.filter(function(c){ return scores[c.code]&&scores[c.code].pass }).length;
+  const acc=totalQ?Math.round(rightQ/totalQ*100):0;
+  const ws=weeklyStats();
+  const it=function(k,v){ return '<span class="os-i">'+k+'<b>'+v+'</b></span>' };
+  box.innerHTML=it('已通过 ',passed+'/'+COURSES.length+' 门')+it('已答 ',totalQ+' 题')+it('正确率 ',acc+'%')
+    +it('错题 ',wrongs.length+' 道')+it('打卡 ',cks.length+' 天')+it('本周 ',ws.minutes+' 分钟');
+}
+
+/* ================= 明细库 ================= */
+var DT={rg:'period', tb:'plan', q:'', course:'', lv:'p', anchor:null};
+function dtFillCourses(){
+  const sel=document.getElementById('dtCourse'); if(!sel) return;
+  if(sel.options.length>1) return;
+  const cur=sel.value||'';
+  sel.innerHTML='<option value="">全部科目</option>'+COURSES.map(function(c){
+    return '<option value="'+c.code+'">'+esc(c.short)+'</option>';
+  }).join('');
+  sel.value=cur;
+}
+function dtSetRange(rg){
+  DT.rg=rg; DT.q='';
+  const q=document.getElementById('dtQ'); if(q) q.value='';
+  DT.lv=({week:'w',month:'m',period:'p',year:'y',all:'am'})[rg]||'p';
+  DT.anchor=today();
+  renderDetail();
+}
+function dtSetTab(tb){ DT.tb=tb; renderDetail() }
+function dtSearch(v){ DT.q=(v||'').trim(); renderDetail() }
+function dtPickCourse(v){ DT.course=v||''; renderDetail() }
+function dtGo(lv,an){ if(lv) DT.lv=lv; if(an) DT.anchor=an; renderDetail() }
+function dtSyncChips(){
+  const a=document.querySelectorAll('#dtRange button');
+  for(let i=0;i<a.length;i++) a[i].classList.toggle('on', a[i].getAttribute('data-rg')===DT.rg);
+  const b=document.querySelectorAll('#dtTabs button');
+  for(let i=0;i<b.length;i++) b[i].classList.toggle('on', b[i].getAttribute('data-tb')===DT.tb);
+}
+function dtRange(){
+  const now=new Date(), y=now.getFullYear();
+  const dow=(now.getDay()+6)%7;
+  const mon=new Date(y,now.getMonth(),now.getDate()-dow);
+  const sun=new Date(mon.getFullYear(),mon.getMonth(),mon.getDate()+6);
+  if(DT.rg==='week') return {from:dtDstr(mon),to:dtDstr(sun)};
+  if(DT.rg==='month') return {from:dtDstr(new Date(y,now.getMonth(),1)),to:dtDstr(new Date(y,now.getMonth()+1,0))};
+  if(DT.rg==='period'){ const p=dtExamRange(); return {from:p.from,to:p.to} }
+  if(DT.rg==='year') return {from:y+'-01-01',to:y+'-12-31'};
+  return {from:dtEarliest(),to:today()};
+}
+function dtMonthKeys(from,to){
+  const out=[];
+  let d=dtParse(from); d=new Date(d.getFullYear(),d.getMonth(),1);
+  const end=dtParse(to);
+  while(d<=end&&out.length<600){ out.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')); d=new Date(d.getFullYear(),d.getMonth()+1,1) }
+  return out;
+}
+function dtWeeksOfMonth(mk){
+  const y=+mk.slice(0,4), m=+mk.slice(5,7);
+  const first=new Date(y,m-1,1), last=new Date(y,m,0);
+  let d=new Date(y,m-1,1);
+  const dow=(d.getDay()+6)%7; d=new Date(y,m-1,1-dow);
+  const out=[];
+  while(d<=last){
+    const mon=new Date(d), sun=new Date(d.getFullYear(),d.getMonth(),d.getDate()+6);
+    out.push({from:dtDstr(mon), to:dtDstr(sun), label:'第 '+dtWeekNo(mon)+' 周',
+      sub:(mon.getMonth()+1)+'/'+mon.getDate()+' 至 '+(sun.getMonth()+1)+'/'+sun.getDate()});
+    d=new Date(sun.getFullYear(),sun.getMonth(),sun.getDate()+1);
+  }
+  return out;
+}
+function dtRateCell(rate){
+  if(rate===null||rate===undefined) return '<span class="muted">未排</span>';
+  if(rate>=100) return '<span class="acc-g">'+rate+'%</span>';
+  if(rate>=60) return '<span class="acc-o">'+rate+'%</span>';
+  return '<span class="acc-r">'+rate+'%</span>';
+}
+function dtStRow(o){
+  const st=dtRangeStat(o.from,o.to);
+  /* 副标题（周一 / 今天）与周期并排一行：空格切段各自成 span，靠 margin 留白，
+     否则 CJK 之间的空格会被清洗掉，显示成「周六今天」 */
+  const sub=o.sub?String(o.sub).split(/\s+/).filter(Boolean).map(function(x){
+    return '<span class="dt-sub">'+esc(x)+'</span>' }).join(''):'';
+  return '<tr class="lv-row" data-lv="'+(o.lv||'')+'" data-anchor="'+(o.anchor||'')+'" onclick="dtDrill(this)">'
+    +'<td class="d-date">'+esc(o.label)+sub+'</td>'
+    +'<td class="d-mid" data-l="计划">'+st.total+'</td><td class="d-mid" data-l="完成">'+st.done+'</td>'
+    +'<td class="d-mid" data-l="时长">'+st.min+' 分</td><td class="d-mid" data-l="反思">'+st.refl+'</td><td class="d-mid" data-l="复述">'+st.feyn+'</td>'
+    +'<td class="d-state" data-l="达成">'+dtRateCell(st.rate)+'</td></tr>';
+}
+function dtDrill(tr){
+  const lv=tr.getAttribute('data-lv'); if(!lv) return;
+  DT.lv=lv; DT.anchor=tr.getAttribute('data-anchor')||today();
+  renderDetail();
+}
+function dtCrumbHtml(items){
+  return items.map(function(it,i){
+    return (i?'<span>&rsaquo;</span>':'')+(it.act
+      ? '<span class="dc-a" onclick="'+it.act+'">'+esc(it.t)+'</span>'
+      : '<span>'+esc(it.t)+'</span>');
+  }).join('');
+}
+function dtPlanTable(rows,emptyTxt){
+  if(!rows.length) return '<div class="dt-empty">'+esc(emptyTxt)+'</div>';
+  return '<div class="dt-wrap"><table class="dt-tb dt-tbd">'
+    +'<thead><tr><th>周期</th><th>计划</th><th>完成</th><th>时长</th><th>反思</th><th>复述</th><th>达成率</th></tr></thead><tbody>'
+    +rows.join('')+'</tbody></table></div>'
+    +'<p class="muted" style="margin-top:8px;font-size:12px">点任意一行可继续下钻到更细的周期；计划数来自当期为该时段排的任务，达成率 = 完成 ÷ 计划。</p>';
+}
+function dtPlanView(cr){
+  const pr=dtExamRange();
+  const an=DT.anchor||today();
+  const ad=dtParse(an);
+  const yy=ad.getFullYear(), mm=ad.getMonth()+1;
+  let rows=[], crumbs=[];
+  if(DT.lv==='y'||DT.lv==='p'||DT.lv==='am'){
+    let from,to,base;
+    if(DT.lv==='y'){ from=yy+'-01-01'; to=yy+'-12-31'; base=[{t:yy+' 年'}] }
+    else if(DT.lv==='p'){ from=pr.from; to=pr.to; base=[{t:pr.name,lv:'p',an:pr.from}] }
+    else { from=dtEarliest(); to=today(); base=[{t:'全部月份'}] }
+    crumbs=base;
+    /* 倒序：最近的月份在最上面，否则考期跨度 4 个月时首屏全是「未排」的空月 */
+    rows=dtMonthKeys(from,to).reverse().map(function(mk){
+      const y=+mk.slice(0,4), m=+mk.slice(5,7);
+      return dtStRow({label:y+' 年 '+m+' 月', from:mk+'-01', to:dtDstr(new Date(y,m,0)), lv:'m', anchor:mk+'-01'});
+    });
+  }else if(DT.lv==='m'){
+    crumbs=[{t:yy+' 年 '+mm+' 月'}];
+    rows=dtWeeksOfMonth(an.slice(0,7)).map(function(w){
+      return dtStRow({label:w.label, sub:w.sub, from:w.from, to:w.to, lv:'w', anchor:w.from});
+    });
+  }else if(DT.lv==='w'){
+    const dow=(ad.getDay()+6)%7;
+    const mon=new Date(yy,ad.getMonth(),ad.getDate()-dow);
+    crumbs=[{t:'第 '+dtWeekNo(ad)+' 周'}];
+    const wd=['周一','周二','周三','周四','周五','周六','周日'];
+    for(let i=0;i<7;i++){
+      const d=new Date(mon.getFullYear(),mon.getMonth(),mon.getDate()+i);
+      const k=dtDstr(d);
+      rows.push(dtStRow({label:(d.getMonth()+1)+' 月 '+d.getDate()+' 日', sub:wd[i]+(k===today()?' 今天':''), from:k, to:k, lv:'d', anchor:k}));
+    }
+  }else{
+    crumbs=[{t:an}];
+    const list=(store.get('tasks',[])||[]).filter(function(t){ return t.date===an });
+    const st=dtRangeStat(an,an);
+    if(!list.length) return {crumbs:crumbs, html:'<div class="dt-empty">'+esc(an)+' 没有排任务。'+(st.min?'当天学习 '+st.min+' 分钟。':'')+'<br>去「复盘 → 智能推荐任务」给这一天排几条，回来就能看到了。</div>'};
+    const inner=list.map(function(t){
+      return '<div style="display:flex;gap:10px;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--border)">'
+        +'<span style="font-size:12.5px;color:'+(t.done?'var(--text3)':'var(--text)')+';'+(t.done?'text-decoration:line-through':'')+'">'+esc(t.text||'')+'</span>'
+        +'<span class="muted" style="margin-left:auto;font-size:11.5px">'+(t.done?'已完成':'未完成')+(t.est?'　约 '+t.est+' 分钟':'')+'</span></div>';
+    }).join('');
+    return {crumbs:crumbs, html:'<div style="font-size:12.5px;color:var(--text2);margin-bottom:8px">当天学习 '+st.min+' 分钟 · 任务 '+st.done+'/'+st.total+' 完成 · 反思 '+st.refl+' 条 · 复述 '+st.feyn+' 条</div>'+inner};
+  }
+  /* 面包屑：按当前范围拼出「范围 › 月 › 周 › 日」，前几级可点回上层 */
+  const path=[];
+  if(DT.lv!=='am'&&DT.lv!=='y'&&DT.lv!=='p'){
+    if(DT.rg==='year') path.push({t:yy+' 年', act:"dtGo('y','"+yy+"-01-01')"});
+    else if(DT.rg==='all') path.push({t:'全部', act:"dtGo('am','"+today()+"')"});
+    else path.push({t:'考期 '+pr.name, act:"dtGo('p','"+pr.from+"')"});
+    if(DT.lv==='w'||DT.lv==='d') path.push({t:yy+' 年 '+mm+' 月', act:"dtGo('m','"+dtDstr(new Date(yy,mm-1,1))+"')"});
+    if(DT.lv==='d') path.push({t:'第 '+dtWeekNo(ad)+' 周', act:"dtGo('w','"+an+"')"});
+    path.push({t:crumbs[0].t});
+  }else{ path.push({t:crumbs[0].t}) }
+  const emptyMap={y:'这一年还没有任何任务记录',p:'本考期还没有任务记录',am:'还没有任何记录'};
+  return {crumbs:path, html:dtPlanTable(rows, emptyMap[DT.lv]||'这段时间还没有记录')};
+}
+function dtTaskView(cr){
+  const rg=dtRange();
+  let list=(store.get('tasks',[])||[]).filter(function(t){ return !t.date||(t.date>=rg.from&&t.date<=rg.to) });
+  if(DT.course){ const c=courseOf(DT.course); const nm=c?c.short:''; if(nm) list=list.filter(function(t){ return String(t.text||'').indexOf(nm)>=0 }) }
+  if(DT.q){ const q=DT.q.toLowerCase(); list=list.filter(function(t){ return String(t.text||'').toLowerCase().indexOf(q)>=0 }) }
+  list.sort(function(a,b){ return String(b.date||'').localeCompare(String(a.date||'')) });
+  cr.innerHTML=dtCrumbHtml([{t:rg.from+' 至 '+rg.to}]);
+  if(!list.length) return '<div class="dt-empty">这段范围里没有符合条件的任务。</div>';
+  return '<div class="dt-wrap"><table class="dt-tb dt-tbw">'
+    +'<thead><tr><th>日期</th><th class="ta-l">任务</th><th>状态</th></tr></thead><tbody>'
+    +list.map(function(t){
+      return '<tr><td class="d-date">'+esc(t.date||'未排期')+'</td>'
+        +'<td class="d-txt" data-l="任务">'+esc(t.text||'')+'</td>'
+        +'<td class="d-state">'+(t.done?'<span class="acc-g">已完成</span>':'<span class="muted">未完成</span>')+'</td></tr>';
+    }).join('')+'</tbody></table></div>';
+}
+function dtReflView(cr){
+  const rg=dtRange();
+  let list=(store.get('reflections',[])||[]).filter(function(r){ return r.date>=rg.from&&r.date<=rg.to });
+  if(DT.q){ const q=DT.q.toLowerCase(); list=list.filter(function(r){ return (String(r.learned||'')+String(r.stuck||'')).toLowerCase().indexOf(q)>=0 }) }
+  list.sort(function(a,b){ return String(b.date||'').localeCompare(String(a.date||'')) });
+  cr.innerHTML=dtCrumbHtml([{t:rg.from+' 至 '+rg.to}]);
+  if(!list.length) return '<div class="dt-empty">这段范围里没有反思记录。</div>';
+  return '<div class="dt-wrap"><table class="dt-tb dt-tbw">'
+    +'<thead><tr><th>日期</th><th class="ta-l">学了什么</th><th class="ta-l">没懂的地方</th><th>AI</th></tr></thead><tbody>'
+    +list.map(function(r){
+      return '<tr><td class="d-date">'+esc(r.date||'')+'</td>'
+        +'<td class="d-txt" data-l="学了">'+esc(r.learned||'—')+'</td>'
+        +'<td class="d-txt" data-l="没懂">'+esc(r.stuck||'—')+'</td>'
+        +'<td class="d-state">'+(r.ai?'<span class="acc-g">已追问</span>':'<span class="muted">无</span>')+'</td></tr>';
+    }).join('')+'</tbody></table></div>';
+}
+function dtFeynView(cr){
+  const rg=dtRange();
+  let list=(store.get('feynman',[])||[]).filter(function(r){ return r.date>=rg.from&&r.date<=rg.to });
+  if(DT.q){ const q=DT.q.toLowerCase(); list=list.filter(function(r){ return (String(r.topic||'')+String(r.text||'')).toLowerCase().indexOf(q)>=0 }) }
+  list.sort(function(a,b){ return String(b.date||'').localeCompare(String(a.date||'')) });
+  cr.innerHTML=dtCrumbHtml([{t:rg.from+' 至 '+rg.to}]);
+  if(!list.length) return '<div class="dt-empty">这段范围里没有复述记录。</div>';
+  return '<div class="dt-wrap"><table class="dt-tb dt-tbw">'
+    +'<thead><tr><th>日期</th><th class="ta-l">知识点</th><th>字数</th><th>AI</th></tr></thead><tbody>'
+    +list.map(function(r){
+      return '<tr><td class="d-date">'+esc(r.date||'')+'</td>'
+        +'<td class="d-txt" data-l="知识点">'+esc(r.topic||'')+'</td>'
+        +'<td class="d-mid" data-l="字数">'+String(r.text||'').length+' 字</td>'
+        +'<td class="d-state">'+(r.ai?'<span class="acc-g">已检查</span>':'<span class="muted">无</span>')+'</td></tr>';
+    }).join('')+'</tbody></table></div>';
+}
+function dtWeekView(cr){
+  cr.innerHTML=dtCrumbHtml([{t:'最新一份周报'}]);
+  const w=store.get('weekly',null);
+  if(!w) return '<div class="dt-empty">还没有生成过周报。<br>去「复盘」页点「生成本周周报」，生成后这里能看到最新一份。</div>';
+  return '<div class="ai-res'+(w.ok?'':' err')+'"><div class="ai-res-hd"><b>'+(w.ok?'本周周报':'生成失败')+'</b>'
+    +'<span>'+esc(w.range||'')+'</span>'+(w.ts?'<span>'+new Date(w.ts).toLocaleString()+'</span>':'')+'</div>'
+    +'<div class="ai-res-bd">'+esc(w.text||'')+'</div></div>'
+    +'<p class="muted" style="margin-top:8px;font-size:12px">周报目前只保留最新一份，重新生成会覆盖上一份。</p>';
+}
+function dtCkView(cr){
+  const rg=dtRange();
+  const cks=(store.get('checkins',[])||[]).filter(function(d){ return d>=rg.from&&d<=rg.to }).sort().reverse();
+  const mkDays=store.get('checkins_makeup_days',[])||[];
+  cr.innerHTML=dtCrumbHtml([{t:rg.from+' 至 '+rg.to}]);
+  if(!cks.length) return '<div class="dt-empty">这段范围里没有打卡记录。</div>';
+  /* 按月汇总放一句摘要，逐日明细进表格，避免同一件事在表格里重复两层 */
+  const byM={};
+  cks.forEach(function(d){ byM[d.slice(0,7)]=(byM[d.slice(0,7)]||0)+1 });
+  const sumTxt=Object.keys(byM).sort().reverse().map(function(k){ return k+' 打卡 '+byM[k]+' 天' }).join('　');
+  return '<p style="font-size:12.5px;color:var(--text2);margin:0 0 8px">'+esc(sumTxt)+'</p>'
+    +'<div class="dt-wrap"><table class="dt-tb">'
+    +'<thead><tr><th>日期</th><th>所属月份</th><th>类型</th></tr></thead><tbody>'
+    +cks.map(function(d){
+      return '<tr><td class="d-date">'+esc(d)+'</td><td class="d-mid" data-l="月份">'+esc(d.slice(0,7))+'</td>'
+        +'<td class="d-state">'+(mkDays.indexOf(d)>=0?'<span class="muted">补打卡</span>':'正常打卡')+'</td></tr>';
+    }).join('')+'</tbody></table></div>';
+}
+function dtQuizView(cr){
+  const qs=store.get('quiz_stats',{})||{};
+  const wrongs=(store.get('wrong_chapter',[])||[]).concat(store.get('wrong_exam',[])||[]);
+  const cnt={};
+  wrongs.forEach(function(w){ cnt[w.course]=(cnt[w.course]||0)+1 });
+  let codes=Object.keys(qs);
+  if(DT.course) codes=codes.filter(function(c){ return c===DT.course });
+  codes.sort(function(a,b){ return (+((qs[b]||{}).total)||0)-(+((qs[a]||{}).total)||0) });
+  cr.innerHTML=dtCrumbHtml([{t:'累计做题与错题（不受时间范围限制）'}]);
+  if(!codes.length) return '<div class="dt-empty">还没有做题记录，去「题库 → 章节练习」开练吧。</div>';
+  /* 科目列走全称，需要单行放得下「习近平新时代中国特色社会主义思想概论」这类 17 字科名；
+     数字列只要够放三位数与百分号，宽度用 px 定死，剩余全给科目列，避免科目折行。
+     表格不铺满容器：撑满时科目列会被拉成 600px+ 的空旷列，反而更难读。 */
+  return '<div class="dt-wrap"><table class="dt-tb dt-tbq">'
+    +'<colgroup><col><col style="width:62px"><col style="width:62px"><col style="width:74px"><col style="width:58px"><col style="width:120px"><col style="width:120px"></colgroup>'
+    +'<thead><tr><th>科目</th><th>已答</th><th>对题</th><th>正确率</th><th>错题</th><th>状态</th><th>建议</th></tr></thead><tbody>'
+    +codes.map(function(c){
+      const o=qs[c]||{}, tot=+o.total||0, rgt=+o.right||0;
+      const acc=tot?Math.round(rgt/tot*100):null;
+      const co=courseOf(c)||{};
+      const cname=co.name||co.short||c;
+      const tip=acc===null?'先刷一轮':(acc>=80?'保持':(acc>=60?'补薄弱章节':'集中突破'));
+      return '<tr><td class="d-date">'+esc(cname)+'</td><td class="d-mid" data-l="已答">'+tot+'</td><td class="d-mid" data-l="对题">'+rgt+'</td>'
+        +'<td class="d-mid" data-l="正确率">'+(acc===null?'—':acc+'%')+'</td><td class="d-mid" data-l="错题">'+(cnt[c]||0)+'</td>'
+        +'<td class="d-state">'+accCell(acc)+'</td><td class="d-state muted">'+tip+'</td></tr>';
+    }).join('')+'</tbody></table></div>';
+}
+function renderDetail(){
+  const body=document.getElementById('dtBody'); if(!body) return;
+  dtFillCourses();
+  dtSyncChips();
+  const cr=document.getElementById('dtCrumb');
+  if(DT.tb!=='plan'&&cr) cr.innerHTML='';
+  if(DT.tb==='plan'){
+    const r=dtPlanView(cr);
+    if(cr) cr.innerHTML=dtCrumbHtml(r.crumbs||[]);
+    body.innerHTML=r.html;
+  }
+  else if(DT.tb==='task') body.innerHTML=dtTaskView(cr);
+  else if(DT.tb==='refl') body.innerHTML=dtReflView(cr);
+  else if(DT.tb==='feyn') body.innerHTML=dtFeynView(cr);
+  else if(DT.tb==='week') body.innerHTML=dtWeekView(cr);
+  else if(DT.tb==='ck') body.innerHTML=dtCkView(cr);
+  else body.innerHTML=dtQuizView(cr);
+}
+/* 页面进入「我的学习」时恢复上次停留的子页 */
+(function(){
+  function boot(){
+    let p='ov';
+    try{ p=store.get('my_pane','ov')||'ov' }catch(e){}
+    myPane(p);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot);
+  else setTimeout(boot,0);
+})();
 /* ================= AI 复盘（Agent 编排入口） ================= */
 function agPlanCourses(){
   const plan=store.get('plan',{})||{};
@@ -4453,7 +6014,9 @@ function renderReflections(){
   const d=$('#rfDate'); if(d&&!d.value) d.value=today();
   const list=store.get('reflections',[]);
   if(!list.length){ box.innerHTML='<p class="muted">还没有反思记录。每天学完记一条，AI 会针对「没懂的地方」追问你 3-5 个问题。</p>'; return }
-  box.innerHTML=list.map((r,i)=>{
+  /* 复盘页只留最近 5 条：几十条历史全铺在这里会把页面撑很长，完整版在「明细 → 反思」 */
+  const shown=list.slice(0,5);
+  box.innerHTML=shown.map((r,i)=>{
     const a=r.ai;
     const ai=a?'<div class="ai-res'+(a.ok?'':' err')+'"><div class="ai-res-hd"><b>'+(a.ok?'🤖 AI 追问':'⚠️ AI 追问失败')+'</b>'+(a.ts?'<span>'+new Date(a.ts).toLocaleString()+'</span>':'')+
       '<button class="btn btn-s" style="margin-left:auto" onclick="reflectionAiClear('+i+')">清除</button></div><div class="ai-res-bd">'+esc(a.text||'')+'</div></div>':'';
@@ -4463,7 +6026,7 @@ function renderReflections(){
       (r.learned?'<div class="mm-lab">学了什么</div><div class="mm-item-bd">'+esc(r.learned)+'</div>':'')+
       (r.stuck?'<div class="mm-lab">没懂的地方</div><div class="mm-item-bd">'+esc(r.stuck)+'</div>':'')+
       ai+'</div>';
-  }).join('');
+  }).join('')+(list.length>5?'<p class="muted" style="margin-top:8px;font-size:12px">共 '+list.length+' 条，这里只显示最近 5 条。<span class="dt-act" onclick="myPane(\'dt\');dtSetTab(\'refl\')">去明细库看全部</span></p>':'');
 }
 function addReflection(){
   const learned=$('#rfLearned').value.trim(), stuck=$('#rfStuck').value.trim();
@@ -4489,7 +6052,9 @@ function renderFeynman(){
   const box=$('#fmList'); if(!box) return;
   const list=store.get('feynman',[]);
   if(!list.length){ box.innerHTML='<p class="muted">还没有复述记录。学完一个知识点，用自己的话讲一遍再保存，AI 会帮你找漏洞。</p>'; return }
-  box.innerHTML=list.map((r,i)=>{
+  /* 同反思：只留最近 5 条，完整版在「明细 → 复述」 */
+  const shown=list.slice(0,5);
+  box.innerHTML=shown.map((r,i)=>{
     const a=r.ai;
     const ai=a?'<div class="ai-res'+(a.ok?'':' err')+'"><div class="ai-res-hd"><b>'+(a.ok?'🤖 AI 找漏洞':'⚠️ AI 分析失败')+'</b>'+(a.ts?'<span>'+new Date(a.ts).toLocaleString()+'</span>':'')+
       '<button class="btn btn-s" style="margin-left:auto" onclick="feynmanAiClear('+i+')">清除</button></div><div class="ai-res-bd">'+esc(a.text||'')+'</div></div>':'';
@@ -4497,7 +6062,7 @@ function renderFeynman(){
       (SET.ai.enabled?'<button class="btn btn-s btn-p" onclick="aiCheckFeynman('+i+')">🔍 AI 找漏洞'+(a?'（重新检查）':'')+'</button>':'')+
       '<button class="btn btn-s btn-d" style="margin-left:auto" onclick="delFeynman('+i+')">删除</button></div>'+
       '<div class="mm-item-bd">'+esc(r.text||'')+'</div>'+ai+'</div>';
-  }).join('');
+  }).join('')+(list.length>5?'<p class="muted" style="margin-top:8px;font-size:12px">共 '+list.length+' 条，这里只显示最近 5 条。<span class="dt-act" onclick="myPane(\'dt\');dtSetTab(\'feyn\')">去明细库看全部</span></p>':'');
 }
 function addFeynman(){
   const topic=$('#fmTopic').value.trim(), text=$('#fmText').value.trim();
@@ -4572,13 +6137,22 @@ async function genWeekly(){
 }
 function clearWeekly(){ store.set('weekly',null); renderWeekly(); toast('已清除周报') }
 /* --- 成绩管理 --- */
+/* 正确率配色：固定 hex（不随主题漂移），深色单独覆盖 */
+function accCell(acc){
+  if(acc===null||acc===undefined) return '<span class="muted">未刷题</span>';
+  if(acc>=80) return '<span class="acc-g">'+acc+'%</span> <span class="tag tag-g">扎实</span>';
+  if(acc>=60) return '<span class="acc-o">'+acc+'%</span> <span class="tag tag-o">待巩固</span>';
+  return '<span class="acc-r">'+acc+'%</span> <span class="tag tag-r">补强</span>';
+}
 function renderScores(){
   mpInitCss();
   const scores=store.get('scores',{});
-  $('#scoreTable').innerHTML='<tr><th>课程</th><th>课程代码</th><th>学分</th><th>成绩</th><th>状态</th><th>考期备注</th></tr>'+
+  /* 表只保留成绩相关 5 列。「已答 / 正确率」会让表变宽、且和右栏的做题总览重复，
+     已移到右栏顶部一行总览（renderStudyAnalysis）+「明细 → 做题」Tab 的单科细项 */
+  $('#scoreTable').innerHTML='<tr><th>课程</th><th>学分</th><th>成绩</th><th>状态</th><th>考期备注</th></tr>'+
     COURSES.map(c=>{
       const s=scores[c.code]||{};
-      return `<tr><td>${c.short}${c.req?'':'<span class="tag tag-b">选</span>'}</td><td>${c.code}</td><td>${c.credit}</td>
+      return `<tr><td>${c.short}${c.req?'':'<span class="tag tag-b">选</span>'}<span class="sc-code">${c.code}</span></td><td>${c.credit}</td>
       <td><input class="score-in" type="number" min="0" max="100" value="${s.score??''}" placeholder="--" onchange="setScore('${c.code}',this.value)"></td>
       <td>${s.pass?'<span class="tag tag-g">已通过</span>':(s.score!==undefined&&s.score!==''?'<span class="tag tag-r">未通过</span>':'<span class="tag">未考</span>')}</td>
       <td><span class="mp-wrap"><input id="mpi-${c.code}" type="text" readonly class="mp-input" value="${s.note||''}" placeholder="如 2026-10" onclick="mpToggle('${c.code}',event)"><div class="mp-panel" id="mp-${c.code}" hidden><div class="mp-head"><button type="button" class="mp-arrow" onclick="mpYear('${c.code}',-1)">◀</button><span class="mp-year" id="mpy-${c.code}">2026</span><button type="button" class="mp-arrow" onclick="mpYear('${c.code}',1)">▶</button></div><div class="mp-grid">${[1,2,3,4,5,6,7,8,9,10,11,12].map(m=>`<button type="button" onclick="mpPick('${c.code}',${m})">${m}月</button>`).join('')}</div><div class="mp-foot"><button type="button" onclick="mpClear('${c.code}')">清除</button><button type="button" onclick="mpToday('${c.code}')">本月</button></div></div></span></td></tr>`
@@ -4586,7 +6160,7 @@ function renderScores(){
   const passed=COURSES.filter(c=>scores[c.code]&&scores[c.code].pass);
   const credits=passed.reduce((s,c)=>s+c.credit,0);
   const avg=passed.length?Math.round(passed.reduce((s,c)=>s+(+scores[c.code].score||0),0)/passed.length):0;
-  $('#scoreSum').textContent=`已通过 ${passed.length} 门 · 已获 ${credits} 学分（毕业需 ≥70 学分 + 论文）· 平均成绩 ${avg} 分`;
+  $('#scoreSum').textContent=`已通过 ${passed.length} / ${COURSES.length} 门 · 已获 ${credits} 学分（毕业需 ≥70 学分 + 论文）· 平均成绩 ${avg} 分`;
 }
 function setScore(code,val){
   const scores=store.get('scores',{});
@@ -5125,38 +6699,26 @@ function renderStudyAnalysis(){
   if(!dirs.length&&totalQ>30) dirs.push('当前各科表现均衡，继续按节奏推进。');
   if(!dirs.length) dirs.push('积累足够做题数据后，这里会自动推荐优先回看的章节。');
 
-  // 各科小表（按 status 分组的颜色）
-  const accCell=acc=>{
-    if(acc===null) return '<span class="muted">未刷题</span>';
-    if(acc>=80) return `<span style="color:#15803d;font-weight:600">${acc}%</span> <span class="tag tag-g">扎实</span>`;
-    if(acc>=60) return `<span style="color:#c2410c;font-weight:600">${acc}%</span> <span class="tag tag-o">待巩固</span>`;
-    return `<span style="color:#dc2626;font-weight:600">${acc}%</span> <span class="tag tag-r">补强</span>`;
-  };
-  const stCell=r=>{
-    if(r.done) return `<span class="tag tag-g">已过${r.score?` ${r.score}`:''}</span>`;
-    if(r.planned) return '<span class="tag tag-b">10月报</span>';
-    return '<span class="muted">未考</span>';
-  };
-  const showRows=rows.filter(r=>r.total>0||r.planned||r.done);
-  const rowsHtml=showRows.length?
-    `<table class="tb" style="font-size:12px"><tr><th>科目</th><th>状态</th><th>已答</th><th>正确率</th></tr>${showRows.map(r=>`<tr><td>${r.name}</td><td>${stCell(r)}</td><td>${r.total||0}</td><td>${accCell(r.acc)}</td></tr>`).join('')}</table>`
-    :'<p class="muted">还没有做题记录，去「题库 → 章节练习」开练吧～</p>';
-
+  /* 原表格里的「已答 / 正确率」两列撤掉后，改在右栏做一张紧凑的「刷题掌握度」表：
+     只列已经刷过题的科目（没刷的不占行），按正确率从低到高排，最该补的排最上。
+     这样既不撑宽左边成绩表，也让右栏不至于空一大块。 */
+  const qRows=rows.filter(r=>r.total>0).sort((a,b)=>a.acc-b.acc);
+  const qzTb=qRows.length
+    ? '<table class="tb tb-qz"><thead><tr><th>科目</th><th>已答</th><th>掌握</th></tr></thead><tbody>'
+      + qRows.map(r=>'<tr><td class="qz-nm">'+esc(r.name)+'</td><td>'+r.total+'</td>'
+        +'<td>'+accCell(r.acc)+'</td></tr>').join('')+'</tbody></table>'
+    : '<p class="muted" style="font-size:12px;margin:4px 0 0">还没有做题记录，刷完一章章节练习这里就会有数据。</p>';
   box.innerHTML=`
-    <h3 style="margin:0 0 8px">📈 学习情况</h3>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;font-size:12.5px">
-      <span>已通过 <b style="color:var(--primary)">${passed.length}</b>/12 门</span>
-      <span>已答 <b>${totalQ}</b> 题</span>
+    <div class="quiz-sum">
+      <span>刷题 <b>${totalQ}</b> 题</span>
       <span>正确率 <b>${totalAcc}%</b></span>
-      <span>错题 <b>${wrongAll.length}</b> 道</span>
-      <span>打卡 <b>${cks.length}</b> 天</span>
-      <span>本周 <b>${weekMin}</b> 分钟</span>
+      <span>已刷 <b>${qRows.length}</b> / ${COURSES.length} 科</span>
     </div>
-    ${rowsHtml}
-    <h3 style="margin:14px 0 6px;font-size:15px">🎯 学习建议</h3>
-    <ul style="padding-left:18px;margin:0;font-size:12.5px;line-height:1.7">${tips.slice(0,6).map(t=>`<li style="margin:3px 0">${t}</li>`).join('')}</ul>
+    ${qzTb}
+    <h3 style="margin:16px 0 6px;font-size:15px">🎯 学习建议 <span class="muted" style="font-weight:400;font-size:12px">按报考计划、正确率、错题分布自动生成</span></h3>
+    <ul style="padding-left:18px;margin:0;font-size:12.5px;line-height:1.75">${tips.slice(0,6).map(t=>`<li style="margin:3px 0">${t}</li>`).join('')}</ul>
     <h3 style="margin:14px 0 6px;font-size:15px">📚 复习方向</h3>
-    <ul style="padding-left:18px;margin:0;font-size:12.5px;line-height:1.7">${dirs.slice(0,5).map(d=>`<li style="margin:3px 0">${d}</li>`).join('')}</ul>
+    <ul style="padding-left:18px;margin:0;font-size:12.5px;line-height:1.75">${dirs.slice(0,5).map(d=>`<li style="margin:3px 0">${d}</li>`).join('')}</ul>
   `;
 }
 /* --- 数据备份（设置 → 数据管理） --- */
@@ -16982,6 +18544,10 @@ function scrollToChapterTitle(title){
       p=p.parentNode;
     }
     el.scrollIntoView({behavior:'smooth', block:'start'});
+    /* scrollIntoView(block:'start') 会把标题顶到视口最顶、被吸顶导航+页签栏盖住一截，
+       这里再回退 104px，让章节标题正好落在页签栏下方（与 rdJump 的落点口径一致） */
+    const y=el.getBoundingClientRect().top+window.scrollY-104;
+    try{ window.scrollTo({top:y, behavior:'smooth'}) }catch(e){ window.scrollTo(0,y) }
   };
   // 第一优先：标题文本匹配；第二优先：章号一致（如“第一章”对“第一章”）
   // 统一规则：文本匹配忽略空白差异（“考点 8 物质世界 的客观存在”这类含散落空格的标题也能命中）
@@ -16989,8 +18555,26 @@ function scrollToChapterTitle(title){
   const nt=normTxt(t);
   let hit=els.find(el=>{ const txt=normTxt(el.textContent); return txt===nt||txt.startsWith(nt)||txt.includes(nt) });
   if(!hit&&wantNum) hit=els.find(el=>chNum(el.textContent||'')===wantNum);
+  /* 第三优先：去掉章号前缀后比标题主体。
+     大纲写「第一章 反对外国侵略的斗争」，同一章在「学习笔记 / 考点速记」里常写成
+     「一、反对外国侵略的斗争」或「（一）…」，只按原文匹配会有一半跳不动。 */
+  if(!hit){
+    const core=stripChPrefix(t);
+    if(core.length>=4){
+      hit=els.find(el=>stripChPrefix(el.textContent)===core)
+        || els.find(el=>{ const c=stripChPrefix(el.textContent); return c.length>=4 && (c.includes(core)||core.includes(c)) });
+    }
+  }
   if(hit) expandAndScroll(hit);
   // 当前模块没有该章节：不跳转、不切换模块
+}
+/* 去掉「第一章 / 一、/ （一）」这类编号前缀与首尾标点，只留标题主体用于跨页签比对 */
+function stripChPrefix(s){
+  return String(s||'').replace(/\s+/g,'')
+    .replace(/^第[0-9一二三四五六七八九十百]+[章节][、.．:：]?/,'')
+    .replace(/^[0-9一二三四五六七八九十]+[、.．]/,'')
+    .replace(/^[（(][0-9一二三四五六七八九十]+[)）]/,'')
+    .replace(/^[、.．:：·]+/,'');
 }
 async function switchTab(tab){
   if(qz&&qz.mode!=='chapter'&&qz.mode!=='review'&&!qz.submitted&&curTab==='quiz'&&tab!=='quiz'){
@@ -17004,6 +18588,7 @@ async function switchTab(tab){
   $$('.stab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
   renderStudyContent();
   rdKey=''; rdSync(true);
+  if(typeof chDirSync==='function') chDirSync();   /* 切页签后重算是否该露出「目录」标识 */
 }
 $$('.stab').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
 function syncStudyChrome(){
@@ -17028,21 +18613,25 @@ function syncStudyChrome(){
   if(bn) bn.style.display = (!curCourse||cardView||nar) ? 'none' : '';
 }
 function isNarrowScreen(){ try{ return window.matchMedia('(max-width:768px)').matches }catch(e){ return false } }
-/* 手机端科目列收起 / 展开：收起后右侧内容占满整宽，读卡片和正文更宽松 */
+/* 科目列收起 / 展开（PC 与手机端通用）：收起后主区占满整宽，左边缘浮出 ☰ 叫回来。
+   浮出按钮用内联 display 控制：PC 端它默认 display:none、窄屏端默认 display:flex，
+   靠 class 切换会因选择器优先级打架，内联最稳。 */
 var sideFolded=false;
 function sideToggle(force){
   sideFolded = (typeof force==='boolean') ? force : !sideFolded;
   const lay=document.querySelector('.study-layout');
   if(lay) lay.classList.toggle('side-folded', sideFolded);
   const fb=document.getElementById('sideFold');
-  if(fb) fb.classList.toggle('off', !sideFolded);
+  if(fb) fb.style.display = sideFolded ? 'flex' : 'none';
   try{ store.set('study_side_folded', sideFolded) }catch(e){}
 }
 (function(){
   function boot(){
     let f=false;
-    try{ f=!!(window.store&&store.get?store.get('study_side_folded',false):false) }catch(e){}
-    if(f) sideToggle(true);
+    /* 注意：store 是 const 声明的，不会挂到 window 上，原来写 window.store 恒为 undefined，
+       导致这里永远读到 false、启动时反而把记忆的 true 覆写成 false。必须用 typeof 判断。 */
+    try{ if(typeof store!=='undefined' && store && store.get) f=!!store.get('study_side_folded',false) }catch(e){}
+    sideToggle(f);   /* 无论收没收起都同步一次：浮出按钮的显示态由内联样式决定 */
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot);
   else setTimeout(boot,0);
@@ -18288,6 +19877,23 @@ function anaSplitQ(txt){
   if(!m) return {stem:s.trim(), ans:''};
   return {stem:s.slice(0,m.index).trim(), ans:s.slice(m.index+m[0].length).trim()};
 }
+/* 主观题参考答案有两个来源：一是题干里内嵌「答：…」（已被 anaSplitQ 拆到 sp.ans），
+   二是原卷直接放在 a 字段——此时 a 是答案文本而不是选项索引。
+   早先只取了前者，导致大量简答/论述题明明录了参考答案，页面上却显示为空。 */
+function anaAnsOf(sp, raw){
+  if(sp.ans) return sp.ans;
+  if(!raw) return '';
+  if(raw.o && raw.o.length) return '';          /* 有选项 → a 是索引，不是答案文本 */
+  /* 少数科目把答案录成字符串数组，合并成一段；选择题的 a 是数字数组，不会走到这里 */
+  let s='';
+  if(typeof raw.a==='string') s=raw.a;
+  else if(Object.prototype.toString.call(raw.a)==='[object Array]' && raw.a.length && raw.a.every(function(x){ return typeof x==='string' }))
+    s=raw.a.join('；');
+  s=s.trim();
+  if(s.length<2) return '';
+  if(/^[A-Ha-h]$/.test(s)) return '';           /* 单独的字母是选项标号 */
+  return s;
+}
 /* 真题归属词表：① 大纲派生词表（全科自动） ② 手工 CHAP_KW 补充 ③ 章名切词兜底
    返回结构为 [{w:词, wt:权重, df:出现章数}]，权重越高越精确。 */
 function anaChapKwList(code){
@@ -18356,10 +19962,12 @@ function anaQIndex(code){
     const arr=[];
     (p.qs||[]).forEach(function(raw){
       const sp=anaSplitQ(raw.q);
+      const aTxt=anaAnsOf(sp,raw);
       /* 题型直映射优先：该题型已明确归属某章（英语等题干为外文的科目）时，不再赌文本匹配 */
       const tn=String(raw.t||'').trim();
       if(tmap[tn]!=null){
-        arr.push({pe:pe,pn:p.name,t:raw.t||'单选',stem:sp.stem,ans:sp.ans,o:raw.o,a:raw.a,ci:tmap[tn],mt:'type'});
+        arr.push({pe:pe,pn:p.name,t:raw.t||'单选',stem:sp.stem,ans:aTxt,o:raw.o,a:raw.a,ci:tmap[tn],mt:'type',
+                  e:raw.e, kpn:anaKpMatch(code,tmap[tn],sp.stem+' '+aTxt), aie:aiExpOf(code,pe,sp.stem)});
         return;
       }
       /* 正确选项必须参与匹配：大量单选题干只写到"……的是"，答案实体（如「南昌起义」「渡江战役」）
@@ -18381,7 +19989,9 @@ function anaQIndex(code){
         }
         if(s>bs){ bs=s; best=i }
       });
-      arr.push({pe:pe,pn:p.name,t:raw.t||'单选',stem:sp.stem,ans:sp.ans,o:raw.o,a:raw.a,ci:best});
+      arr.push({pe:pe,pn:p.name,t:raw.t||'单选',stem:sp.stem,ans:aTxt,o:raw.o,a:raw.a,ci:best,
+                e:raw.e, kpn:best>=0?anaKpMatch(code,best,sp.stem+' '+(right||'')+' '+aTxt):'',
+                aie:aiExpOf(code,pe,sp.stem)});
     });
     for(let i=0;i<arr.length;i++){
       if(arr[i].ci>=0) continue;
@@ -18518,6 +20128,483 @@ function anaTopicsOf(ch,kws){
     .sort(function(a,b){ return b.n-a.n || b.t.length-a.t.length })
     .slice(0,7);
 }
+/* ================= 考点标签与高频考点榜 =================
+   数据来源一律取自考试大纲，不凭空造词：
+     ① 大纲「课程内容与考核要求」里的知识点全称（kp）——最权威，能对上教材目录
+     ② kp 按「和 / 与 / 、 / ，」切出的短语——全称很长，题干很少逐字出现，需要切段才能命中
+     ③ kp 为空的科目（13000 英语 / 14104 人力资源 / 00051 管理信息系统）退回章节词表里的高权重词，
+        此时标签是「关键词」而非完整知识点，页面上不做区分，但由 anaKpSrc() 标明口径
+   只统计历史频率，不做任何预测。 */
+let _kpCache={};
+/* 纯结构词：它们几乎出现在任何一题里，做考点标签等于没标签
+   （15044 第七章曾被标成「作用」3 题，就是因为该题没命中任何长词时的兜底）。
+   注意这里只砍「单词形式」，含这些词的复合词（如「四项基本原则」「组织结构」）不受影响。 */
+const KP_STOP=/^(作用|意义|特点|特征|内容|性质|原则|方法|职能|类型|构成|要素|条件|关系|问题|概念|地位|影响|因素|目标|过程|功能|结构|模式|形式|要求|措施|途径|原因|表现|评价|类型|作用|原则|优缺点|重要性|必要性|含义|定义|分类|步骤|环节|阶段|方面|情况|能力|水平|范围|程度|方式|手段)$/;
+function anaKpIdx(code){
+  if(_kpCache[code]) return _kpCache[code];
+  const sy=syllaOf(code), ch=chapsOf(code);
+  const byCi=ch.map(function(c,i){
+    const sci=(sy&&sy.chapters[i])||{};
+    const kpList=(sci.kp||[]).map(function(x){ return String(x||'').trim() }).filter(Boolean);
+    const shortN=String(sci.short||c[0]||'');
+    /* 词表已含「知识点全称(wt3) + 知识点切段(wt2) + 考核要求术语(wt1.5) + 章名(wt2)」，
+       且跨章常见词已被 df 降权。这里只把命中词归一到它所属的知识点全称：
+       全称长短不一，超过 18 字的当作标签会挤成一坨，就用命中的切段词本身。 */
+    const items=[], seen={};
+    function push(w,wt,name){
+      if(w.length<2) return;
+      if(w===shortN) return;                                  /* 章名本身不当作考点，和「所属章节」列重复 */
+      if(KP_STOP.test(w)) return;
+      if(seen[w]!=null) return;
+      seen[w]=1;
+      let nm=name||w;
+      if(nm.length>18 || nm.length<w.length) nm=w;
+      items.push({w:w, n:nm, wt:(wt||2)});
+    }
+    ((sci.kw)||[]).forEach(function(o){
+      const w=String(o&&o.w||'').trim();
+      if(!w) return;
+      let nm='';
+      for(let k=0;k<kpList.length;k++){
+        const K=kpList[k];
+        if(K===w || K.indexOf(w)>=0){ nm=K; break }
+      }
+      push(w, o.wt, nm);
+    });
+    return items;
+  });
+  _kpCache[code]={n:ch.length, byCi:byCi};
+  return _kpCache[code];
+}
+function anaKpSrc(code){
+  const sy=syllaOf(code);
+  let kp=0; if(sy) sy.chapters.forEach(function(c){ kp+=c.kp.length });
+  return kp>0?'大纲知识点':'章节关键词';
+}
+/* 一道真题最可能对应的考点：在同章候选词里打分，长词优先、跨章泛词（df 降权后 wt 低）靠后。
+   分数 = 词长×2 + 权重×1.5，取最高；要求命中词 ≥2 字，单字命中一律不算。 */
+function anaKpMatch(code, ci, text){
+  if(ci<0 || !text) return '';
+  const idx=anaKpIdx(code), list=(idx.byCi[ci]||[]);
+  if(!list.length) return '';
+  let best='', bs=0;
+  for(let i=0;i<list.length;i++){
+    const it=list[i];
+    if(it.w.length<2) continue;
+    if(text.indexOf(it.w)<0) continue;
+    const sc=it.w.length*2 + it.wt*1.5;
+    if(sc>bs){ bs=sc; best=it.n }
+  }
+  return best;
+}
+/* 高频考点榜：把全部考期的真题按「章节 + 考点」聚合，统计出现题次、覆盖考期、常考题型、最近考查。
+   rate 的分母是该科实际有原卷的考期数，不是大纲里的考期数。 */
+let _hpCache={};
+function anaHotPoints(code){
+  const all=anaQIndex(code);
+  const hit=_hpCache[code];
+  if(hit && hit.src===all.length) return hit.out;
+  const per={}; all.forEach(function(x){ per[x.pe]=1 });
+  const nPer=Object.keys(per).length;
+  const m={};
+  all.forEach(function(x){
+    if(!x.kpn || x.ci<0) return;
+    const k=x.ci+'|'+x.kpn;
+    const o=m[k]||(m[k]={kp:x.kpn, ci:x.ci, n:0, ps:{}, tm:{}, last:''});
+    o.n++; o.ps[x.pe]=1; o.tm[x.t]=(o.tm[x.t]||0)+1;
+    if(!o.last || anaKey(x.pe)>anaKey(o.last)) o.last=x.pe;
+  });
+  const out=Object.keys(m).map(function(k){
+    const o=m[k], ps=Object.keys(o.ps);
+    return {kp:o.kp, ci:o.ci, n:o.n, pn:ps.length, rate:nPer?ps.length/nPer:0, last:o.last, tm:o.tm,
+            types:Object.keys(o.tm).sort(function(a,b){ return o.tm[b]-o.tm[a] })};
+  }).filter(function(o){ return o.n>=2 })
+    .sort(function(a,b){ return b.pn-a.pn || b.n-a.n || b.kp.length-a.kp.length })
+    .slice(0,12);
+  out.nPer=nPer;                        /* 分母：该科实际有原卷的考期数 */
+  out.nQ=all.length;
+  _hpCache[code]={src:all.length, out:out, nPer:nPer};
+  return out;
+}
+/* 解析字段分三类：
+   exp  = 真解析正文，正常展示
+   rule = 评分口径（「按要点作答…」「【评分说明】…」），折叠成一行小字，不当解析显摆
+   ''   = 模板噪音（「正确答案：B（2026年4月 真题（原卷） 第 1 题）」），一律不展示——
+          选项里已经打了 ✓，再显示一遍只是占地方，还会让人误以为题目有解析 */
+/* ================= AI 生成内容（与原卷数据严格分离） =================
+   PAST 原卷里没有解析的题，在这里补「AI 解析」。原卷字段一个都不改，
+   渲染时用紫色标识与紫竖线与「参考答案」「原卷解析」区分开。
+   key = 考期|题干前缀：用题干而不用题号，题号会随原卷重排而错位；
+   匹配时按前缀比对，写错了只会「不显示」，不会张冠李戴。
+   当前是样张：15044 马原 2026年4月卷（该科 297 道原卷全无解析）。按同一格式追加即可生效。 */
+const AI_EXP={
+  '15043':{
+    '2026年4月|1842年8月，清政府与英国签订的':
+      '1842 年 8 月《南京条约》是第一次鸦片战争后中国近代史上第一个不平等条约，割香港岛、赔款、五口通商、协定关税。时间线要分清：《天津条约》《北京条约》都是 1858／1860 年第二次鸦片战争的产物，《马关条约》是 1895 年甲午战败后签订。记忆抓手：南京—1842—第一个。',
+    '2026年4月|旧民主主义革命时期，中国反侵略失败的根本原因':
+      '教材口径是两层：社会制度的腐败是根本原因，经济技术的落后是另一重要原因。题目问「根本」，答案必须落在制度层面。A 经济技术落后虽是事实，但它是「重要原因」而非根本；C 思想文化保守、D 军事指挥失误都只是具体表现或次要因素。',
+    '2026年4月|近代中国睁眼看世界的第一人是':
+      '林则徐主持编译《四洲志》，被称为近代中国睁眼看世界的第一人。魏源在其基础上编成《海国图志》，提出「师夷长技以制夷」。梁启超、严复、谭嗣同都是后来的维新派人物，严复以译《天演论》传播进化论著称，但都不是「第一人」。',
+    '2026年4月|魏源《海国图志》中提出的思想是':
+      '魏源在《海国图志》中提出「师夷长技以制夷」。B「中学为体、西学为用」是洋务派的指导思想，冯桂芬作了最早完整表述；C「物竞天择、适者生存」是严复译《天演论》宣传的进化论；D「维新变法、救亡图存」是戊戌维新派的主张。四句话分别对应四个派别，别串。',
+    '2026年4月|太平天国农民战争爆发的标志是':
+      '1851 年 1 月金田起义，是太平天国农民战争爆发的标志。永安建制是初步确立政权组织与官制；1853 年攻克南京、定都天京，才是正式建立与清政府对峙的政权。问「标志」答起点，问「正式建立政权」才答定都天京。',
+    '2026年4月|最先对洋务派兴办洋务事业的指导思想作出比较完整表述的是':
+      '冯桂芬在《校邠庐抗议》中提出「以中国之伦常名教为原本，辅以诸国富强之术」，是「中学为体、西学为用」的最早完整表述。奕䜣是洋务派在中央的代表人物，曾国藩、左宗棠、李鸿章是地方代表，他们是实践者，不是这一表述的提出者。',
+    '2026年4月|洋务派建成的新式海军中主力是':
+      '19 世纪 70—90 年代洋务派建成北洋、南洋、福建三支新式海军，其中北洋水师规模最大、是主力，1894 年甲午战争中在威海卫之战全军覆没。福建水师早在 1884 年中法马江海战中几乎覆没，不能与北洋并列看。',
+    '2026年4月|新文化运动的主要内容是':
+      '新文化运动的两大口号是民主与科学，即「德先生」与「赛先生」，同时提倡新文学、反对旧文学。宣传俄国十月革命、主张社会革命是五四运动之后马克思主义广泛传播的内容，属于新文化运动后期的新因素，不是它前期的主要内容。',
+    '2026年4月|五四运动爆发的直接导火线是':
+      '1919 年巴黎和会决定把德国在山东的特权转让给日本，中国外交失败的消息传回国内，直接引爆五四运动。「二十一条」和西原借款是此前日本侵略的背景因素，华盛顿会议 1921 年才召开，时间上晚于五四，不可能是导火线。',
+    '2026年4月|中国共产党第一次明确提出反帝反封建的会议是':
+      '1922 年中共二大制定民主革命纲领（最低纲领）：打倒军阀、推翻国际帝国主义的压迫、统一中国为真正的民主共和国，这是第一次明确提出反帝反封建。中共一大 1921 年只确定党的名称和最高奋斗目标，尚未提出民主革命纲领。',
+    '2026年4月|1927年，中共八七会议确定的方针是':
+      '1927 年 8 月 7 日八七会议确定了土地革命和武装反抗国民党反动派的总方针，毛泽东在会上提出「政权是由枪杆子中取得的」。推翻北洋军阀统治是北伐战争的目标，1927 年北伐已近尾声，不可能成为八七会议的新方针。',
+    '2026年4月|中国共产党独立领导革命战争，创建人民军队和武装夺取政权的伟大开端是':
+      '1927 年 8 月 1 日南昌起义打响了武装反抗国民党反动派的第一枪，是党独立领导革命战争、创建人民军队和武装夺取政权的伟大开端。秋收起义同年 9 月，特点是转向农村、创建井冈山根据地；广州起义 12 月；百色起义 1929 年，时间都晚。',
+    '2026年4月|《义勇军进行曲》的曲作者是':
+      '《义勇军进行曲》由田汉作词、聂耳作曲，1935 年为影片《风云儿女》创作，后来成为中华人民共和国国歌。茅盾、郭沫若都是作家，瞿秋白是党的早期领导人兼文艺理论家，都不写这首曲。记住「田词聂曲」。',
+    '2026年4月|日本帝国主义在1931年制造的侵占中国东北的事变':
+      '1931 年 9 月 18 日九一八事变，日本侵占中国东北。一二八事变是 1932 年进攻上海；华北事变是 1935 年日本策动华北五省「特殊化」；卢沟桥事变是 1937 年 7 月，标志全面抗战开始。按时间与地点对号，1931＋东北只能选九一八。',
+    '2026年4月|1933年11月，在福州发动抗日反蒋运动的国民党爱国将领是':
+      '1933 年 11 月蔡廷锴、蒋光鼐率十九路军在福州发动福建事变，成立中华共和国人民革命政府，抗日反蒋。佟麟阁、赵登禹是 1937 年抗战中殉国的将领；张学良、杨虎城发动的是 1936 年西安事变；冯玉祥、吉鸿昌组织的是察哈尔民众抗日同盟军。',
+    '2026年4月|1938年3月，国民党军队在抗日战争中取得大捷的战役是':
+      '1938 年 3 月台儿庄战役是抗战以来国民党正面战场取得的最大胜利，歼敌万余人。淞沪会战 1937 年 8—11 月，意义是粉碎日军速亡中国的企图；枣宜战役 1940 年，张自忠殉国；桂南战役 1939 年底至 1940 年初，围绕昆仑关。',
+    '2026年4月|新中国1953年开始实施':
+      '「一五」计划 1953—1957 年，以苏联援建的 156 项工程为中心，集中主要力量发展重工业，为我国工业化奠定初步基础。注意「集中主要力量」这个限定：重工业优先，同时不放松农业和轻工业，不能答成「只发展重工业」。',
+    '2026年4月|我国农业合作化运动过程中，具有完全社会主义性质的是':
+      '农业合作化三步走：互助组属社会主义萌芽；初级社实行土地入股、按股分红，属半社会主义性质；高级社土地归集体所有、实行按劳分配，属完全社会主义性质。问「完全社会主义」只能答高级社。',
+    '2026年4月|处理中国共产党与民主党派关系的方针是':
+      '1956 年《论十大关系》提出处理共产党与民主党派关系的方针是「长期共存、互相监督」。B「百花齐放、百家争鸣」是繁荣科学文化的方针；A「肝胆相照、荣辱与共」是 1982 年后补充的表述，属改革开放时期；D「统筹兼顾、适当安排」是经济和社会政策原则。',
+    '2026年4月|1979年3月，在党的理论工作务虚会上':
+      '1979 年 3 月邓小平在党的理论工作务虚会上提出四项基本原则：坚持社会主义道路，坚持无产阶级专政（后表述为人民民主专政），坚持共产党的领导，坚持马克思列宁主义、毛泽东思想。四项基本原则是立国之本，这是它的提出人和提出场合，属高频识记点。',
+    '2026年4月|1981年，通过《关于建国以来党的若干历史问题的决议》的是':
+      '1981 年 6 月中共十一届六中全会通过《关于建国以来党的若干历史问题的决议》，彻底否定「文化大革命」，科学评价毛泽东的历史地位和毛泽东思想的指导意义，标志着党在指导思想上拨乱反正任务的完成。十一届三中全会 1978 年是转折点，十二届、十二届三中全会分别 1984 年、1984 年 10 月，时间不符。',
+    '2026年4月|中共十三大正式制定我国现代化发展战略':
+      '1987 年中共十三大制定「三步走」发展战略：第一步 1990 年解决温饱，第二步 20 世纪末达到小康，第三步 21 世纪中叶基本实现现代化。「两步走」是 1964 年周恩来在三届全国人大一次会议提出的；「四位一体」「五位一体」分别是 2005 年后、2012 年十八大关于总体布局的表述，不是发展战略。',
+    '2026年4月|1999年12月20日，中国在推进祖国统一大业方面迈出重要一步的是':
+      '1999 年 12 月 20 日中国恢复对澳门行使主权。香港回归是 1997 年 7 月 1 日，注意区分；「九二共识」是 1992 年两岸达成「海峡两岸均坚持一个中国原则」的共识；汪辜会谈是 1993 年新加坡的首次会谈。按日期对号即可。',
+    '2026年4月|2002年召开的中共十六大明确提出':
+      '2002 年中共十六大提出 21 世纪头二十年全面建设更高水平的小康社会。B 国民生产总值翻一番是 20 世纪 80—90 年代的阶段性目标；C 构建社会主义和谐社会是 2004 年十六届四中全会提出；D 基本实现现代化是「三步走」第三步、21 世纪中叶的目标。',
+    '2026年4月|简述戊戌维新运动是一场思想启蒙运动的意义':
+      '按「传播—批判—启蒙」三层作答：一是维新派广泛传播西方资产阶级的社会政治学说和自然科学知识；二是宣传自由平等、社会进化观念；三是批判封建君权和封建纲常伦理，把封建主义思想壁垒打开了一个缺口。落点句是「起到思想启蒙作用，推动中国人民的觉醒」，这一句是本题的给分点。',
+    '2026年4月|简述中国共产党早期组织的工作':
+      '三条并列，条条都要答：一是研究和宣传马克思主义，同时研究中国的实际问题；二是到工人群众中去进行宣传和组织工作，推动马克思主义与工人运动结合；三是进行关于建党问题的讨论和实际组织工作。第一条后半句「研究中国实际问题」最易漏，漏了会扣分。',
+    '2026年4月|简述遵义会议的历史意义':
+      '分三层答：一是遵义会议是党的历史上一个生死攸关的转折点，结束了「左」倾教条主义在中央的统治；二是事实上确立了毛泽东在党中央和红军的领导地位，开始确立以毛泽东为主要代表的马克思主义正确路线在党中央的领导地位；三是标志着中国共产党在政治上开始走向成熟。第三层是常见加分点。',
+    '2026年4月|简述抗日战争中新民主主义':
+      '《新民主主义论》系统阐明新民主主义理论，意义有两点：一是它是马克思主义中国化的重大理论成果，标志着毛泽东思想得到多方面展开而趋于成熟；二是从思想上武装了中国共产党人，极大增强了他们参加和领导抗日战争及新民主主义革命的自觉性。答题时「趋于成熟」这个定语不能省。',
+    '2026年4月|简述新中国成立初期中国共产党面临的问题和考验':
+      '四条「能不能」并列：一是能不能保卫住革命胜利成果、巩固新生的人民政权；二是能不能战胜严重经济困难、迅速恢复和发展国民经济；三是能不能巩固民族独立、维护国家主权和安全；四是能不能经受住全国执政的考验，保持同人民群众的血肉联系。前三条讲任务，第四条讲执政能力，缺一条就不完整。',
+    '2026年4月|试述辛亥革命的历史意义':
+      '论述题先定性再展开。定性：辛亥革命是资产阶级领导的、以反对封建君主专制制度、建立资产阶级共和国为目的的革命，是一次比较完全意义上的资产阶级民主革命。分点：一是推翻清王朝统治，沉重打击中外反动势力；二是结束延续两千多年的封建君主专制制度，建立中华民国，使民主共和观念深入人心；三是推动民族资本主义发展和思想解放。末尾补局限——没有改变半殖民地半封建的社会性质，没有完成反帝反封建任务，论述才完整。',
+    '2025年10月|资本一帝国主义列强对近代中国的侵略':
+      '列强对近代中国的侵略分军事、政治、经济、文化四类，其中首先和主要进行的是军事侵略——发动侵略战争、屠杀中国人民、割占领土、勒索赔款。政治控制、经济掠夺、文化渗透都是在军事侵略打开缺口之后逐步展开的手段，次序不能倒。',
+    '2025年10月|第二次鸦片战争中洗劫和烧毁圆明园的是':
+      '1860 年第二次鸦片战争中，英法联军攻入北京、洗劫并烧毁圆明园。八国联军是 1900 年侵华，日本侵略军主要在 1894 年甲午战争与 1931 年后，俄国虽参与第二次鸦片战争并割占大片领土，但不是烧圆明园的主体。时间 1860 是关键。',
+    '2025年10月|1894年，孙中山在檀香山建立的中国第一个资产阶级革命组织':
+      '1894 年孙中山在檀香山建立兴中会，是中国第一个资产阶级革命组织，提出「驱除鞑虏，恢复中国，创立合众政府」。华兴会 1904 年成立于长沙，光复会 1904 年成立于上海，岳王会 1905 年成立于安徽，时间都晚，且都不是「第一个」。',
+    '2025年10月|邹容发表的号召人民推翻清朝统治':
+      '邹容的《革命军》号召推翻清朝统治、建立「中华共和国」。三本小册子要分清：陈天华的《警世钟》《猛回头》宣传反清救国，章炳麟（章太炎）的《驳康有为论革命书》驳保皇立宪。记住「邹容—革命军—中华共和国」这一组。',
+    '2025年10月|1905年中国同盟会成立，其机关报是':
+      '1905 年中国同盟会在东京成立，机关报是《民报》，孙中山在发刊词中把纲领概括为民族、民权、民生三大主义。《新民丛报》是梁启超主办的保皇派刊物，曾与《民报》展开论战；《时务报》是 1896 年维新派在上海办的；《国闻报》是严复在天津办的。',
+    '2025年10月|1915年9月，在上海创办《青年杂志》的是':
+      '1915 年 9 月陈独秀在上海创办《青年杂志》（第二卷起改名《新青年》），标志新文化运动开始。同一时期的代表人物各有阵地：李大钊宣传十月革命，胡适发表《文学改良刍议》倡导白话文，鲁迅以《狂人日记》抨击封建礼教。',
+    '2025年10月|决定共产党员以个人身份加入国民党':
+      '1923 年中共三大决定共产党员以个人身份加入国民党，采取「党内合作」形式实现国共合作。中共二大 1922 年解决的是民主革命纲领，四大 1925 年提出无产阶级领导权与工农联盟，五大 1927 年批评陈独秀右倾错误，都不是「加入国民党」这件事。',
+    '2025年10月|1925年，国民政府所辖各部队统一改编为':
+      '1925 年 7 月国民政府在广州成立，所辖各部队统一改编为国民革命军，初编八个军，成为北伐战争的武装基础。东征军、西征军是国民革命军在不同作战方向上的临时编组，不是统一番号。',
+    '2025年10月|1928年底，在东北宣布':
+      '1928 年 12 月 29 日张学良宣布东北易帜——「遵守三民主义，服从国民政府，改易旗帜」，标志国民党在全国范围内形式上完成统一。其父张作霖 1928 年 6 月在皇姑屯被日军炸死，易帜是张学良的决定，别把两人弄混。',
+    '2025年10月|1931—1934年，中国共产党内出现的主要错误倾向是':
+      '1931 年 1 月六届四中全会后，王明「左」倾教条主义统治中央达四年之久，直至 1935 年遵义会议纠正，这是 1931—1934 年的主要错误。「左」倾盲动主义是 1927 年 11 月至 1928 年 4 月瞿秋白为代表；右倾错误主要指大革命后期陈独秀的右倾机会主义。',
+    '2025年10月|中共中央、中革军委率中央红军主力开始实行战略转移':
+      '1934 年 10 月中央红军主力被迫撤离根据地、开始长征。三个时间要分清：1934 年 10 月出发，1935 年 10 月中央红军到达陕北，1936 年 10 月三大主力红军会师、长征结束。1933 年 10 月是第五次反「围剿」开始的时间。',
+    '2025年10月|为争取和平民主，中国共产党在1945年8月至10月':
+      '1945 年 8 月 28 日毛泽东赴重庆，10 月 10 日签订《政府与中共代表会谈纪要》即双十协定，这是抗战胜利后争取和平民主的重大行动。西安谈判发生在 1936 年西安事变后，南京谈判在 1946 年，北平谈判在 1949 年 4 月，时间都对不上。',
+    '2025年10月|1949年3月，毛泽东明确提出':
+      '1949 年 3 月中共七届二中全会在河北平山西柏坡召开，毛泽东提出「两个务必」：务必使同志们继续保持谦虚、谨慎、不骄、不躁的作风，务必使同志们继续保持艰苦奋斗的作风；同时提出党的工作重心由乡村转移到城市。',
+    '2025年10月|中国人民解放军在1949年4月发起的重大战役是':
+      '1949 年 4 月渡江战役打响，解放南京，宣告国民党在全国统治的覆灭。辽沈、淮海、平津三大战役是 1948 年 9 月至 1949 年 1 月进行的，属于战略决战；渡江战役是「将革命进行到底」的追击作战，按时间对号即可。',
+    '2025年10月|开启我国改革开放和社会主义现代化建设新时期的会议是':
+      '1978 年 12 月中共十一届三中全会作出把工作重心转移到经济建设上来、实行改革开放的历史性决策，是开启改革开放和社会主义现代化建设新时期的标志。十二大 1982 年提出「建设有中国特色的社会主义」，十二届三中全会 1984 年作出经济体制改革的决定，十三大 1987 年制定三步走战略，都是在新时期之内。',
+    '2025年10月|1979年元旦，全国人大常委会发表的重要文献是':
+      '1979 年 1 月 1 日全国人大常委会发表《告台湾同胞书》，宣布争取和平统一祖国的大政方针，同日中美正式建交，并停止对金门等岛屿的炮击。1995 年江泽民发表《为促进祖国统一大业的完成而继续奋斗》提出八项主张，2019 年习近平在《告台湾同胞书》发表 40 周年纪念会上讲话，都不是 1979 年这份文献。',
+    '2025年10月|1988年，七届全国人大一次会议正式批准建立的经济特区是':
+      '1988 年七届全国人大一次会议批准海南建省并设立经济特区，海南成为面积最大的经济特区。深圳、珠海、汕头、厦门四个特区是 1980 年设立的，时间比海南早八年，不要混。',
+    '2025年10月|中共十四大明确提出，我国经济体制改革的目标是建立':
+      '1992 年中共十四大明确提出我国经济体制改革的目标是建立社会主义市场经济体制，并明确要使市场在国家宏观调控下对资源配置起基础性作用（后发展为决定性作用）。十二届三中全会 1984 年提出的是「有计划的商品经济」，属于此前的认识阶段。',
+    '2025年10月|2005年3月，十届全国人大三次会议通过的法律是':
+      '2005 年 3 月 14 日十届全国人大三次会议通过《反分裂国家法》，针对「台独」分裂势力，明确国家得采取非和平方式及其他必要措施维护国家统一。香港基本法 1990 年、澳门基本法 1993 年由全国人大通过，《国家安全法》2015 年通过，都与本题时间不符。',
+    '2025年10月|中国特色社会主义进入新时代的标志是':
+      '2012 年 11 月中共十八大召开，标志中国特色社会主义进入新时代。十九大 2017 年确立习近平新时代中国特色社会主义思想为党必须长期坚持的指导思想，二十大 2022 年明确新时代新征程党的中心任务，都是进入新时代之后的事。',
+    '2025年10月|2013年11月，审议通过':
+      '2013 年 11 月中共十八届三中全会审议通过《中共中央关于全面深化改革若干重大问题的决定》，首次提出使市场在资源配置中起决定性作用和更好发挥政府作用。四中全会 2014 年专题是全面依法治国，五中全会 2015 年审议「十三五」规划建议。',
+    '2025年10月|中国特色社会主义最本质的特征是':
+      '党的十九大明确：中国共产党领导是中国特色社会主义最本质的特征，也是中国特色社会主义制度的最大优势。B 人民民主专政是国体，C 人民代表大会制度是政体，D 全面依法治国是「四个全面」战略布局的一项，都属于制度层面或布局层面，不承担「最本质特征」这个表述。',
+    '2025年10月|中共中央在2018年12月举行大会':
+      '改革开放始于 1978 年 12 月十一届三中全会，2018 年 12 月 18 日举行庆祝改革开放 40 周年大会。算周年用「2018－1978＝40」，这类题只要记准起点年份就不会错。',
+    '2025年10月|中国共产党第二十次全国代表大会胜利召开的时间是':
+      '2022 年 10 月 16 日至 22 日，中国共产党第二十次全国代表大会在北京召开。大会明确新时代新征程党的中心任务是团结带领全国各族人民全面建成社会主义现代化强国、实现第二个百年奋斗目标，以中国式现代化全面推进中华民族伟大复兴。',
+    '2025年4月|鸦片战争前，中国封建文化的核心是':
+      '鸦片战争前中国封建文化的核心是儒家思想，经汉武帝「罢黜百家、独尊儒术」后成为官方意识形态，三纲五常、修齐治平构成封建统治的精神支柱。法家、道家、墨家在先秦各成一家，但都不曾在帝制时代承担「核心」地位。',
+    '2025年4月|甲午战争后，日本迫使清政府签订割让台湾的不平等条约是':
+      '1895 年甲午战败后签订《马关条约》，割让台湾全岛及所有附属各岛屿、澎湖列岛，赔款二亿两白银，开放沙市、重庆、苏州、杭州为商埠，允许日本在通商口岸设厂。《南京条约》1842 年割香港岛，《北京条约》1860 年割九龙司，《天津条约》1858 年无割地。',
+    '2025年4月|1895年，在《救亡决论》一文中喊出':
+      '严复 1895 年在天津《直报》发表《救亡决论》，喊出「救亡」的口号，后又译《天演论》宣传「物竞天择、适者生存」。康有为是维新运动的领袖，梁启超主办《时务报》，孙中山走的是革命道路，三人都不写这篇。',
+    '2025年4月|1919年，发表《马克思主义》':
+      '杨匏安 1919 年在《广东中华新报》发表《马克思主义》（一称《科学的社会主义》），对马克思主义的三个组成部分作了比较确切的阐述，与李大钊并称「北李南杨」。李达、蔡和森也是早期传播者，但本篇作者是杨匏安。',
+    '2025年4月|1923年，北京政府调动军警镇压京汉铁路总同盟罢工制造的惨案是':
+      '1923 年 2 月京汉铁路工人大罢工（二七大罢工）遭吴佩孚镇压，制造二七惨案，林祥谦、施洋遇害，工人运动第一次高潮转入低潮。济南惨案 1928 年日军制造，下关惨案 1946 年发生在南京下关，校场口惨案 1946 年发生在重庆。',
+    '2025年4月|大革命失败后，中共中央召开的确定土地革命和武装斗争方针的紧急会议是':
+      '1927 年 8 月 7 日八七会议在汉口召开，确定土地革命和武装反抗国民党反动派的总方针。古田会议 1929 年解决红军党的建设问题，遵义会议 1935 年解决军事与组织问题，洛川会议 1937 年制定全面抗战路线，都不是大革命失败后的这次紧急会议。',
+    '2025年4月|中共中央政治局在遵义会议后成立了全权负责红军军事行动的新三人团':
+      '1935 年 3 月遵义会议后成立新三人团，成员是毛泽东、周恩来、王稼祥，全权负责红军的军事行动。这个小组的成立标志着毛泽东在军事指挥上取得实际领导地位，是与遵义会议意义配套的常考点。',
+    '2025年4月|1930年1月，毛泽东提出中国革命':
+      '1930 年 1 月《星星之火，可以燎原》，提出「以乡村为中心」，初步形成农村包围城市、武装夺取政权的理论。《中国的红色政权为什么能够存在？》《井冈山的斗争》是 1928 年的两篇，解决的是「红旗到底能打多久」的疑问；《反对本本主义》1930 年 5 月提出「没有调查，没有发言权」。',
+    '2025年4月|1936年5月，在共产党人积极参与下':
+      '1936 年 5 月宋庆龄等爱国民主人士在上海发起成立全国各界救国联合会，主张停止内战、一致对外，沈钧儒、邹韬奋等「七君子」即出自这一团体。保卫中国同盟 1938 年由宋庆龄在香港创建，中国民权保障同盟 1932 年成立，国民参政会是国民党政府的咨询机构。',
+    '2025年4月|日本侵略者制造震惊中外的':
+      '1937 年 12 月 13 日日军占领南京后开始大屠杀，持续六周，遇难同胞 30 万以上。1937 年 7 月是卢沟桥事变与全面抗战爆发，1937 年 8 月至 11 月是淞沪会战，时间上要区分「开战」与「屠城」。',
+    '2025年4月|1940年5月，在枣宜会战中以身殉国的国民党爱国将领是':
+      '1940 年 5 月枣宜会战中，第三十三集团军总司令张自忠殉国，是抗战中牺牲的国民党最高将领。赵登禹、佟麟阁 1937 年在北平南苑殉国，戴安澜 1942 年殉国于缅甸，三人的时间与战场都不同。',
+    '2025年4月|1945年出席联合国制宪会议的中国代表团中':
+      '1945 年 4 月至 6 月联合国制宪会议在旧金山召开，中国代表团中的解放区代表是董必武，他在《联合国宪章》上签字。叶剑英、林伯渠、王若飞当时都在国内承担其他工作，未出席这次会议。',
+    '2025年4月|中华人民共和国的成立，标志着中国进入':
+      '1949 年新中国成立标志中国进入新民主主义到社会主义的过渡时期，即新民主主义社会（1949—1956）。这个时期的社会性质是新民主主义社会，1956 年社会主义改造基本完成后才进入社会主义社会，所以 B「社会主义社会」是提前了一步的错误答案。',
+    '2025年4月|导火线是':
+      '1965 年 11 月姚文元发表《评新编历史剧〈海瑞罢官〉》，成为「文化大革命」的导火线。1966 年 5 月「五一六通知」标志「文革」正式开始，8 月「十六条」是「文革」的纲领性文件，《炮打司令部》是毛泽东 1966 年 8 月写的大字报。导火线、开始、纲领三个节点要分开。',
+    '2025年4月|1984年通过《中共中央关于经济体制改革的决定》的重要会议是':
+      '1984 年 10 月中共十二届三中全会通过《中共中央关于经济体制改革的决定》，明确社会主义经济是公有制基础上的有计划的商品经济，把改革重点由农村转向城市。十一届三中全会 1978 年是总转折，十一届六中全会 1981 年通过历史问题决议，十二届六中全会 1986 年通过精神文明建设指导方针的决议。',
+    '2025年4月|中国正式加入世界贸易组织的时间是':
+      '2001 年 12 月 11 日中国正式成为世界贸易组织成员，这是中国对外开放进入新阶段的标志。1997 年香港回归、1990 年上海浦东开发开放、1988 年海南建省设特区，都不是入世时间。',
+    '2025年4月|明确提出我国在21世纪头二十年实现全面建设小康社会奋斗目标的会议是':
+      '2002 年中共十六大明确提出 21 世纪头二十年全面建设惠及十几亿人口的更高水平的小康社会。十七大 2007 年对全面建设小康社会提出新要求，十八大 2012 年提出全面建成小康社会，十九大 2017 年提出决胜全面建成小康社会，时间线要按「十六大提出、十八大改为建成」来记。',
+    '2025年4月|资产阶级维新派自身弱点和局限的主要表现':
+      '三条并列，这是标准答案结构：一是不敢否定封建主义——政治上不敢根本否定封建君主专制，经济上不敢触动封建土地所有制，思想上打着孔子的旗号「托古改制」；二是对帝国主义抱有幻想，不敢正面反对帝国主义，甚至幻想依靠列强支持；三是惧怕人民群众，只靠少数人自上而下改良，不敢发动群众。三条都落在「不敢」二字上，答题时把「政治、经济、思想」「帝国主义」「群众」三个对象点出来即可得分。',
+    '2025年4月|新文化运动的历史意义':
+      '先讲意义再讲局限。意义：一是中国历史上一次空前的思想解放运动，沉重打击封建专制主义和纲常礼教，为各种新思想尤其是马克思主义的传播扫清障碍；二是培养了一批具有新思想的知识分子，为五四运动作了思想准备；三是推动了白话文与新文学的发展。局限：前期局限于知识分子范围，没有同群众斗争结合；部分人在东西方文化问题上存在形式主义的偏向。只答意义不答局限，会丢掉题目的后半部分分值。',
+    '2025年4月|1927年建立的国民党政权在全国实行独裁统治的主要表现':
+      '分四个层面答：政治上实行一党专政和个人独裁，建立中统、军统等特务组织，推行保甲制度，镇压共产党人和进步力量；军事上建立庞大军队，对革命根据地和红军发动军事「围剿」；经济上以四大家族为代表的官僚资本垄断国家经济命脉；文化上推行文化专制主义，查禁进步书刊、迫害进步文化工作者。开头补一句「对外依附帝国主义势力」，答案才完整。',
+    '2025年4月|1952年我国开展的':
+      '「五反」针对违法资本家，内容是反行贿、反偷税漏税、反盗窃国家资财、反偷工减料、反盗窃国家经济情报。极易与「三反」混淆：「三反」1951 年底在党政机关内部开展，反贪污、反浪费、反官僚主义。一个是「对着资本家」，一个是「对着干部」，按对象区分最稳。',
+    '2025年4月|1979年邓小平提出的坚持四项基本原则及其重要性':
+      '两问两答。内容：坚持社会主义道路，坚持无产阶级专政（后表述为人民民主专政），坚持共产党的领导，坚持马克思列宁主义、毛泽东思想。重要性：四项基本原则是实现四个现代化的根本前提，是立国之本；它保证改革开放和现代化建设的社会主义方向；是全国各族人民团结奋斗的共同政治基础。第二问至少写出「根本前提」和「立国之本」两个关键词。',
+    '2025年4月|中华民国临时政府的成立':
+      '三问三答，缺一问就丢一档分。成立：1912 年 1 月 1 日孙中山在南京就任临时大总统，中华民国临时政府成立，以 1912 年为民国元年。性质：资产阶级共和国性质的革命政权，资产阶级革命派在其中占主体地位。局限性：承认清政府与列强签订的不平等条约继续有效，不敢正面反帝；没有提出彻底的土地纲领，未能解决农民土地问题；内部成分复杂、妥协性明显，最终把政权让给袁世凯。',
+    '2025年4月|抗日战争胜利后中国国内的三种建国方案':
+      '三家方案要一一对应：一是国民党蒋介石集团，坚持独裁统治和内战，主张建立国民党一党专政的政权；二是中国共产党，主张建立民主联合政府，建设新民主主义国家；三是民主党派和民主人士，主张建立英美式的资产阶级共和国，走「中间路线」。答题还需落到结论：第三条道路在半殖民地半封建的中国行不通，中国人民最终选择了中国共产党的方案，这是历史的选择。',
+    '2025年4月|中国共产党百年奋斗的历史意义和历史经验':
+      '两个部分分开写。历史意义五条：从根本上改变了中国人民的前途命运；开辟了实现中华民族伟大复兴的正确道路；展示了马克思主义的强大生命力；深刻影响了世界历史进程；锻造了走在时代前列的中国共产党。历史经验十条：坚持党的领导、坚持人民至上、坚持理论创新、坚持独立自主、坚持中国道路、坚持胸怀天下、坚持开拓创新、坚持敢于斗争、坚持统一战线、坚持自我革命。这两组数字（五个意义、十条经验）出自 2021 年 11 月十九届六中全会通过的第三个历史决议，按数字助力记忆。'
+  },
+  '15044':{
+    '2026年4月|下列选项属于马克思主义基本组成部分':
+      '马克思主义由哲学、政治经济学、科学社会主义三部分组成，与三个理论来源（德国古典哲学、英国古典政治经济学、法国空想社会主义）一一对应。A 讲的「立场观点方法」是马克思主义的理论品质，B、C 是具体观点集合，都不属于「组成部分」的划分口径。记忆抓手：三个来源对三个组成部分。',
+    '2026年4月|作为马克思主义公开问世标志的':
+      '1848 年 2 月《共产党宣言》发表，标志马克思主义公开问世。易错项：「正义者同盟」1847 年改组为共产主义者同盟，属于建党组织上的准备，不是问世标志；《新莱茵报》1848 年 6 月创刊，只是宣传阵地；欧洲革命爆发是时代背景。答题抓手：问世＝宣言。',
+    '2026年4月|下列表述属于列宁的物质定义':
+      '列宁原文是「物质是标志客观实在的哲学范畴，这种客观实在是人通过感觉感知的，它不依赖于我们的感觉而存在，为我们的感觉所复写、摄影、反映」，落脚点在客观实在性。B、D 讲物质与时空的统一，C 讲物质与运动不可分割，都属于物质观的内容，但不是「定义」本身的表述。',
+    '2026年4月|下列选项正确揭示意识的本质':
+      '意识本质要答两层：意识是人脑的机能，意识是客观世界的主观映象——内容来自客观世界，形式是主观的。A 把生理器官当成唯一来源；B 讲的是意识在劳动和交往中发展，属产生的条件；C 只说「物质的产物」，丢掉了主观形式这一半，所以只有 D 完整。',
+    '2026年4月|世界的统一性问题':
+      '世界统一性问题问的是万事万物有没有共同的本质（本原）：唯物主义答统一于物质，唯心主义答统一于精神。「共同特征」「相同结构」「相同功能」都停在现象层面的相似性，不构成本原问题——这是三个干扰项的共同陷阱，看到「本质／本原」才是统一性。',
+    '2026年4月|任何事物内部的各要素之间':
+      '题干两层意思都指向「范围」：事物内部各要素之间、事物与他事物之间、整个世界相互联系，说明联系无处不在，即普遍性。客观性回答「联系是否依赖人的意识」，多样性回答「联系有几种形式」，条件性回答「联系受什么制约」，与题干问法都对不上。',
+    '2026年4月|在认识的本质问题上，旧唯物主义':
+      '旧唯物主义认识论有两大缺陷：一是离开实践考察认识问题，二是不懂认识的辩证发展（离开辩证法）。题干已给出第二条，缺的正是「离开实践」。其余三项要么把旧唯物主义的反映论立场说反，要么把它说成先验论，方向就错了。',
+    '2026年4月|理性认识由低级向高级':
+      '理性认识三种基本形式由低到高是概念、判断、推理；感性认识三种形式是感觉、知觉、表象。本题陷阱就是把感性认识的形式（A 项）塞进问理性认识的题干里。记住一句：感性＝感觉知觉表象，理性＝概念判断推理。',
+    '2026年4月|下列关于真理的说法中':
+      '真理是主观与客观相符合，即人们对客观事物及其规律的正确反映。A 把真理当成物质实体，混淆了认识与客观对象；B 是唯心主义真理观；C 把真理等同于客观规律本身——规律是客观的，真理属认识范畴，两者不能划等号。',
+    '2026年4月|对人类社会发展起决定作用':
+      '物质资料生产方式是社会历史发展的决定力量：它决定社会的性质、结构和面貌，也决定社会形态的更替。自然资源、生态环境、人口数量属于社会存在中的地理环境和人口因素，只起加速或延缓作用，不承担「决定」二字。',
+    '2026年4月|在整个上层建筑中，居于主导地位':
+      '上层建筑分两层：政治上层建筑（政治法律制度与设施，核心是国家政权）和观念上层建筑（意识形态）。居主导地位的是政治上层建筑。A「政治法律思想」是意识形态的核心，位置看得对但层级答错了，属观念上层建筑。',
+    '2026年4月|承认社会形态更替的必然性':
+      '既承认历史发展的客观必然性、又承认主体的选择作用，正是历史唯物主义的立场：必然性提供可能空间，选择在可能空间内进行。机械决定论只认必然性、否认选择；历史唯心主义否认客观规律；诡辩论既不讲规律也不讲条件。',
+    '2026年4月|关于个人在历史进程中的作用':
+      '唯物史观认为每个人都是历史活动的参与者，历史是无数个人合力作用的结果，但个人作用有大小之别、性质之别。B 说历史人物「总是促进性」的，忽略了反动人物；C 否认差别；D 否认规律的制约，三项都错。',
+    '2026年4月|商品经济得以产生的社会历史条件':
+      '商品经济产生有两个条件：一是社会分工，二是生产资料和劳动产品属于不同所有者。题干已给出第二条，缺的正是社会分工。自然分工、部落内部分工属于更早的形态，不是商品经济特有的条件，别被「分工」二字带偏。',
+    '2026年4月|商品二因素中反映人与自然之间的':
+      '商品二因素是使用价值和价值。使用价值是商品能满足人的需要的属性，反映人与自然的关系，是自然属性，不反映社会关系；价值是凝结的无差别人类劳动，反映商品生产者之间的社会关系，才是社会属性。题干问「人与自然」，答案是使用价值。',
+    '2026年4月|以私有制为基础的商品经济的基本矛盾':
+      '私人劳动和社会劳动的矛盾是以私有制为基础的商品经济的基本矛盾：私有制使劳动具有私人性质，社会分工又使劳动具有社会性质，二者能否统一要靠交换来检验。具体劳动与抽象劳动的矛盾是它借以表现的形式，层级不同，不能混。',
+    '2026年4月|资本主义生产方式的绝对规律':
+      '剩余价值规律是资本主义生产方式的绝对规律：它决定资本主义生产的实质和目的，支配其产生、发展和灭亡的全过程。竞争规律、资本积累一般规律、再生产周期规律都由它派生，是它的表现形式，不能反过来说。',
+    '2026年4月|什么是价值观':
+      '两问两答，按点给分。一是定义：价值观是人们对价值本质的认识，以及评价标准、评价原则、评价方法的观点体系——「标准、原则、方法」三个词是给分点，只写「对价值的看法」会丢分。二是内容分三层：国家层面富强、民主、文明、和谐；社会层面自由、平等、公正、法治；公民层面爱国、敬业、诚信、友善。三层顺序不能乱，每层四个词不能漏。',
+    '2026年4月|简要说明社会存在与社会意识的含义':
+      '答题走三步。第一步含义：社会存在是社会物质生活条件，属社会生活的物质方面；社会意识是社会存在的反映，属精神方面。第二步定性：二者是辩证统一关系。第三步展开：社会存在决定社会意识（决定内容、产生和发展），社会意识反作用于社会存在（先进促退、落后阻碍）。末尾补一句「社会意识具有相对独立性」，是常见加分点。',
+    '2026年4月|简述生产价格的形成过程':
+      '分四步：一是剩余价值转化为利润，进一步转化为平均利润；二是价值随之转化为生产价格，生产价格＝生产成本＋平均利润；三是生产成本由生产中实际耗费的不变资本和可变资本构成；四是价值规律作用形式发生变化——商品按生产价格交换，市场价格以生产价格为中心波动。第四步最容易被漏掉，却是本题的落点。',
+    '2026年4月|第二次世界大战后资本主义发生':
+      '先列五个表现：生产资料所有制的变化；劳资关系和分配关系的变化；社会阶层和阶级结构的变化；经济调节机制和经济危机形态的变化；政治制度的变化。再落结论：这些变化没有改变资本主义制度的本质——私有制基础没变、雇佣劳动没变、剥削关系没变、基本矛盾没变，所以「两个必然」依然成立。结论段不能省，题目第二问就在这里给分。',
+    '2026年4月|简述社会主义发展道路多样性':
+      '三个原因并列，各一两句即可得分，关键是把「原因定位词」带上。一是各国生产力发展状况和社会发展阶段不同，决定了发展道路各具特点（根本原因）；二是历史文化传统的差异，是造成多样性的重要条件；三是时代和实践的不断发展，是造成多样性的现实原因。只罗列现象、不点定位词，拿不满分。',
+    '2026年4月|把主要矛盾和次要矛盾':
+      '论述题按三段式写。第一段两点论：认识复杂事物既要看到主要矛盾、又不忽略次要矛盾；认识某一矛盾既要看到主要方面、又不忽略次要方面。第二段重点论：抓主要矛盾、抓矛盾的主要方面。第三段讲统一：两点论是有重点的两点论，重点论是两点中的重点论，离开两点论讲重点就成了形而上学的一点论。现实意义必须单独成段——当前要抓住主要矛盾，同时统筹兼顾，只答原理不答意义，后半段分值会丢。',
+    '2026年4月|试述商品经济中商品价值量':
+      '四点答全。一是价值量由生产商品的社会必要劳动时间决定，不是个别劳动时间；二是与社会必要劳动时间成正比，与劳动生产率成反比；三是劳动生产率提高后，单位商品价值量下降，但同一时间内创造的价值总量不变；四是个别生产者提高劳动生产率，在社会必要劳动时间不变时可获得超额收益。后两点常被漏答，也是拉开分差的地方。',
+    '2026年4月|如何理解资本主义的历史进步性':
+      '三个表现要答全：一是资本主义把科学技术转变为强大的生产力；二是追求剩余价值的内在动力和竞争的外在压力，推动社会生产力迅速发展；三是资本主义的意识形态和政治制度作为上层建筑，在战胜封建小生产方式、保护和促进资本主义生产方式方面起了重要作用。结尾补一句「进步性是相对于封建社会而言，不掩盖其历史局限性」，论述题这样收尾更完整。',
+    '2026年4月|从资本循环角度看，资本家工厂中已经进入仓库的产成品':
+      '产业资本循环三阶段对应三种职能形式：购买阶段是货币资本，生产阶段是生产资本，售卖阶段是商品资本。已经进入仓库待售的产成品处在售卖阶段，属于商品资本形态。D 固定资本是按价值周转方式划分的类别，与循环形态不是一个分类维度。',
+    '2026年4月|私人垄断资本主义形成的基础是':
+      '教材链条是：自由竞争引起生产集中，生产集中发展到一定程度必然引起资本集中，生产和资本集中到少数大企业就产生垄断。「市场集中」「技术集中」不是这一表述里的概念，别被字面相近的选项带偏。',
+    '2026年4月|最简单、初级的垄断组织形式是':
+      '垄断组织形式由低到高依次为：短期价格协定（最简单、最初级）→ 卡特尔（销售协定）→ 辛迪加（统一销售机构）→ 托拉斯（合并为独立企业）→ 康采恩（跨部门混合联合）。问「最简单初级」只能答短期价格协定。',
+    '2026年4月|资本主义国家运用财政政策、货币政策等经济手段':
+      '国家干预经济的手段分三类：法律调节（立法与司法）、行政调节、经济调节（财政政策、货币政策）。用经济手段对社会总供给和总需求进行调节，对象是整个国民经济的总量，因此属于宏观调节。微观调节指对具体市场主体行为的规制，与总供求调节不同。',
+    '2026年4月|从输出资本的主体来看，主要有':
+      '题干限定「输出主体」，所以答案只能按主体划分：私人资本输出和国家资本输出。D 生产资本输出、借贷资本输出是按输出资本的「形式」划分的，方向对但维度错——这类题先看清问的是主体还是形式。',
+    '2026年4月|马克思一生有两大发现':
+      '恩格斯在《在马克思墓前的讲话》中指出：马克思一生有两大发现，即唯物史观和剩余价值学说，正是这两大发现使社会主义从空想变为科学。A 是马克思主义哲学的整体表述，C 的劳动价值论是剩余价值学说的理论基础，都不在「两大发现」这一固定表述里。',
+    '2026年4月|马克思主义与空想社会主义的根本区别是':
+      '根本区别在于是否坚持科学的立场、观点、方法。马克思主义只揭示未来社会的一般特征，拒绝作详尽描述，因为对未来社会的设想只能建立在现实发展的基础上；空想社会主义恰恰热衷于描绘详尽的乌托邦蓝图，B 描述的正是空想社会主义的特征。C、D 两项空想社会主义也做到了，不构成区别。',
+    '2026年4月|共产党人的最高理想是':
+      '党的最高理想和最终目标是实现共产主义。要区分三个层次：最高理想是实现共产主义，现阶段共同理想是建设中国特色社会主义，新民主主义则是民主革命阶段的目标。问「最高理想」只能答共产主义。',
+    '2025年10月|下列选项属于为马克思主义的创立提供了直接理论来源的是':
+      '马克思主义的三个直接理论来源是：德国古典哲学、英国古典政治经济学、法国空想社会主义。古希腊罗马哲学、文艺复兴运动的思想成果属于更早的思想渊源，法国复辟时期历史学家的阶级斗争学说只是思想资料，都不在「三个直接来源」这个固定表述里。',
+    '2025年10月|唯物主义和唯心主义是两种根本对立的哲学派别':
+      '两者对立源于对哲学基本问题第一方面的不同回答，即物质和意识谁是第一性、谁是本原。D 对思维和存在有无同一性的回答，区分的是可知论与不可知论，属于基本问题的第二方面，不是唯物、唯心之争。',
+    '2025年10月|客观实在性作为物质的唯一特性':
+      '客观实在性是从共性与个性的关系上把握物质的，它概括的是自然存在和社会存在的共同特性，即都不依赖于人的意识而存在。A「某种自然存在的个别特性」把共性降成了个性，C「几种自然存在的共同特性」把社会存在漏在外，都不完整。',
+    '2025年10月|观念的东西不外是移入人脑':
+      '这句话说明意识的内容来自客观物质世界，但进入人脑后又经过加工改造，因此意识是客观内容与主观形式的统一，即客观世界的主观映象。A、C 把人脑当成分泌器官，属于庸俗唯物主义；D「虚幻影像」否认了意识内容的客观性。',
+    '2025年10月|反映事物的过去，现在和将来关系的一对范畴是':
+      '唯物辩证法五对基本范畴各有侧重：原因和结果、必然和偶然、可能和现实、现象和本质、内容和形式。其中可能和现实联结事物的过去、现在与未来——现实是过去的可能转化而来，可能是现实发展的趋向。A「内奧和形式」是「内容和形式」的录入错字。',
+    '2025年10月|认识的本质是主体在实践基础上':
+      '这句话包含三个要点：以实践为基础、主体对客体的反映、能动的而不是消极直观的反映，三点合起来正是辩证唯物主义认识论的观点。旧唯物主义认识论承认反映但否认能动性，唯心主义认识论则否认反映论本身。',
+    '2025年10月|轻视理性认识而片面夸大感性认识的作用':
+      '只承认感性经验、否认理性认识的作用，在实践中表现为经验主义；反过来只承认理性认识、轻视感性经验，则表现为教条主义。这两个词要成对记，题干说的是前者。实用主义、怀疑主义是真理观上的错误，不是这一对。',
+    '2025年10月|实践是检验真理的唯一标准，这是因为':
+      '真理是主观认识，认识本身无法检验自己，客观事物也不会主动答话，只有实践才能把主观认识同客观实际联结起来加以对照。这个「联结」能力来自实践的直接现实性——实践本身是现实的物质活动。A、B、C 讲的都是实践的地位或作用，不是它能够充当检验标准的原因。',
+    '2025年10月|中国共产党的思想路线的核心是':
+      '党的思想路线是：一切从实际出发，理论联系实际，实事求是，在实践中检验真理和发展真理，其核心是实事求是。A 自信自立、B 守正创新、D 自我革命是习近平新时代中国特色社会主义思想世界观方法论「六个必须坚持」的内容，不属于思想路线的表述。',
+    '2025年10月|社会历史观的基本问题是':
+      '社会历史观的基本问题是社会存在和社会意识的关系问题，它是哲学基本问题（物质与意识的关系）在历史观领域的贯彻。其余三项都是社会历史领域的具体关系问题，层次不同。',
+    '2025年10月|下列选项中不属于社会存在的是':
+      '社会存在包括自然地理环境、人口因素和物质生产方式三项；社会意识包括政治法律思想、道德、艺术、宗教、哲学等。政治法律思想是意识形态的核心，属于社会意识，所以「不属于社会存在」的就是它。',
+    '2025年10月|下列各项正确说明经济基础与上层建筑的关系的是':
+      '经济基础决定上层建筑的产生、性质和变化发展，上层建筑对经济基础有反作用。B、C 把决定关系说反了；D 错在「同步变化」——上层建筑具有相对独立性，其变化往往滞后于经济基础，不会齐步走。',
+    '2025年10月|从商品二因素与劳动二重性的关系考察':
+      '具体劳动创造商品的使用价值，抽象劳动形成商品的价值，这是劳动二重性学说的核心结论。体力劳动与脑力劳动是按劳动力支出形式划分的，不构成价值的来源，也不是本题的划分维度。',
+    '2025年10月|下列关于商品价值量决定关系的表述中，正确的是':
+      '两条正反比关系要背准：商品价值量与社会必要劳动时间成正比；与劳动生产率成反比。劳动生产率越高，同一时间生产的商品越多，单位商品包含的社会必要劳动时间越少，价值量就越小。',
+    '2025年10月|劳动力成为商品要具备的基础条件':
+      '劳动力成为商品需两个基本条件：一是劳动者有人身自由，能自由支配自己的劳动力；二是劳动者丧失一切生产资料和生活资料，除劳动力外一无所有，只能靠出卖劳动力为生。B「人身依附于资本家」是封建社会农奴的特征，恰恰是资本主义要打破的关系，所以它不是条件。',
+    '2025年10月|资本主义经济周期的必经阶段和基本阶段':
+      '资本主义再生产周期一般经过危机、萧条、复苏、高涨四个阶段，其中危机是必经阶段和基本阶段，是新一轮周期的起点。题目特别说明「不一定都要依次经过四个阶段」，正是在提示只有危机阶段不可跳过。',
+    '2025年10月|三权分立制度':
+      '三权分立指立法权、行政权、司法权分别由议会、政府、法院独立行使并相互制衡，是资本主义国家政权采取的组织形式。监督权不属于这「三权」，它通常寓于三权相互制衡的机制之中，而不是独立的一权。',
+    '2025年10月|由于这一时期的垄断资本主义主要以私人垄断资本为基础':
+      '19 世纪末 20 世纪初形成的垄断资本主义以私人垄断资本为基础，因此称为私人垄断资本主义。二战后国家垄断资本主义成为主要形式，但它的基础仍是私人垄断资本，两者是阶段关系，不是替代关系。',
+    '2025年10月|垄断组织虽然形式多种多样，但本质都是为了':
+      '垄断组织无论采取卡特尔、辛迪加、托拉斯还是康采恩形式，本质都是凭借垄断地位规定垄断价格，获取高额垄断利润。促进技术进步、控制市场、增加产量都只是手段或附带结果，不是本质目的。',
+    '2025年10月|成为居主导地位的所有制形式是':
+      '二战后资本主义生产资料所有制发生新变化：国家资本所有制形成并发挥作用，法人资本所有制随之崛起并成为居主导地位的资本所有制形式。注意区分「国家资本所有制形成」与「法人资本所有制居主导」这两句的不同表述。',
+    '2025年10月|马克思主义政治经济学的金融资本概念有其独特内涵':
+      '马克思主义政治经济学中的金融资本，指垄断的工业资本和垄断的银行资本融合或混合生长而形成的一种资本形式，不是银行资本与借入资本的简单相加，也不是资本市场货币资本的总和。抓住「融合」二字即可排除前三项。',
+    '2025年10月|无产阶级夺取政权的第一次伟大尝试是':
+      '1871 年巴黎公社革命是无产阶级夺取政权的第一次伟大尝试，虽然只存在 72 天，但提供了宝贵经验。第一国际 1864 年成立是国际工人组织，第二国际 1889 年成立，十月革命 1917 年是第一次成功的社会主义革命，都不是「第一次尝试」。',
+    '2025年10月|社会主义国家的最高政治领导力量是':
+      '共产党是社会主义国家的最高政治领导力量，党的领导是中国特色社会主义最本质的特征和最大优势。工会、共青团是党领导下的群众组织，社会党是资本主义国家的政党类型。',
+    '2025年10月|共产主义社会的根本特征是':
+      '共产主义社会的基本特征中，物质财富极大丰富、社会关系高度和谐、精神境界极大提高都是条件或表现，根本特征是每个人自由而全面的发展，这也是马克思主义追求的最高价值目标。',
+    '2025年10月|简述马克思主义的基本特征':
+      '按五点展开，每点一句话加一句解释：科学性——正确反映自然、社会和人类思维发展的本质与规律；革命性——具有彻底的批判精神，公开申明为无产阶级和人类解放服务；实践性——从实践中来、到实践中去，以改造世界为己任；人民性——来自人民、为了人民、造福人民；发展性——与时俱进，是开放的理论体系。这五点里实践性是区别于其他理论的最显著特征，答到要单独点出。',
+    '2025年10月|如何理解真理和谬误的关系':
+      '三段式作答。一是相互对立：在确定的对象和范围内，真理与谬误的对立是绝对的，二者有原则界限，真理就是真理、谬误就是谬误，不能混淆。二是相互依存、相互转化：二者相比较而存在、相斗争而发展，超出一定范围或条件，真理会变成谬误，谬误也可能转化为真理。三是要以实践为标准，敢于并善于同谬误作斗争。中间「转化」这一段最容易漏，漏了就从「关系」变成了「区别」。',
+    '2025年10月|实现资本顺利循环必须具备的两个基本前提条件':
+      '两个条件各占一半分，缺一不可。一是空间上的并存：产业资本必须按一定比例同时存在于货币资本、生产资本、商品资本三种职能形式上，三种形式缺一种，循环就会中断。二是时间上的继起：三种职能形式必须依次转化、连续不断地经过购买、生产、售卖三个阶段，任何一个阶段停顿，整个循环都会受阻。答题时把「按比例同时存在」和「依次连续转化」两个短语写准。',
+    '2025年10月|简述经济全球化的含义':
+      '先给含义再列表现。含义：在生产不断发展、科技加速进步、社会分工和国际分工不断深化、生产社会化和国际化程度不断提高的条件下，世界各国各地区的经济活动越来越超出本国和本地区的范围而相互联系、相互依赖。表现四项：生产的全球化、贸易的全球化、金融的全球化、企业经营的全球化。只写含义不写表现，会丢掉一半分值。',
+    '2025年10月|马克思主义经典作家预见未来社会的方法论原则':
+      '四条原则：一是在揭示人类社会发展一般规律的基础上指明社会发展的方向；二是在剖析资本主义旧世界的过程中阐发未来新世界的特点；三是在社会主义社会发展中不断深化对未来共产主义社会的认识；四是立足于揭示未来社会的一般特征，而不作详尽的细节描绘。第四条最易漏，而它恰恰是马克思主义区别于空想社会主义的方法论要害。',
+    '2025年10月|矛盾的普遍性、矛盾的特殊性的含义':
+      '三块内容按题面顺序写。普遍性：矛盾存在于一切事物之中，存在于一切事物发展过程的始终，即矛盾无处不在、无时不有。特殊性：各个具体事物的矛盾、每一事物在不同发展阶段上的矛盾各有其特点，可从三个层次展开——不同事物的矛盾各有特点，同一事物在不同阶段各有不同，构成事物的诸多矛盾及每一矛盾的不同方面各有不同地位和作用（即主要矛盾与次要矛盾、矛盾的主要方面与次要方面）。意义：具体问题具体分析是马克思主义活的灵魂，是正确认识事物的基础，也是正确解决矛盾的关键。第三块必须点出「活的灵魂」这一表述。',
+    '2025年10月|社会意识相对独立性的含义及表现':
+      '先答含义再答表现。含义：社会意识是社会存在的反映，是社会生活的精神方面；相对独立性指社会意识在根本上受社会存在决定的同时，还具有自身特有的发展形式和发展规律。表现五条：与社会存在发展不完全同步，可能超前也可能滞后；与经济发展水平不平衡；具有历史继承性；各种社会意识形式之间相互影响、相互作用；对社会存在具有能动的反作用。最后一条是最突出的表现，务必写上「先进的社会意识促进社会发展，落后的社会意识阻碍社会发展」。',
+    '2025年10月|资本主义为社会主义所代替的历史必然性':
+      '论述题按「根源—表现—趋势」三步写。根源：资本主义基本矛盾是生产社会化与生产资料资本主义私人占有之间的矛盾，这一矛盾决定了资本主义必然被社会主义取代，是历史发展的基本趋势。表现：这一基本矛盾「包含着现代的一切冲突的萌芽」，是资本主义社会一切矛盾和冲突的总根源；它表现为个别企业生产的有组织性与整个社会生产无政府状态的矛盾、生产无限扩大趋势与劳动人民有支付能力需求相对缩小的矛盾，导致周期性经济危机；资本积累造成两极分化、阶级矛盾激化。趋势：社会主义代替资本主义是长期、曲折的历史过程，要同时讲「两个必然」（必然灭亡、必然胜利）与「两个决不会」（旧社会形态在它所能容纳的全部生产力发挥出来以前决不会灭亡，新的更高的生产关系在物质存在条件成熟以前决不会出现），只答必然性不答长期性，论述会显得单薄。'
+  }
+};
+/* 前缀匹配：AI_EXP 的 key 后半段只需写出题干开头若干个字，改卷子时题干有细微差异也不至于全丢 */
+let _aiKeys={};
+function aiExpOf(code,pe,stem){
+  const g=AI_EXP[code]; if(!g) return '';
+  const s=String(stem==null?'':stem).replace(/[\s\u3000]+/g,'');
+  if(!s) return '';
+  const pre=String(pe)+'|';
+  const keys=_aiKeys[code]||(_aiKeys[code]=Object.keys(g));
+  for(let i=0;i<keys.length;i++){
+    const k=keys[i];
+    if(k.indexOf(pre)!==0) continue;
+    const head=k.slice(pre.length);
+    /* 用「包含」而不是「开头」：原卷题干常带编号、引号前缀（「19世纪70—90年代，洋务派…」），
+       要求从首字匹配会让写得对的解析也命中不了。key 已按考期分组且片段足够长，误命中风险很低。 */
+    if(head && s.indexOf(head)>=0) return g[k];
+  }
+  return '';
+}
+/* 答题骨架：把参考答案的分点结构抽成要点清单，只「抽取 + 计数」，不改写内容。
+   参考答案本身仍原样显示在上方，两者是「全文」与「结构视图」的关系，不冲突。 */
+function aiOutline(ans){
+  const t=String(ans==null?'':ans).trim();
+  if(t.length<50) return null;
+  let segs=null;
+  if((t.match(/（[1-9]）/g)||[]).length>=2) segs=t.split(/（[1-9]）/).slice(1);
+  else if((t.match(/[①②③④⑤⑥⑦⑧⑨]/g)||[]).length>=2) segs=t.split(/[①②③④⑤⑥⑦⑧⑨]/).slice(1);
+  if(!segs || segs.length<2) return null;
+  const tags=[];
+  segs.forEach(function(s){
+    s=String(s).replace(/^[\s\u3000：:、]+/,'');
+    /* 标签取法按可读性排序：引导短语（「新变化：」「国家层面：」）＞ 首个逗号前短语 ＞ 含否定/结论词的分句 ＞ 截断。
+       最后一级才截断，且带省略号，避免把半句话当成要点名。 */
+    let tag='';
+    const mA=s.match(/^([^，。；：、\n]{2,16})[：:]/);
+    if(mA) tag=mA[1];
+    else {
+      const mC=s.match(/^([^，。；：、\n]{2,16})[，。；、]/);
+      /* 结论型要点（「…并没有改变资本主义制度的本质」）取否定词之后的内容，
+         比截前半句更贴近这一点的意思；前缀必须锚定段首，否则会从句中随便找个位置起切。 */
+      const mB=s.match(/^[^，。；：、\n]{0,20}(并没有|没有改变|并未|不能|不会|不是)([^，。；：、\n]{2,16})/);
+      if(mC) tag=mC[1];
+      else if(mB) tag=mB[1]+mB[2];
+      else tag=s.slice(0,10)+(s.length>10?'…':'');
+    }
+    tag=tag.replace(/[\s\u3000]+$/,'');
+    if(tag && tags.indexOf(tag)<0) tags.push(tag);
+  });
+  if(tags.length<2) return null;
+  const mark='①②③④⑤⑥⑦⑧⑨⑩';
+  return {n:tags.length, items:tags.slice(0,10).map(function(x,i){ return (mark[i]||'·')+' '+x })};
+}
+function anaExp(e){
+  const t=String(e==null?'':e).trim();
+  if(!t) return {kind:'', txt:''};
+  if(/^正确答案[：:]\s*[A-Ha-h]?\s*[（(]/.test(t) || /真题（原卷）\s*第\s*\d+\s*题/.test(t)) return {kind:'', txt:''};
+  if(/^【评分(说明|参考|标准)】/.test(t)) return {kind:'rule', txt:t};
+  if(t.length<60 && /^(按要点|写出公式|观点接近|按题目要求|答出|答对)/.test(t)) return {kind:'rule', txt:t};
+  return {kind:'exp', txt:t};
+}
+/* 单章考点频次：章节细则里用，回答「这一章具体考了哪些知识点、各考几次」。
+   与 anaHotPoints 共用同一套标签口径，保证榜上的考点名和章内清单完全一致。 */
+let _kcCache={};
+function anaKpCiList(code, ci){
+  const key=code+'#'+ci, all=anaQIndex(code);
+  const hit=_kcCache[key];
+  if(hit && hit.src===all.length) return hit.out;
+  const m={};
+  all.forEach(function(x){ if(x.ci===ci && x.kpn) m[x.kpn]=(m[x.kpn]||0)+1 });
+  const out=Object.keys(m).map(function(k){ return {n:k, c:m[k]} })
+    .sort(function(a,b){ return b.c-a.c || b.n.length-a.n.length })
+    .slice(0,8);
+  _kcCache[key]={src:all.length, out:out};
+  return out;
+}
 function t3FmtPt(v){ return String(Math.round(v*100)/100) }
 /* 优先级：按"期均真题分值"四分位标注，对任何科目都自适应。
    旧版用命中率 + 题数，结果 12 章里 7 章都是「必拿」，标签失去区分度。 */
@@ -18605,7 +20692,8 @@ function qBreaks(raw,emScore){
 }
 function t3Card(x){
   let h='<div class="t3-qc">';
-  h+=`<div class="t3-qh"><span class="t3-pe">${esc(x.pn)}</span><span class="t3-ty">${esc(x.t)}</span></div>`;
+  h+=`<div class="t3-qh"><span class="t3-pe">${esc(x.pn)}</span><span class="t3-ty">${esc(x.t)}</span>`
+    +(x.kpn?`<span class="t3-kp" title="对应大纲知识点">${esc(x.kpn)}</span>`:'')+'</div>';
   h+=`<div class="t3-qs">${qBreaks(x.stem)}</div>`;
   if(x.o&&x.o.length){
     h+='<div class="t3-oo">'+x.o.map(function(o,i){
@@ -18616,6 +20704,26 @@ function t3Card(x){
   if(x.ans){
     const ans=qBreaks(x.ans,true);
     h+=`<div class="t3-ans"><b>参考答案</b>${ans}</div>`;
+  }
+  const ex=anaExp(x.e);
+  if(ex.txt){
+    h+=`<div class="t3-exp${ex.kind==='rule'?' t3-rule':''}"><b>${ex.kind==='rule'?'评分口径':'解析'}</b>${qBreaks(ex.txt,true)}</div>`;
+  }
+  const subj=/简答|论述|案例|分析|计算|名词|辨析/.test(String(x.t||''));
+  /* 原卷没有参考答案时直接说明，避免被当成页面没加载出来 */
+  if(!x.ans && subj && !(x.o&&x.o.length)) h+='<div class="t3-na">原卷未录入本题参考答案</div>';
+  /* AI 解析：只在原卷没有真解析时补位，不与原卷解析并存；一律带紫色标识 */
+  if(!ex.txt && x.aie){
+    h+=`<div class="t3-exp t3-aiexp"><b>AI 解析<span class="ai-badge" title="由 AI 生成，非原卷内容，仅供理解参考">AI 生成</span></b>${qBreaks(x.aie,true)}</div>`;
+  }
+  /* 答题骨架：主观题且有参考答案时给结构视图（抽取要点，不改写内容） */
+  if(subj && x.ans){
+    const sk=aiOutline(x.ans);
+    if(sk){
+      h+=`<div class="t3-skel"><b>答题骨架<span class="ai-badge" title="从参考答案中自动抽取要点，未改写内容">AI 提炼</span></b>`
+        +`<span class="sk-n">共 ${sk.n} 个要点</span>`
+        +`<div class="sk-chips">${sk.items.map(function(t){ return '<i>'+esc(t)+'</i>' }).join('')}</div></div>`;
+    }
   }
   return h+'</div>';
 }
@@ -18716,7 +20824,38 @@ function buildT3(code,periods,info,pe){
           : `本课程尚未录入真题原卷，分值为按章节权重的估算值；导入原卷后本表自动切换为实测口径。`))
     +`</p>`;
 
-  /* ③ 章节细则：真题回放 */
+  /* ③ 高频考点榜：跨考期聚合，回答「哪些知识点反复考、以什么题型考、最近一次是哪期」
+     口径写死「历史频率」，不出现「必考 / 预测 / 命中率 X% 会考」这类说法 */
+  const hps=anaHotPoints(code);
+  if(hps.length){
+    const nPerAll=hps.nPer||1, nQAll=hps.nQ||0;
+    h+=`<h4 style="margin:18px 0 6px">高频考点榜<span class="muted" style="font-weight:400;font-size:12px;margin-left:8px">按覆盖考期排，考点取自${esc(anaKpSrc(code))}</span></h4>`;
+    h+='<table class="t3-hp">';
+    h+='<tr><th>考点</th><th>所属章节</th><th>出现</th><th>覆盖考期</th></tr>';
+    hps.forEach(function(o){
+      const lv=o.rate>=0.6?'hp-hot':o.rate>=0.3?'hp-mid':'hp-low';
+      const lab=o.rate>=0.6?'高频':o.rate>=0.3?'中频':'偶发';
+      const ty=o.types.slice(0,2).map(function(t){ return esc(t)+' '+o.tm[t] }).join('、');
+      h+='<tr>';
+      h+=`<td><div class="hp-k">${esc(o.kp)}<span class="hp-tag ${lv}">${lab}</span></div>`
+        +`<div class="hp-sub">常考 ${ty||'—'}</div>`
+        +`<div class="hp-sub hp-last">最近 ${esc(o.last)}</div></td>`;
+      h+=`<td>第${cnNum(o.ci+1)}章 ${esc(chaps[o.ci]?chaps[o.ci][0]:'')}</td>`;
+      h+=`<td>${o.n} 题</td>`;
+      h+=`<td>${o.pn}/${nPerAll} 期<div class="hp-bar"><i style="width:${Math.round(o.rate*100)}%"></i></div></td>`;
+      h+='</tr>';
+    });
+    h+='</table>';
+    h+=`<p class="muted" style="font-size:11.5px;margin:7px 0 0;line-height:1.7">`
+      +`「覆盖考期」= 该考点在 ${nPerAll} 个已录考期里出现过几期，是<b>历史频率</b>，不是对下一次考试的预测；`
+      +`高频 ≥ 60%、中频 ≥ 30%、其余为偶发。同一考点在不同考期换了问法也算同一考点，重复出现的次数（出现列）比分值更能反映它的地位。`
+      +`</p>`;
+  } else if(allQ){
+    h+=`<p class="muted" style="font-size:11.5px;margin:14px 0 0;line-height:1.7">`
+      +`该科暂时归纳不出高频考点：${esc(anaKpSrc(code))}与题干没有稳定重合词（原卷多为英文或只按题型命题），强行匹配会给出错误标签，因此宁可不显示。补齐该科关键词表后此榜自动生成。</p>`;
+  }
+
+  /* ④ 章节细则：真题回放 */
   h+='<div class="t3-dets">';
   order.forEach(function(i,rank){
     const e=ev[i], p=pri[i];
@@ -18726,6 +20865,12 @@ function buildT3(code,periods,info,pe){
     h+=`<span class="t3-mini">${hasEv?('期均 '+norm(e.perScore)+' 分'):('本期约 '+chapScores[i]+' 分')}</span>`;
     h+=`<span class="t3-pri ${p.c}">${p.t}</span></span></summary>`;
     h+='<div class="t3-dbody">';
+    const kpl=anaKpCiList(code,i);
+    if(kpl.length){
+      h+='<div class="t3-topic"><b>本章考点</b>';
+      h+=kpl.map(x=>`<span>${esc(x.n)}<i>×${x.c}</i></span>`).join('');
+      h+='</div>';
+    }
     const tops=anaTopicsOf(e,kws[i]||[]);
     if(tops.length){
       h+='<div class="t3-topic"><b>真题反复出现的对象</b>';
@@ -18762,7 +20907,8 @@ function renderAnalysis(s){
   let html=`<div class="card"><h3>历年题型分析 · ${c.name}</h3><p class="muted">${note}</p>`;
   html+=`<h4 style="margin:14px 0 6px">各章节历年分值与重要性</h4><div style="overflow-x:auto">${buildT1(code,periods,info)}</div>`;
   html+=`<h4 style="display:flex;align-items:center;flex-wrap:wrap;margin:16px 0 6px"><span><span id="anaP2">${anaSelPeriod}</span>真题分析</span><span style="margin-left:10em;color:#64748b;font-weight:400;font-size:13px">考期：<select id="anaPeriodSel" style="margin-left:6px;padding:5px 10px;border-radius:7px;border:1px solid #cbd5e1;background:#fff;color:#1e293b;font-size:13px" onchange="anaSetPeriod(this.value)">`+periods.slice().reverse().map(p=>`<option value="${p}"${p===anaSelPeriod?' selected':''}>${p}</option>`).join('')+`</select></span></h4><div style="overflow-x:auto" id="anaT2">${buildT2(code,periods,info,anaSelPeriod)}</div>`;
-  html+=`<h4 style="margin:16px 0 6px"><span id="anaP3">${anaSelPeriod}</span>真题分析细则<span class="muted" style="font-weight:400;font-size:12px;margin-left:8px">按历次原卷实测，章节归属已校验</span></h4><div id="anaT3">${buildT3(code,periods,info,anaSelPeriod)}</div>`;
+  const expN=anaQIndex(code).filter(function(x){ return anaExp(x.e).kind==='exp' }).length;
+  html+=`<h4 style="margin:16px 0 6px"><span id="anaP3">${anaSelPeriod}</span>真题分析细则<span class="muted" style="font-weight:400;font-size:12px;margin-left:8px">按历次原卷实测，章节归属已校验 · ${allQ} 道原卷中 ${expN} 道带解析</span></h4><div id="anaT3">${buildT3(code,periods,info,anaSelPeriod)}</div>`;
   html+='</div>';
   $('#studyContent').innerHTML=html;
 }
@@ -19075,13 +21221,92 @@ function rdJump(i){
   rdCur=i;
   const t=$('#rdPillTxt'); if(t) t.textContent=rdLabel(it.txt);
 }
+
+/* ================= 章节目录：右侧贴边「目录」标识 + 滑出面板 =================
+   数据与跳转完全复用原来的 #chList（renderChapters 渲染、jumpChapter/jumpMdChapter 跳转），
+   这里只负责「什么时候露标识」「面板开关」「点完自动收起」。 */
+var CHDIR_TABS=['outline','notes','cards'];   /* 只有这几个页签是长正文、需要章节跳转 */
+function chDirSync(){
+  const btn=$('#chDirBtn'), list=$('#chList');
+  if(!btn) return;
+  const pg=$('#page-study');
+  const onPg = !!(pg && pg.classList.contains('active'));
+  const n = list ? list.querySelectorAll('.ch-item').length : 0;
+  const okTab = CHDIR_TABS.indexOf(curTab)>=0;
+  const on = onPg && n>0 && okTab;
+  btn.classList.toggle('on', on);
+  if(!on) chDirClose();
+  const cnt=$('#chDirCnt');
+  if(cnt) cnt.textContent = n ? '共 '+n+' 章' : '';
+}
+function chDirOpen(){
+  const m=$('#chDirMask'); if(!m) return;
+  chDirMarkCurrent();                       /* 先标出“正读到哪一章”，再滚动到该项 */
+  m.classList.add('on');
+  const btn=$('#chDirBtn'); if(btn) btn.classList.add('open');
+  const cur=$('#chList') ? $('#chList').querySelector('.ch-item.active') : null;
+  if(cur){ try{ cur.scrollIntoView({block:'center'}) }catch(e){} }
+}
+/* 按正文滚动位置回推当前章节：章节列表的文案与正文标题同源，用「文本归一化后互含」匹配，
+   取最后一个已经滚过顶部 140px 的标题，保证打开目录时高亮的永远是当前在读的那章。 */
+function chDirMarkCurrent(){
+  const list=$('#chList'), box=$('#studyContent');
+  if(!list||!box) return;
+  const items=[...list.querySelectorAll('.ch-item')];
+  if(!items.length) return;
+  const els=[...box.querySelectorAll('.od-chapter-hd,.note-sec-hd,.note-period-hd,[id^="md-anchor-"],h3')].filter(e=>e.offsetParent!==null);
+  const norm=s=>(s||'').replace(/\s+/g,'');
+  let cur=-1;
+  items.forEach((it,i)=>{
+    const nt=norm(it.textContent); if(!nt) return;
+    const core=stripChPrefix(it.textContent);
+    const hit=els.find(e=>{
+      const t=norm(e.textContent);
+      if(t===nt||t.startsWith(nt)||t.includes(nt)) return true;
+      /* 与跳转同一套兜底：笔记/速记里章节写成「一、xxx」，去章号后比主体 */
+      if(core.length>=4){ const c=stripChPrefix(t); return c===core || (c.length>=4&&(c.includes(core)||core.includes(c))) }
+      return false;
+    });
+    if(hit && hit.getBoundingClientRect().top<=140) cur=i;
+  });
+  items.forEach((it,i)=>it.classList.toggle('active', i===cur));
+}
+function chDirClose(){
+  const m=$('#chDirMask'); if(m) m.classList.remove('on');
+  const btn=$('#chDirBtn'); if(btn) btn.classList.remove('open');
+}
+(function(){
+  function init(){
+    const list=$('#chList');
+    if(list){
+      /* 点章节：先标记当前项（再打开面板能直接看到“我在哪章”），然后收起面板让用户看正文 */
+      list.addEventListener('click',function(e){
+        const it=e.target && e.target.closest ? e.target.closest('.ch-item') : null;
+        if(!it) return;
+        [...list.querySelectorAll('.ch-item')].forEach(x=>x.classList.toggle('active',x===it));
+        setTimeout(chDirClose,60);
+      });
+      /* chList 的 innerHTML 由 renderChapters 整体重建，用 MutationObserver 同步标识显隐，
+         这样章节练习/选课/切页等所有路径都不用手工挂钩子 */
+      if(window.MutationObserver) new MutationObserver(chDirSync).observe(list,{childList:true});
+    }
+    chDirSync();
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
+  else setTimeout(init,0);
+})();
 window.addEventListener('scroll',()=>rdSync(),{passive:true});
 window.addEventListener('resize',()=>{
   if(curTab==='mindmap'&&isNarrowScreen()) switchTab('notes');
   rdKey=''; rdSync(true);
 },{passive:true});
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){ const m=$('#rdMask'); if(m&&m.classList.contains('on')){ rdClose(); e.preventDefault() } }
+  if(e.key==='Escape'){
+    const m=$('#rdMask');
+    if(m&&m.classList.contains('on')){ rdClose(); e.preventDefault(); return }
+    const cm=$('#chDirMask');
+    if(cm&&cm.classList.contains('on')){ chDirClose(); e.preventDefault() }
+  }
 });
 function restoreReadMark(){
   if(!curCourse||!RM_TABS.includes(curTab)) return;
