@@ -81,6 +81,23 @@ a{color:var(--primary); text-decoration:none}
 /* 通用组件 */
 .card{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:18px 20px; box-shadow:var(--shadow); margin-bottom:16px}
 .card h3{font-size:15px; margin-bottom:12px; display:flex; align-items:center; gap:8px}
+/* 复盘页左右两张卡（每日反思 / 费曼复述）：右卡内容天生比左卡少，按钮会浮在半空。
+   做法：卡片改纵向 flex，输入区 .rv-form 吃掉剩余高度，右卡的「我的复述」文本框 stretched 到填满，
+   于是两卡按钮落在同一水平线上；h3 统一压成两行高，标题换行行数不同也不会把按钮顶歪。 */
+.rv-card{display:flex; flex-direction:column}
+.rv-card>h3{min-height:46px}
+/* 卡名不让折行（窄屏时「每日反思」会被断成「每日反 / 思」），空间不够时先折副标题 */
+.rv-card>h3 .rv-t{flex:0 0 auto; white-space:nowrap}
+.rv-form{display:flex; flex-direction:column; flex:1 1 auto; min-height:0}
+.rv-form textarea.grow{flex:1 1 auto; resize:vertical}
+/* 卡片头右侧「长图 / PDF」不跟着被挤成两行 */
+.rv-card>h3 .exp-bar{flex:0 0 auto; flex-wrap:nowrap}
+@media (max-width:768px){
+  /* 手机端一行放不下「卡名 + 说明 + 两个导出键」：卡名与导出键占第一行，说明整行落到下面 */
+  .rv-card>h3{flex-wrap:wrap; min-height:0; row-gap:4px}
+  .rv-card>h3 .muted{order:3; flex:1 1 100%; font-size:12px}
+  .rv-card>h3 .exp-bar{order:2; margin-left:auto}
+}
 .grid{display:grid; gap:14px}
 .g4{grid-template-columns:repeat(4,1fr)}
 /* 首页 KPI 行：已通过/已获学分 + 打卡三合一 + 本周/近30天，共 4 张 */
@@ -353,7 +370,10 @@ html.dark .acc-r{color:#ff7b72}
   color:var(--text2); cursor:pointer; font-family:inherit; white-space:nowrap}
 .dt-rg button.on{background:var(--card); color:var(--text); font-weight:600; box-shadow:0 1px 2px rgba(15,23,42,.08)}
 html.dark .dt-rg button.on{background:#2a2f36; box-shadow:none; color:#e8eaed}
-.dt-q{flex:1 1 150px; min-width:0; padding:6px 10px; border:1px solid var(--border); border-radius:8px;
+/* 搜索框：固定约十个汉字宽（10×12.5 + 左右内边距 20 + 边框 2 ≈ 147），靠右放，
+   与右侧「全部科目」之间留三个字（3×12.5 = 37.5px，减去 .dt-bar 已有的 8px gap ≈ 30px）。 */
+.dt-q{flex:0 0 auto; width:150px; margin-left:auto; margin-right:30px;
+  padding:6px 10px; border:1px solid var(--border); border-radius:8px;
   background:var(--bg); color:var(--text); font-size:12.5px; font-family:inherit}
 .dt-sel{flex:0 0 auto; max-width:170px; padding:6px 8px; border:1px solid var(--border); border-radius:8px;
   background:var(--bg); color:var(--text); font-size:12.5px; font-family:inherit}
@@ -390,8 +410,9 @@ table.dt-tb tbody tr:hover td{background:var(--bg)}
 table.dt-tb thead tr:hover th{background:var(--plight)}
 table.dt-tb tr.sum-row td{font-weight:600; color:var(--text); background:var(--bg)}
 /* 「明细 → 做题」表专用：科目走全称、单行不折行；其后各列一律居中。
-   宽度按内容定档——17 字科名 + 6 个窄列 = 780px 保底，900px 封顶；靠左对齐，不居中。 */
-table.dt-tbq{table-layout:fixed; width:100%; min-width:780px; max-width:900px}
+   表格宽度跟着内容走（width:auto + table-layout:auto）：科目列只占最长科名的实际宽度，
+   数字列由 colgroup 定死 px，剩余空间不会堆成科目后面那一大块空白；靠左对齐，不居中。 */
+table.dt-tbq{table-layout:auto; width:auto; max-width:100%}
 table.dt-tbq th:first-child{text-align:left}
 .dt-empty{padding:26px 6px; text-align:center; color:var(--text3); font-size:13px; line-height:1.8}
 .dt-act{font-size:12px; color:var(--primary); cursor:pointer; white-space:nowrap}
@@ -409,11 +430,11 @@ table.dt-tbq th:first-child{text-align:left}
   .ov-strip{display:grid; grid-template-columns:repeat(3,1fr); gap:13px 6px}
   .ov-strip .os-i{white-space:normal; display:flex; flex-direction:column; font-size:11.5px; color:var(--text3)}
   .ov-strip .os-i b{font-size:16px; margin:1px 0 0; color:var(--text)}
-  .dt-q{flex:1 1 100%}
+  .dt-q{flex:1 1 100%; width:auto; margin:0}
   .dt-sel{flex:1 1 auto; max-width:none}
   .dt-wrap{overflow-x:visible}
   table.dt-tb{min-width:0; display:block; table-layout:auto}
-  /* 做题表在 PC 有 720px 保底宽度，手机端要放回 0，否则整页横向溢出 */
+  /* 做题表现在只占内容宽度（PC 约 750px），手机端仍要放回 0，否则整页横向溢出 */
   table.dt-tbq{min-width:0}
   table.dt-tb thead{display:none}
   table.dt-tb tbody{display:block}
@@ -2815,30 +2836,34 @@ html.dark .kr{color:#fb923c}
   <!-- ================= 页三 · 复盘 ================= -->
   <div class="my-pane" id="myPane-rv">
   <div class="grid g2">
-    <div class="card">
-      <h3>📝 每日反思 <span class="muted" style="font-weight:400">记下学了什么、哪里没懂，AI 会追问检验你是不是真懂</span>
+    <div class="card rv-card">
+      <h3><span class="rv-t">📝 每日反思</span> <span class="muted" style="font-weight:400">记下学了什么、哪里没懂，AI 会追问检验你是不是真懂</span>
         <span class="exp-bar" style="margin-left:auto">
           <button class="btn btn-s" onclick="expPanel('rf','img')" title="把下面的反思列表导出为 PNG 长图">🖼 长图</button>
           <button class="btn btn-s" onclick="expPanel('rf','print')" title="用浏览器打印，可另存为 PDF">🖨 PDF</button>
         </span></h3>
+      <div class="rv-form">
       <div style="margin-bottom:8px"><input id="rfDate" type="date" style="padding:6px 8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text)"></div>
       <div class="mm-lab">今天学了什么</div>
-      <textarea id="rfLearned" class="ans-input" style="min-height:56px" placeholder="如：看完近代史第三章，做了 20 道选择题"></textarea>
+      <textarea id="rfLearned" class="ans-input" style="min-height:112px" placeholder="如：看完近代史第三章，做了 20 道选择题"></textarea>
       <div class="mm-lab">哪里没懂</div>
-      <textarea id="rfStuck" class="ans-input" style="min-height:56px" placeholder="如：分不清天京事变和北伐失败，哪个才是转折点"></textarea>
+      <textarea id="rfStuck" class="ans-input" style="min-height:112px" placeholder="如：分不清天京事变和北伐失败，哪个才是转折点"></textarea>
+      </div>
       <div style="margin-top:10px"><button class="btn btn-p" onclick="addReflection()">保存今日反思</button></div>
       <div id="rfList" style="margin-top:12px"></div>
     </div>
-    <div class="card">
-      <h3>🗣 费曼复述 <span class="muted" style="font-weight:400">用自己的话讲一遍，AI 帮你找漏洞</span>
+    <div class="card rv-card">
+      <h3><span class="rv-t">🗣 费曼复述</span> <span class="muted" style="font-weight:400">用自己的话讲一遍，AI 帮你找漏洞</span>
         <span class="exp-bar" style="margin-left:auto">
           <button class="btn btn-s" onclick="expPanel('fm','img')" title="把复述记录导出为 PNG 长图">🖼 长图</button>
           <button class="btn btn-s" onclick="expPanel('fm','print')" title="用浏览器打印，可另存为 PDF">🖨 PDF</button>
         </span></h3>
+      <div class="rv-form">
       <div class="mm-lab">知识点</div>
       <input id="fmTopic" placeholder="如：辛亥革命失败的原因" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text)">
       <div class="mm-lab">我的复述（像讲给完全不懂的人听）</div>
-      <textarea id="fmText" class="ans-input" style="min-height:80px" placeholder="用自己的话把这个知识点讲一遍…"></textarea>
+      <textarea id="fmText" class="ans-input grow" style="min-height:112px" placeholder="用自己的话把这个知识点讲一遍…"></textarea>
+      </div>
       <div style="margin-top:10px"><button class="btn btn-p" onclick="addFeynman()">保存这次复述</button></div>
       <div id="fmList" style="margin-top:12px"></div>
     </div>
@@ -3195,6 +3220,18 @@ const CAL_P=periodAt();                 // 当前/下一场考期
 const EXAM_KEY=CAL_P.key;               // 报考计划按考期存档
 const EXAM_DATE=CAL_P.examStart+'T09:00:00';
 const CAL_NODES=periodNodes(CAL_P);
+/* 倒计时目标：笔试最后一天过完 → 自动切到本期实践课考核（只有组考校公布了现场安排才有）；
+   实践课结束 → 落到下一期笔试。返回 {at,kind,p,pe,label}，首页大数字/顶栏/说明行共用一份口径。 */
+function cdTargetAt(when){
+  const t=isoD(when||new Date()), list=calPeriods();
+  for(let i=0;i<list.length;i++){
+    const p=list[i];
+    if(p.examEnd>=t) return {at:new Date(p.examStart+'T09:00:00'), kind:'exam', p:p, label:'距 '+p.name+' 笔试'};
+    const pe=pracExamOf(p);
+    if(pe && pe.start && pe.end>=t) return {at:new Date(pe.start+'T09:00:00'), kind:'prac', p:p, pe:pe, label:'距 '+p.name+' 实践课考核'};
+  }
+  return {at:new Date(EXAM_DATE), kind:'exam', p:CAL_P, label:'距 '+CAL_P.name+' 笔试'};
+}
 /* 当前考期的「月份」简称，用于文案（如「10 月计划」），换考期自动跟着变 */
 function curPeriodShort(){ const m=+(String(EXAM_KEY||'').slice(5))||0; return m?(m+' 月'):(CAL_P.name||'本期'); }
 /* 报考计划：本考期有数据就用本考期，没有则沿用上一个有记录的考期（换考期不丢选课） */
@@ -3958,34 +3995,39 @@ function renderSchedNow(){
 let _heroCalDay='';
 function tick(){
   if(document.hidden) return;             // 后台标签页不跑，省电
-  const now=new Date(), end=new Date(EXAM_DATE);
+  const now=new Date(), tg=cdTargetAt(now), end=tg.at;
   let diff=Math.max(0,end-now);
   const d=Math.floor(diff/86400000), h=Math.floor(diff%86400000/3600000), m=Math.floor(diff%3600000/60000), s=Math.floor(diff%60000/1000);
   const cdEl=$('#cdDays'); if(cdEl) cdEl.textContent=d;
-  const lab=$('#cdLabel'); if(lab) lab.textContent='距 '+CAL_P.name+' 笔试';
+  const lab=$('#cdLabel'); if(lab) lab.textContent=tg.label;
   // 顶栏倒计时：文本没变就不写 DOM（每秒重写同一内容会白触发样式计算）
-  const nav=$('#navCd'), navTxt='⏳ 距'+CAL_P.name+'考试 '+d+' 天';
+  const nav=$('#navCd'), navTxt='⏳ 距'+tg.p.name+(tg.kind==='prac'?'实践课考核':'考试')+' '+d+' 天';
   if(nav && nav.textContent!==navTxt) nav.textContent=navTxt;
   const det=$('#cdDetail');
-  if(det) det.textContent='下次考试：'+cnRange(CAL_P.examStart,CAL_P.examEnd)+' · 倒计时 '+d+'天'+h+'时'+m+'分'+s+'秒';
+  if(det) det.textContent = tg.kind==='prac'
+    ? '下次考试：'+cnRange(tg.pe.start,tg.pe.end)+' 实践课考核 · 倒计时 '+d+'天'+h+'时'+m+'分'+s+'秒'
+    : '下次考试：'+cnRange(tg.p.examStart,tg.p.examEnd)+' · 倒计时 '+d+'天'+h+'时'+m+'分'+s+'秒';
   const chk=$('#calCheck');
   if(chk) chk.textContent=CAL.checkedAt?('数据核查 '+CAL.checkedAt):'';
-  const regS=new Date(CAL_P.regStart+'T00:00:00'), regE=new Date(CAL_P.regEnd+'T23:59:59');
+  /* 信息行跟着倒计时目标同一个考期走：笔试考完切到实践课后，CAL_P 已经翻到下一期，
+     若还读 CAL_P，就会出现「大数字倒计时 11 月实践课、下面小字写着次年 3 月报考」的自相矛盾。 */
+  const HP = tg.kind==='prac' ? tg.p : CAL_P;
+  const regS=new Date(HP.regStart+'T00:00:00'), regE=new Date(HP.regEnd+'T23:59:59');
   const regTxt=$('#regTip');
   if(regTxt) regTxt.textContent = now<regS
-    ? '⚠ '+CAL_P.name+'笔试报考：'+cnRange(CAL_P.regStart,CAL_P.regEnd)+'，新生注册'+cnRange(CAL_P.freshRegStart,CAL_P.freshRegEnd)+'，别错过！'
-    : now<=regE ? '🔔 笔试报考进行中：截至 '+cnDate(CAL_P.regEnd)+'，别忘了缴费'
-    : '成绩发布：'+cnDate(CAL_P.scoreDate)+' · 毕业申报：'+cnRange(CAL_P.gradStart,CAL_P.gradEnd);
-  const pracS=new Date(CAL_P.pracRegStart+'T09:00:00'), pracE=new Date(CAL_P.pracRegEnd+'T17:00:00');
+    ? '⚠ '+HP.name+'笔试报考：'+cnRange(HP.regStart,HP.regEnd)+'，新生注册'+cnRange(HP.freshRegStart,HP.freshRegEnd)+'，别错过！'
+    : now<=regE ? '🔔 笔试报考进行中：截至 '+cnDate(HP.regEnd)+'，别忘了缴费'
+    : '成绩发布：'+cnDate(HP.scoreDate)+' · 毕业申报：'+cnRange(HP.gradStart,HP.gradEnd);
+  const pracS=new Date(HP.pracRegStart+'T09:00:00'), pracE=new Date(HP.pracRegEnd+'T17:00:00');
   const pracTxt=$('#practiceTip');
   if(pracTxt){
-    const _pe=pracExamOf(CAL_P);
+    const _pe=pracExamOf(HP);
     pracTxt.textContent = now<pracS
-      ? '📋 实践课报考：'+cnRange(CAL_P.pracRegStart,CAL_P.pracRegEnd)
-      : now<pracE ? '🔔 实践课报考进行中：截至 '+cnDate(CAL_P.pracRegEnd)
+      ? '📋 实践课报考：'+cnRange(HP.pracRegStart,HP.pracRegEnd)
+      : now<pracE ? '🔔 实践课报考进行中：截至 '+cnDate(HP.pracRegEnd)
       : _pe
         ? '📋 实践课考核：'+cnDate(_pe.start)+'—'+cnDate(_pe.end)+' 现场（'+_pe.school+'）· 准考证 '+cnDate(_pe.ticketFrom)+' 起打印'
-        : '📋 实践课考核安排由各主考院校公布 · 成绩 '+cnDate(CAL_P.scoreDate)+' 发布';
+        : '📋 实践课考核安排由各主考院校公布 · 成绩 '+cnDate(HP.scoreDate)+' 发布';
   }
   // 黄历 / 农历整块重建每天只会变一次，原来每秒重建一次，是无谓的主要开销
   const dk=today();
@@ -5905,8 +5947,8 @@ function dtQuizView(cr){
   cr.innerHTML=dtCrumbHtml([{t:'累计做题与错题（不受时间范围限制）'}]);
   if(!codes.length) return '<div class="dt-empty">还没有做题记录，去「题库 → 章节练习」开练吧。</div>';
   /* 科目列走全称，需要单行放得下「习近平新时代中国特色社会主义思想概论」这类 17 字科名；
-     数字列只要够放三位数与百分号，宽度用 px 定死，剩余全给科目列，避免科目折行。
-     表格不铺满容器：撑满时科目列会被拉成 600px+ 的空旷列，反而更难读。 */
+     数字列只要够放三位数与百分号，宽度用 px 定死。科目列不定宽，交给 auto 布局按最长科名收窄，
+     多出来的空间不会被堆到科目和「已答」之间变成一大块空白（只剩两个汉字的呼吸位）。 */
   return '<div class="dt-wrap"><table class="dt-tb dt-tbq">'
     +'<colgroup><col><col style="width:62px"><col style="width:62px"><col style="width:74px"><col style="width:58px"><col style="width:120px"><col style="width:120px"></colgroup>'
     +'<thead><tr><th>科目</th><th>已答</th><th>对题</th><th>正确率</th><th>错题</th><th>状态</th><th>建议</th></tr></thead><tbody>'
